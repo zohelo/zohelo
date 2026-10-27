@@ -26,8 +26,7 @@ all of them (owner's choice, 27 October 2026).
 | `STORAGE_LAKEHOUSE_BUCKET_NAME` | `zohelo-lakehouse-prod` | zohelo-data, zohelo-bi |
 | `STORAGE_LAKEHOUSE_CATALOG_URL` | Iceberg REST URL of the catalog | zohelo-data |
 | `STORAGE_LAKEHOUSE_CATALOG_NAME` | catalog warehouse name `<account>_zohelo-lakehouse-prod` | zohelo-data |
-| `ORG_BOT_APP_ID` | numeric ID of the GitHub App zohelo-automation | scheduler Worker, workflows (fallback) |
-| `ORG_BOT_CLIENT_ID` (to add) | Client ID of the same app (app settings page) | workflows (preferred by the app-token action) |
+| `ORG_BOT_CLIENT_ID` | Client ID of the GitHub App zohelo-automation (app settings page) | workflows (app-token action), scheduler Worker |
 
 ## Secrets
 

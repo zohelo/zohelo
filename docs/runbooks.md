@@ -16,7 +16,7 @@ Each deploy checks itself: the site answers, the API answers, sign-in is enforce
 1. Create the replacement where the register says it comes from ([credentials.md](credentials.md)), same name, same permissions, one-year expiry.
 2. Paste it into the organisation secret of the same name (Edit; the old value is replaced).
 3. Run **Check credentials** in zohelo-bi.
-4. For `ORG_BOT_PRIVATE_KEY` or `ORG_BOT_APP_ID`: also run Ops `scheduler_trigger deploy` so the Worker gets it.
+4. For `ORG_BOT_PRIVATE_KEY` or `ORG_BOT_CLIENT_ID`: also run Ops `scheduler_trigger deploy` so the Worker gets it.
 5. For `PORTAL_SIGNIN_ALLOWED_EMAILS`: redeploy data and bi (manual run of their deploy workflows on `main`) so Access picks it up.
 6. Delete the old token in Cloudflare.
 
