@@ -1,0 +1,274 @@
+key: com/site/site-v1
+area: com/site
+title: Multi-route site with pre-rendering, PL/EN, SEO
+phase: 1
+priority: P1
+target: 2026-12-12
+why: 'zohelo.com is one scrolling page rendered only in the browser: search engines see an empty <div id="root">,
+  there is one URL, one language (English) and nothing to link to. Return visits and search traffic need real pages,
+  each with its own address, title and Polish version.'
+outcome: The site has routes pre-rendered to static HTML, Polish at / and English at /en/, per-page meta, a sitemap,
+  and the shared header and footer, so every later page (indicators, regions, data) only adds a route.
+in_scope:
+- React Router v7 framework mode with ssr false and pre-rendering
+- One site.config.ts holding site names, descriptions and the route list
+- PL/EN routing and a dictionary for shell texts
+- Meta tags, canonical, hreflang, sitemap.xml, robots.txt, 404 page
+- Shared AppHeader/AppFooter from @zohelo/design
+out_of_scope:
+- Content of the indicator, region, data, sources, about pages (their Epics)
+- Translating the current home sections (they are replaced in com/site/real-content and later)
+- OG image generation (todo below; needs data)
+done_when:
+- build/client contains pre-rendered HTML for / and /en/ with real text (not an empty root div)
+- Every route has a unique title and description in its language, canonical and hreflang links
+- https://zohelo.com/sitemap.xml lists every pre-rendered route; robots.txt references it
+decisions:
+- 'architect 27 Oct: React Router v7 framework mode, ssr: false, prerender from site.config routes (design package
+  §2.5 allowed Vite SSG or Astro; staying on React + Vite keeps the existing components and the design package usable
+  without a rewrite).'
+- 'architect 27 Oct: Polish is the default at /, English under /en/ (plan assumption 7)'
+- 'architect 27 Oct: build output moves from dist/ to build/client/; deploy.yml changes accordingly'
+deliverables:
+- key: com/site/site-v1/router
+  title: Routes pre-rendered to static HTML
+  done_when:
+  - bun run build pre-renders / with the current home content; deploy serves build/client
+  tasks:
+  - key: com/site/site-v1/router/framework
+    type: Task
+    title: Move the site to React Router framework mode with pre-rendering
+    effort: L
+    state: open
+    contract: true
+    context: index.html loads src/main.tsx (fonts + src/App.tsx). vite.config.ts uses @vitejs/plugin-react and @tailwindcss/vite;
+      output is dist/. Browser APIs run only in handlers/effects, so Node pre-rendering works.
+    files:
+    - create: react-router.config.ts
+    - create: src/root.tsx
+    - create: src/routes.ts
+    - create: src/routes/home.tsx
+    - delete: index.html
+    - delete: src/main.tsx
+    - edit: vite.config.ts
+    - edit: package.json
+    - edit: tsconfig.json
+    - edit: .gitignore
+    - edit: .github/workflows/deploy.yml
+    steps:
+    - bun add --exact react-router@7 && bun add --dev --exact @react-router/dev@7 (same version).
+    - 'react-router.config.ts: export default { appDirectory: ''src'', ssr: false, prerender: [''/''] } satisfies
+      Config.'
+    - 'src/root.tsx: Layout (html lang=''pl''; head: charset, viewport, <Meta/>, <Links/>; body with index.html''s
+      body classes, children, <ScrollRestoration/>, <Scripts/>), default App = <Outlet/>, ErrorBoundary. Move main.tsx''s
+      font/CSS imports here.'
+    - 'src/routes.ts: export default [index(''routes/home.tsx'')] satisfies RouteConfig. home.tsx renders the existing
+      App (import App from ''../App''); meta() returns index.html''s title and description.'
+    - 'vite.config.ts: plugins [tailwindcss(), reactRouter()] from ''@react-router/dev/vite''; remove @vitejs/plugin-react.'
+    - 'package.json scripts: dev ''react-router dev --port 3000 --host 0.0.0.0''; build = existing prefix kept (e.g.
+      ''bun run --cwd packages/design build && '') + ''react-router build''; lint = existing prefix kept + ''react-router
+      typegen && tsc --noEmit''.'
+    - 'tsconfig.json include [''src'', ''.react-router/types/**/*'', ''react-router.config.ts'', ''vite.config.ts''],
+      rootDirs [''.'', ''./.react-router/types''], types [''vite/client'']. .gitignore: .react-router/ and build/.'
+    - 'deploy.yml: deploy build/client instead of dist; smoke greps ''Research'' instead of ''id="root"''.'
+    acceptance:
+    - build/client/index.html contains the header nav text and the hero text (pre-rendered)
+    - The page hydrates without console errors in the preview; modals and ⌘K still work
+    verify:
+    - run: bun install && bun run lint && bun run build && grep -c "Research" build/client/index.html
+      expect: 1 or more
+    - workflow: Deploy zohelo.com, manual run on the branch
+      expect: preview 200, smoke green
+    out_of_scope:
+    - New routes, translations, header redesign
+    notes:
+    - 'Browser APIs during render go into useEffect; never set ssr: true.'
+    - 'F37: never drop an existing script prefix (the design package build).'
+  - key: com/site/site-v1/router/config
+    type: Task
+    title: Add site.config.ts and a 404 page; pre-render from the config
+    effort: S
+    state: open
+    depends_on:
+    - com/site/site-v1/router/framework
+    context: One file must hold site-wide names and the list of pre-rendered paths so that routes, prerender and
+      the sitemap never disagree.
+    files:
+    - create: src/site.config.ts
+    - create: src/routes/not-found.tsx
+    - edit: src/routes.ts
+    - edit: react-router.config.ts
+    steps:
+    - 'src/site.config.ts: export const site = { name: ''zohelo'', url: ''https://zohelo.com'', description: { pl:
+      ''…'', en: ''…'' } } and export const pages = [{ path: ''/'', title: {pl, en}, description: {pl, en} }]. Descriptions:
+      pl ''Dane publiczne o Polsce i świecie — wskaźniki, regiony i źródła, aktualizowane automatycznie.''; en ''Public
+      data on Poland and the world — indicators, regions and sources, updated automatically.'''
+    - 'react-router.config.ts: prerender() returns pages.map(p => p.path).'
+    - 'routes.ts: add route(''*'', ''routes/not-found.tsx''); not-found renders a short message with a link home
+      (PL text, EN under /en).'
+    acceptance:
+    - Adding a page to pages[] is the only step needed to pre-render it
+    verify:
+    - run: bun run build && ls build/client/index.html build/client/__spa-fallback.html
+      expect: both exist
+    out_of_scope:
+    - Sitemap (Task seo/sitemap)
+- key: com/site/site-v1/i18n
+  title: Polish and English routes
+  depends_on:
+  - com/site/site-v1/router
+  done_when:
+  - / serves Polish shell texts, /en/ English; html lang matches; a toggle switches to the same page in the other
+    language
+  tasks:
+  - key: com/site/site-v1/i18n/routing
+    type: Task
+    title: Add PL/EN routing and a dictionary for shell texts
+    effort: M
+    state: open
+    context: Polish is the default language at /, English lives under /en/. Only shell texts (nav, footer, buttons,
+      page titles) go through the dictionary now; section bodies stay as they are until their content Epics replace
+      them.
+    files:
+    - create: src/i18n/pl.ts
+    - create: src/i18n/en.ts
+    - create: src/i18n/index.ts
+    - edit: src/routes.ts
+    - edit: src/root.tsx
+    - edit: src/site.config.ts
+    - edit: src/components/Header.tsx
+    - edit: src/components/Footer.tsx
+    steps:
+    - 'pl.ts exports const pl = { nav: {…}, footer: {…}, common: {…} } as const; en.ts exports en with the same
+      keys (type Dict = typeof pl; en: Dict).'
+    - 'i18n/index.ts: useLocale() returns ''en'' when the pathname starts with /en, else ''pl''; useT() returns
+      the dictionary; localizedPath(path, locale) prefixes /en.'
+    - 'routes.ts: define the page routes once and register them twice: as-is and under prefix(''en'', …) with ids
+      suffixed ''-en''.'
+    - 'site.config.ts pages: each path is pre-rendered in both languages (prerender maps to [path, ''/en'' + path]).'
+    - 'root.tsx Layout: <html lang={locale}>.'
+    - Header and Footer read labels from useT(); add a PL | EN toggle linking to localizedPath(currentPath, other).
+    acceptance:
+    - build/client/index.html has lang="pl" and Polish nav labels; build/client/en/index.html has lang="en"
+    - No user-visible shell string is hard-coded in Header or Footer
+    verify:
+    - run: bun run build && grep -c 'lang="pl"' build/client/index.html && grep -c 'lang="en"' build/client/en/index.html
+      expect: 1 and 1
+    out_of_scope:
+    - Translating section bodies and data files
+    depends_on:
+    - com/site/site-v1/router/framework
+    - com/site/site-v1/router/config
+- key: com/site/site-v1/shell
+  title: Shared header and footer
+  depends_on:
+  - com/site/site-v1/i18n
+  done_when:
+  - The site uses AppHeader/AppFooter from @zohelo/design; old Header/Footer components deleted
+  tasks:
+  - key: com/site/site-v1/shell/adopt
+    type: Task
+    title: Replace Header and Footer with the design-system shell
+    effort: M
+    state: open
+    depends_on:
+    - com/design/design-v1/components/shell
+    - com/site/site-v1/router/framework
+    - com/site/site-v1/i18n/routing
+    context: src/components/Header.tsx scrolls to home sections (targets pulse, metrics, chronicles, compass, products,
+      vault, consulting) and opens the ⌘K palette; Footer.tsx has brand, nav and legal columns. Both move onto AppHeader/AppFooter.
+    files:
+    - edit: src/root.tsx
+    - edit: src/App.tsx
+    - delete: src/components/Header.tsx
+    - delete: src/components/Footer.tsx
+    - create: public/favicon.svg
+    steps:
+    - root.tsx Layout renders <AppHeader product='com' nav={…} actions={language toggle + search button}/> above
+      <Outlet/> and <AppFooter/> below, labels from useT().
+    - 'Nav items: one link per entry of site.config pages except ''/'', then, while the home page still has its
+      sections, anchors /#metrics (Metrics), /#compass (Regions), /#chronicles (Research), /#vault (Data); labels
+      from useT().'
+    - The search button dispatches the same open event the old Header used for CommandPalette (lift the state into
+      root.tsx or a small context).
+    - 'Footer legal line: ''Copyright © 2026 Radosław Utkała. All rights reserved.'''
+    - Remove Header/Footer imports and props from App.tsx; delete the two files.
+    - 'Copy packages/design/assets/favicon.svg to public/favicon.svg and add links: [{ rel: ''icon'', href: ''/favicon.svg'',
+      type: ''image/svg+xml'' }] to root.tsx''s links export.'
+    acceptance:
+    - Header shows the product switcher; ⌘K still opens the palette; footer has no EaC/GCP text
+    verify:
+    - run: bun run lint && bun run build
+      expect: exit 0
+    - workflow: Deploy zohelo.com, manual run on the branch
+      expect: preview 200
+    out_of_scope:
+    - Section content
+- key: com/site/site-v1/seo
+  title: Meta, sitemap and robots
+  depends_on:
+  - com/site/site-v1/i18n
+  done_when:
+  - Every pre-rendered page has title, description, canonical, hreflang pl/en/x-default, og:title/description/url
+  - sitemap.xml and robots.txt are generated at build
+  tasks:
+  - key: com/site/site-v1/seo/meta
+    type: Task
+    title: Generate per-page meta, canonical and hreflang
+    effort: S
+    state: open
+    context: Each route exports meta(). A helper builds the full tag set from site.config so pages only supply their
+      title and description.
+    files:
+    - create: src/seo.ts
+    - edit: src/routes/home.tsx
+    - edit: src/routes/not-found.tsx
+    steps:
+    - 'src/seo.ts: pageMeta({ path, locale, title, description }) returns MetaDescriptor[]: title ''<title> · zohelo'',
+      description, link canonical https://zohelo.com + localizedPath, link alternate hreflang pl / en / x-default
+      (→ pl), og:title, og:description, og:url, og:type website, og:locale pl_PL|en_GB, twitter:card summary.'
+    - home.tsx meta uses pageMeta with the page entry from site.config; not-found adds robots noindex.
+    - 'Home only: JSON-LD WebSite (name, url, inLanguage) via a <script type=''application/ld+json''> in the route
+      component.'
+    acceptance:
+    - build/client/index.html and build/client/en/index.html each contain one canonical and three alternate links
+    verify:
+    - run: bun run build && grep -o 'hreflang="[a-z-]*"' build/client/index.html | sort | uniq | wc -l
+      expect: '3'
+    out_of_scope:
+    - Dataset JSON-LD (indicator pages)
+    depends_on:
+    - com/site/site-v1/router/config
+    - com/site/site-v1/i18n/routing
+    - com/site/site-v1/router/framework
+  - key: com/site/site-v1/seo/sitemap
+    type: Task
+    title: Write sitemap.xml and robots.txt at build
+    effort: S
+    state: open
+    depends_on:
+    - com/site/site-v1/seo/meta
+    context: The page list lives in src/site.config.ts; the sitemap must list exactly the pre-rendered paths.
+    files:
+    - create: scripts/sitemap.ts
+    - edit: package.json
+    steps:
+    - 'scripts/sitemap.ts imports pages and site from src/site.config.ts, writes build/client/sitemap.xml (one <url>
+      per path and language, with xhtml:link alternates) and build/client/robots.txt (''User-agent: *'', ''Allow:
+      /'', ''Sitemap: https://zohelo.com/sitemap.xml'').'
+    - 'package.json build: append '' && bun scripts/sitemap.ts''.'
+    acceptance:
+    - Sitemap URL count = 2 × pages.length; XML is well-formed
+    verify:
+    - run: bun run build && xmllint --noout build/client/sitemap.xml && grep -c "<url>" build/client/sitemap.xml
+      expect: well-formed; count = 2 × pages
+    out_of_scope:
+    - Submitting to search consoles (owner, later)
+- key: com/site/site-v1/og
+  title: Sharing cards
+  depends_on:
+  - com/site/site-v1/seo
+  done_when:
+  - Each indicator and region page has an og:image with value, source and date
+  todo:
+  - Generate OG images at build with satori + resvg for indicator and region pages (needs data/published/published-v1).

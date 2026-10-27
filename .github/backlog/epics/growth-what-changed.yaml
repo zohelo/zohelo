@@ -1,0 +1,49 @@
+key: com/growth/what-changed
+area: com/growth
+title: What-changed feed and RSS
+phase: 1
+priority: P1
+target: 2027-01-16
+why: A site that looks the same every day gives no reason to return. The pipeline already knows when each dataset
+  was refreshed; turning that into a daily "what changed" list gives fresh content every day with no editorial work.
+outcome: zohelo.com shows "what changed" (latest dataset updates and the KPIs they moved) on the home page and at
+  /changes, rebuilt after each pipeline publish, with an RSS feed.
+in_scope:
+- Reading feed/changes.json from the published layer at build
+- Home block, /changes page (PL/EN), /rss.xml and /en/rss.xml
+- Rebuild trigger after each publish
+out_of_scope:
+- E-mail delivery (newsletter Epic, Phase 2)
+- Hand-written commentary
+done_when:
+- /changes lists the entries of the latest published feed/changes.json with dates and links to indicator pages
+- rss.xml validates as RSS 2.0 and updates after each publish
+depends_on:
+- data/published/published-v1
+- com/site/site-v1
+deliverables:
+- key: com/growth/what-changed/build-data
+  title: Build-time fetch of the published layer
+  done_when:
+  - The deploy workflow downloads 06_published/v1 files needed by the site with the lakehouse read key before building
+  todo:
+  - Add scripts/fetch-published.ts (S3 GetObject with STORAGE_LAKEHOUSE_READ_ACCESS_KEY/SECRET_KEY, endpoint STORAGE_ENDPOINT_URL,
+    bucket STORAGE_LAKEHOUSE_BUCKET_NAME) writing to .published/; deploy.yml passes those env names; the build fails
+    if catalog.json is missing. Shared with the Indicators Epic — whichever starts first writes it.
+- key: com/growth/what-changed/page
+  title: Home block, /changes and RSS
+  depends_on:
+  - com/growth/what-changed/build-data
+  done_when:
+  - Home shows the 10 latest changes; /changes shows 30 days; rss.xml generated at build
+  todo:
+  - Route /changes reading .published/feed/changes.json; home block component; scripts/rss.ts writing build/client/rss.xml
+    and en/rss.xml.
+- key: com/growth/what-changed/trigger
+  title: Rebuild after each publish
+  repo: zohelo-data
+  done_when:
+  - After gold.publish succeeds, zohelo.com's deploy workflow runs on main
+  todo:
+  - 'zohelo-data publish step dispatches zohelo''s deploy.yml via the org bot token (actions: write on zohelo);
+    debounce to at most one rebuild per hour.'

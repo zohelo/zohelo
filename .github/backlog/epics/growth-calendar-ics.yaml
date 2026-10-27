@@ -1,0 +1,37 @@
+key: com/growth/calendar-ics
+area: com/growth
+title: Release calendar feed (.ics)
+phase: 1
+priority: P2
+target: 2027-01-23
+why: A calendar entry in the reader's own calendar is the strongest external trigger to return on release day (inflation,
+  unemployment, GDP flash). The platform will hold a release calendar table.
+outcome: zohelo.com offers a subscribable calendar (webcal) of upcoming releases from GUS, Eurostat and NBP, generated
+  from the published release calendar.
+in_scope:
+- /calendar.ics generated at build from feed/calendar.ics or the release_calendar extract
+- Subscribe link on home and indicator pages
+out_of_scope:
+- The /calendar page with filters (Phase 2 Epic com/growth/calendar-page)
+- Push notifications
+done_when:
+- https://zohelo.com/calendar.ics validates (RFC 5545) and contains next 60 days of releases
+depends_on:
+- data/published/published-v1
+- com/growth/what-changed
+deliverables:
+- key: com/growth/calendar-ics/feed
+  title: Calendar feed served
+  done_when:
+  - calendar.ics copied/generated into build/client at build; Content-Type text/calendar via public/_headers
+  todo:
+  - 'Copy .published/feed/calendar.ics to build/client/calendar.ics (or generate with a 40-line writer from release_calendar
+    rows); public/_headers sets Content-Type: text/calendar; charset=utf-8 for /calendar.ics.'
+- key: com/growth/calendar-ics/links
+  title: Subscribe links
+  depends_on:
+  - com/growth/calendar-ics/feed
+  done_when:
+  - webcal://zohelo.com/calendar.ics link on home and each indicator page, PL/EN labels
+  todo:
+  - Add a SubscribeCalendar link component; place it in the home what-changed block and the indicator page sidebar.

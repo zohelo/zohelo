@@ -1,0 +1,22 @@
+# Areas of the zohelo repository (zohelo.com and the shared design system), in display order.
+areas:
+  - key: com/site
+    title: Site & content
+    purpose: >-
+      The public website zohelo.com: its pages, routes, languages, and the words and numbers on
+      them. Every number shown is real and traceable to a KPI and a date.
+  - key: com/design
+    title: Design system
+    purpose: >-
+      One look for all zohelo products: colour and type tokens, logo, React components and the
+      chart style, released from this repo and used by zohelo-bi and the data portal.
+  - key: com/growth
+    title: Growth
+    purpose: >-
+      The reasons people come back: what-changed feed, chart of the day, release calendar,
+      newsletter, and the cookieless analytics that show whether it works.
+  - key: com/platform
+    title: Platform
+    purpose: >-
+      How the site is built, checked, deployed and secured: workflows, dependencies, repository
+      settings and the shared workflows used by all zohelo repos.

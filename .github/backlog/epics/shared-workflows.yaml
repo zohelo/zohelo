@@ -1,0 +1,85 @@
+key: com/platform/shared-workflows
+area: com/platform
+title: Shared workflow files kept identical by copy
+phase: 0
+priority: P2
+target: 2026-11-21
+why: The three repos need the same small automations (branch cleanup, security policy). Keeping them as small per-repo
+  files avoids an extra repo and cross-repo coupling; copies must stay identical so a fix in one repo is not lost
+  in the others.
+outcome: Each repo carries its own copy of the shared files (branch-cleanup.yml, SECURITY.md), byte-for-byte identical
+  across zohelo, zohelo-bi and zohelo-data.
+in_scope:
+- branch-cleanup.yml in each repo (this repo's copy here; the others in their repos' backlogs)
+- SECURITY.md per repo
+out_of_scope:
+- A separate platform repo or use of the org .github repo (owner decision 27 Oct 13:29)
+- 'Reusable cross-repo workflows: only if a duplicated workflow exceeds ~50 identical lines in all three repos;
+  it would then live in zohelo-data/.github/workflows (not planned)'
+done_when:
+- branch-cleanup.yml and SECURITY.md exist in zohelo, zohelo-bi and zohelo-data with identical content (same git
+  blob SHA)
+decisions:
+- 'owner 27 Oct 13:29: no zohelo-platform repo and no use of .github. Each repo keeps its own small workflows; identical
+  cross-repo files are kept identical by copy. A reusable workflow, if ever worth it, lives in zohelo-data/.github/workflows
+  and is called cross-repo.'
+deliverables:
+- key: com/platform/shared-workflows/branch-cleanup
+  title: Merged branches deleted automatically
+  done_when:
+  - branch-cleanup.yml on zohelo main; a merged PR's branch is deleted by the workflow
+  tasks:
+  - key: com/platform/shared-workflows/branch-cleanup/workflow
+    type: Task
+    title: Delete merged branches automatically
+    effort: S
+    state: done
+    contract: true
+    notes: []
+    context: Claude sessions cannot delete branches through the proxy, and merged branches piled up. A workflow
+      deletes a PR's head branch after merge with the repo's GITHUB_TOKEN.
+    files:
+    - create: .github/workflows/branch-cleanup.yml
+    steps:
+    - The file is already in PR 12; review that it matches the zohelo-bi and zohelo-data copies byte for byte and
+      merge (owner).
+    - After merge run Actions → Branch cleanup → Run workflow on main once; it deletes today's merged branches.
+    acceptance:
+    - The file's blob SHA equals the copies in zohelo-bi and zohelo-data
+    verify:
+    - run: for r in zohelo zohelo-bi zohelo-data; do gh api repos/zohelo/$r/contents/.github/workflows/branch-cleanup.yml
+        --jq .sha; done | sort -u | wc -l
+      expect: '1'
+    - workflow: Branch cleanup after the next merged PR
+      expect: the PR's branch no longer exists
+    out_of_scope:
+    - Branches of open PRs; main
+    done_by: https://github.com/zohelo/zohelo/pull/12
+- key: com/platform/shared-workflows/security-policy
+  title: Security policy per repo
+  done_when:
+  - SECURITY.md on zohelo main, identical to the zohelo-bi and zohelo-data copies
+  tasks:
+  - key: com/platform/shared-workflows/security-policy/file
+    type: Task
+    title: Add SECURITY.md
+    effort: S
+    state: open
+    context: GitHub shows SECURITY.md under a repo's Security tab. Each repo carries its own copy with identical,
+      repo-neutral text; private vulnerability reporting is the channel (no e-mail address published).
+    files:
+    - create: .github/SECURITY.md
+    steps:
+    - 'Create .github/SECURITY.md with exactly these sections: ''# Security policy''; ''## Supported versions''
+      — ''Only the main branch is supported. Everything this repository builds or deploys comes from main.''; ''##
+      Reporting a vulnerability'' — ''Use GitHub private vulnerability reporting: open the Security tab of this
+      repository → Report a vulnerability. Do not open a public issue.''; ''## Response'' — ''Reports are acknowledged
+      within 7 days.''; ''## Scope'' — ''This repository and anything it builds or deploys.'''
+    acceptance:
+    - .github/SECURITY.md exists; blob SHA equal across the three repos once all are merged
+    verify:
+    - run: for r in zohelo zohelo-bi zohelo-data; do gh api repos/zohelo/$r/contents/.github/SECURITY.md --jq .sha;
+        done | sort -u | wc -l
+      expect: 1 (once all three are merged)
+    out_of_scope:
+    - Enabling private vulnerability reporting (org security configuration already covers it)

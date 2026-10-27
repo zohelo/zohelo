@@ -1,0 +1,122 @@
+key: com/site/about
+area: com/site
+title: About & portfolio stub
+phase: 1
+priority: P3
+target: 2027-01-09
+why: The consulting section and the owner profile sit at the bottom of a long scroll. A clear /about page under
+  the owner's name (decision 5) and an honest /portfolio placeholder give visitors and recruiters a direct link.
+outcome: /about presents the owner, services and contact links; /portfolio says what is coming in Phase 2; the commercial
+  "Products" section becomes an honest roadmap of sub-products.
+in_scope:
+- /about and /portfolio routes (PL/EN) from src/content/consultantData.ts
+- ProductsSection rewritten as a sub-product roadmap with status
+out_of_scope:
+- Portfolio dashboards and case studies (Phase 2 Epic com/site/portfolio)
+done_when:
+- /about and /portfolio pre-rendered in PL and EN and linked from the header
+- ProductsSection shows sub-products with status Concept/Beta/Live and no commercial claims
+depends_on:
+- com/site/site-v1
+decisions:
+- 'owner 27 Oct no. 5: portfolio under the owner''s name'
+deliverables:
+- key: com/site/about/pages
+  title: /about and /portfolio
+  done_when:
+  - Both routes exist in both languages, in site.config pages and in the header nav
+  tasks:
+  - key: com/site/about/pages/about
+    type: Task
+    title: Add the /about page from the consulting section
+    effort: M
+    state: open
+    depends_on:
+    - com/site/site-v1/i18n/routing
+    - com/site/real-content/claims/contact
+    - com/site/site-v1/router/framework
+    - com/site/site-v1/router/config
+    context: HeroConsultingSection renders the owner profile, timeline and contact from src/content/consultantData.ts
+      (src/data before the rename Task). The page reuses that data; the home keeps a short teaser linking to /about.
+    files:
+    - create: src/routes/about.tsx
+    - edit: src/routes.ts
+    - edit: src/site.config.ts
+    - edit: src/components/HeroConsultingSection.tsx
+    - edit: src/i18n/pl.ts
+    - edit: src/i18n/en.ts
+    steps:
+    - about.tsx renders profile, experience timeline and contact links from consultantData; headings via useT();
+      meta via pageMeta (title PL 'O mnie', EN 'About').
+    - Register the route in both languages and add the pages entry in site.config.
+    - 'HeroConsultingSection on home: keep only name, one-line summary and a link ''More'' → /about (localized).'
+    acceptance:
+    - /about and /en/about pre-rendered; home teaser links there
+    verify:
+    - run: bun run build && ls build/client/about/index.html build/client/en/about/index.html
+      expect: both exist
+    out_of_scope:
+    - Rewriting the biography text (owner's content)
+  - key: com/site/about/pages/portfolio-stub
+    type: Task
+    title: Add a /portfolio placeholder page
+    effort: S
+    state: open
+    depends_on:
+    - com/site/site-v1/i18n/routing
+    - com/site/site-v1/router/framework
+    - com/site/site-v1/router/config
+    context: Phase 2 brings portfolio dashboards on demo enterprise data (sales, finance, HR, supply chain, CRM,
+      SME accounting). Until then the page states that plan in three sentences.
+    files:
+    - create: src/routes/portfolio.tsx
+    - edit: src/routes.ts
+    - edit: src/site.config.ts
+    steps:
+    - 'portfolio.tsx: heading ''Portfolio'', a Callout ''In preparation — planned for Q1 2027'' and a list of the
+      six dashboard themes; PL and EN via the dictionary.'
+    - Register the route in both languages and add the pages entry.
+    acceptance:
+    - /portfolio and /en/portfolio pre-rendered; no fake dashboard images
+    verify:
+    - run: bun run build && ls build/client/portfolio/index.html
+      expect: exists
+    out_of_scope:
+    - Any dashboard
+- key: com/site/about/products
+  title: Honest sub-product roadmap
+  done_when:
+  - ProductsSection lists Indicators, Regions, Brief & calendar, Data & API, Portfolio, Markets (rates) with status
+  tasks:
+  - key: com/site/about/products/roadmap
+    type: Task
+    title: Rewrite ProductsSection as the sub-product roadmap
+    effort: S
+    state: open
+    depends_on:
+    - com/site/real-content/claims/content-dir
+    context: src/content/productsData.ts lists four invented commercial suites (Voivodeship Monitor, Municipal Fiscal
+      Scanner, Housing Index…). The design package §2.4 defines the real sub-products and their phases.
+    files:
+    - edit: src/content/productsData.ts
+    - edit: src/components/ProductsSection.tsx
+    - edit: src/types.ts
+    steps:
+    - 'src/content/productsData.ts: six items {id, name, oneLine, status, href?}, all status ''concept'': indicators
+      ''Wskaźniki'' — ''Jedna strona na każdy wskaźnik: definicja, wartość, wykres, regiony, źródła.''; regions
+      ''Regiony'' — ''Profil każdego województwa, potem powiatu i gminy, z rankingami i mapami.''; brief ''Brief
+      i kalendarz'' — ''Wykres dnia, cotygodniowy przegląd i kalendarz publikacji GUS, Eurostatu i NBP.''; data
+      ''Dane i API'' — ''Pliki do pobrania, licencje i cytowania; później publiczne API.''; portfolio ''Portfolio''
+      (href /portfolio) — ''Studia przypadków: dashboardy na danych demonstracyjnych i publicznych.''; markets ''Rynki''
+      — ''Kursy walut i stopy NBP z otwartych danych.'''
+    - Update the ProductItem type; render a status pill per item; remove prices, CTAs and the IllustrativeBadge
+      from this section.
+    acceptance:
+    - No price, 'suite' or purchase wording remains in productsData.ts or ProductsSection.tsx
+    verify:
+    - run: grep -ciE "price|suite|buy|pln" src/content/productsData.ts
+      expect: '0'
+    - run: bun run lint && bun run build
+      expect: exit 0
+    out_of_scope:
+    - Changing statuses later (each sub-product Epic updates its own)

@@ -1,0 +1,43 @@
+key: com/site/portfolio
+area: com/site
+title: Analyst portfolio case studies
+phase: 2
+priority: P2
+target: 2027-03-12
+why: 'The owner''s analyst portfolio (decision 5: under his name) needs pages a client or recruiter can read in
+  two minutes: the business question, the data model, the dashboard, the result. The dashboards live in zohelo-bi''s
+  Portfolio space; zohelo.com tells the story.'
+outcome: /portfolio shows at least 3 case studies (e.g. sales, finance, HR) on demo enterprise data, each with problem,
+  model diagram, dashboard screenshots or embed, and skills shown, in PL and EN.
+in_scope:
+- /portfolio index and /portfolio/<slug> case-study pages
+- Attribution for vendor sample data (AdventureWorks, WideWorldImporters MIT; Odoo LGPL)
+out_of_scope:
+- Building the demo warehouse and dashboards (zohelo-data and zohelo-bi Phase 2 Epics)
+- Contoso or other non-redistributable raw data downloads
+done_when:
+- 3 case-study pages × 2 languages pre-rendered, each linking to its live zohelo-bi dashboard
+- Every case study names its dataset and licence
+depends_on:
+- com/site/about
+- bi/dashboards/portfolio
+decisions:
+- 'owner 27 Oct no. 5: under the owner''s name'
+- 'plan assumption 10: non-MIT vendor data used for dashboards only, never re-published'
+deliverables:
+- key: com/site/portfolio/template
+  title: Case-study page template
+  done_when:
+  - Route /portfolio/:slug renders Markdown from content/portfolio/<slug>.md with frontmatter (title, dataset, licence,
+    dashboard_url, skills)
+  todo:
+  - Markdown loader at build (remark), frontmatter schema validated with zod at build; index page lists cards.
+- key: com/site/portfolio/studies
+  title: First three case studies
+  depends_on:
+  - com/site/portfolio/template
+  done_when:
+  - Three Markdown case studies (PL and EN) published with screenshots under 200 kB each
+  todo:
+  - Write sales (AdventureWorks), supply chain (WideWorldImporters) and SME accounting (synthetic ledger) case studies
+    once their dashboards exist.

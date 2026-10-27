@@ -1,0 +1,317 @@
+key: com/platform/hardening
+area: com/platform
+title: Site repo hardening & scaffold removal
+phase: 0
+priority: P1
+target: 2026-11-07
+why: The repo had no pull-request check, a vulnerable deploy tool (wrangler 4.43), floating action versions, leftovers
+  from the Google AI Studio prototype, and a market ticker (Finnhub) whose licence does not allow public commercial
+  display.
+outcome: Nothing reaches main without a green check, dependencies are pinned and patched weekly, and the site carries
+  no prototype scaffolding or unlicensed data.
+in_scope:
+- wrangler upgrade, SHA-pinned actions, Dependabot (A-01, A-04, A-02 file part)
+- PR check workflow and ruleset (A-03)
+- AI Studio leftovers, package cleanup (A-09)
+- Finnhub removal (owner decision 27 Oct no. 3)
+- Copyright notice (owner decision 27 Oct no. 4)
+- SHA-pin rule in the check workflow (A-04)
+- Platform docs corrected to the running setup (D0.8)
+out_of_scope:
+- New pages or content (Phase 1)
+- Shared reusable workflows (Epic com/platform/shared-workflows)
+done_when:
+- Ruleset on main requires the check status
+- bun audit reports no high or critical advisory
+- No file or org secret references Finnhub
+- check fails on any action not pinned by a 40-character SHA
+- docs/ mention no retired component and every page has a 'Last verified' line
+decisions:
+- owner 27 Oct no. 3 (Finnhub removed)
+- owner 27 Oct no. 4 (no licence; all rights reserved)
+deliverables:
+- key: com/platform/hardening/supply-chain
+  title: Dependencies pinned and patched
+  done_when:
+  - wrangler is a pinned devDependency used from the lockfile
+  - All actions pinned by SHA with a version comment
+  - bun audit shows 0 high and 0 critical
+  tasks:
+  - key: com/platform/hardening/supply-chain/pin
+    type: Task
+    title: Pin wrangler and action SHAs; add Dependabot
+    effort: M
+    state: done
+    done_by: https://github.com/zohelo/zohelo/pull/4
+    contract: true
+    context: wrangler 4.43.0 was vulnerable (GHSA-36p8-mvp6-cv38) and actions floated on tags.
+    files:
+    - edit: package.json
+    - edit: .github/workflows/deploy.yml
+    - create: .github/dependabot.yml
+    steps:
+    - Shipped in PR 4.
+    acceptance:
+    - wrangler 4.150.0 exact in devDependencies; deploy uses bun run wrangler
+    verify:
+    - workflow: Deploy zohelo.com (manual run on a branch)
+      expect: preview deployed
+    out_of_scope:
+    - Major upgrades
+  - key: com/platform/hardening/supply-chain/dependabot-minor
+    type: Task
+    title: Group Dependabot minor and patch updates only
+    effort: S
+    state: done
+    contract: true
+    notes: []
+    context: Dependabot's first weekly group (PR 9, closed) mixed major upgrades (TypeScript 7, Vite 8, lucide 1.x)
+      into one PR. Majors must be done deliberately in their own Task.
+    files:
+    - edit: .github/dependabot.yml
+    steps:
+    - 'In the bun entry add ignore: dependency-name "*", update-types [version-update:semver-major].'
+    - 'In groups.dependencies add update-types: [minor, patch].'
+    - 'If PR 10 is still open: edit its body (gh api -X PATCH repos/zohelo/zohelo/pulls/10 -f body=...) so it starts
+      with ''Closes #<this issue>''; do not open a second PR.'
+    acceptance:
+    - dependabot.yml bun entry ignores semver-major and groups minor/patch
+    verify:
+    - run: python3 -c "import yaml;u=[x for x in yaml.safe_load(open('.github/dependabot.yml'))['updates'] if x['package-ecosystem']=='bun'][0];print(u['ignore'])"
+      expect: '[{''dependency-name'': ''*'', ''update-types'': [''version-update:semver-major'']}]'
+    out_of_scope:
+    - Security updates (org setting, unaffected)
+    done_by: https://github.com/zohelo/zohelo/pull/10
+  - key: com/platform/hardening/supply-chain/audit-fix
+    type: Task
+    title: Clear the remaining bun audit advisories
+    effort: S
+    state: open
+    depends_on:
+    - com/platform/hardening/supply-chain/dependabot-minor
+    context: 'After PR 4, bun audit on main reports 9 advisories (3 high): source-map-js 1.2.1 (via vite and @tailwindcss/vite),
+      undici 7.29.1 (via wrangler > miniflare) and vite 6.4.3. All have fixes inside the current major versions.
+      zohelo-bi solved undici with an override.'
+    files:
+    - edit: package.json
+    - edit: bun.lock
+    steps:
+    - 'Branch from main. Run: bun audit fix'
+    - 'Add to package.json top level: "overrides": { "undici": "7.30.1" } (same as zohelo-bi).'
+    - 'Run: bun install, then bun audit. If vite still shows <=6.4.3, run: bun update vite (stays on 6.x).'
+    - Run bun run lint and bun run build.
+    acceptance:
+    - bun audit prints 0 high and 0 critical
+    - vite major version is still 6 and typescript major still 5
+    verify:
+    - run: bun install --frozen-lockfile && bun audit
+      expect: no high or critical lines
+    - run: bun run lint && bun run build
+      expect: exit 0
+    out_of_scope:
+    - Major upgrades of vite, typescript, @vitejs/plugin-react
+- key: com/platform/hardening/pr-gate
+  title: Pull-request gate on main
+  done_when:
+  - check.yml runs on every PR and rejects unpinned actions
+  - Ruleset on main requires check
+  tasks:
+  - key: com/platform/hardening/pr-gate/check
+    type: Task
+    title: Add a pull-request check workflow
+    effort: S
+    state: done
+    done_by: https://github.com/zohelo/zohelo/pull/5
+    contract: true
+    context: PRs merged with no checks; deploy only ran after merge.
+    files:
+    - create: .github/workflows/check.yml
+    steps:
+    - Shipped in PR 5.
+    acceptance:
+    - 'check.yml: frozen install, lint, build on pull_request; no credentials'
+    verify:
+    - workflow: Check on any PR
+      expect: green
+    out_of_scope:
+    - Deploy workflow
+  - key: com/platform/hardening/pr-gate/ruleset
+    type: Task
+    title: 'Owner: require the check on main; delete the Finnhub secret'
+    effort: S
+    state: open
+    verify_only: true
+    owner_action: (1) github.com/zohelo/zohelo → Settings → Rules → Rulesets → New branch ruleset. Name "main",
+      Enforcement Active, Target branches "Include default branch". Tick "Require a pull request before merging"
+      (0 approvals) and "Require status checks to pass", add "check". Save. (2) github.com/organizations/zohelo/settings/secrets/actions
+      → SOURCE_FINNHUB_API_KEY → Remove (skip if it is not listed). About 5 minutes.
+    context: The check exists but is not required, so a red PR can still be merged. The Finnhub secret has no reader
+      since PR 6. Merged branches are deleted by the branch-cleanup workflow (D9), not by a repo setting.
+    files: []
+    steps:
+    - Owner does the clicks above and replies 'done'.
+    - Agent runs the verify calls and closes this Task with a comment quoting their output.
+    acceptance:
+    - A ruleset on the default branch requires the check status
+    - SOURCE_FINNHUB_API_KEY is not in the org secret list (owner confirms)
+    verify:
+    - run: gh api repos/zohelo/zohelo/rules/branches/main --jq '.[].type'
+      expect: contains required_status_checks
+    out_of_scope:
+    - Required reviews (single maintainer)
+  - key: com/platform/hardening/pr-gate/pin-rule
+    type: Task
+    title: Fail the check on actions not pinned by SHA
+    effort: S
+    state: open
+    contract: true
+    context: zohelo-data's repo_check rejects 'uses:' lines without a full commit SHA; zohelo has no such rule,
+      so a future edit could reintroduce a floating tag (A-04).
+    files:
+    - edit: .github/workflows/check.yml
+    steps:
+    - 'Add a first step to the check job, named ''Actions pinned by SHA'', before checkout''s following steps:'
+    - 'run: | (bash) set -euo pipefail; bad=$(grep -rhoE ''uses:[[:space:]]*[^[:space:]#]+'' .github/workflows |
+      sed -E ''s/uses:[[:space:]]*//'' | grep -v ''^\./'' | grep -vE ''@[0-9a-f]{40}$'' || true); if [ -n "$bad"
+      ]; then echo "::error title=unpinned action::$bad"; exit 1; fi'
+    - The step needs the checkout, so place it right after actions/checkout.
+    acceptance:
+    - check fails when any workflow uses an action by tag or branch
+    - check passes on main as it is today (all actions pinned)
+    verify:
+    - workflow: Check on this PR
+      expect: green; step "Actions pinned by SHA" ran
+    - run: grep -rhoE 'uses:[[:space:]]*[^[:space:]#]+' .github/workflows | sed -E 's/uses:[[:space:]]*//' | grep
+        -v '^\./' | grep -vcE '@[0-9a-f]{40}$'
+      expect: '0'
+    out_of_scope:
+    - Changing which actions are used
+- key: com/platform/hardening/scaffold
+  title: Prototype scaffolding and Finnhub removed
+  done_when:
+  - No Finnhub code, env name or org secret
+  - No AI Studio files; package named @zohelo/site; TS strict
+  tasks:
+  - key: com/platform/hardening/scaffold/finnhub
+    type: Task
+    title: Remove Finnhub; Pulse shows illustrative values
+    effort: M
+    state: done
+    done_by: https://github.com/zohelo/zohelo/pull/6
+    context: No free stock source allows public commercial display (owner decision 27 Oct no. 3).
+    files:
+    - delete: functions/api/stocks/quote.ts
+    - edit: src/components/PulseSection.tsx
+    steps:
+    - Shipped in PR 6.
+    acceptance:
+    - Pulse renders sample values with an Illustrative values badge
+    verify:
+    - run: grep -ri finnhub src scripts .github | wc -l
+      expect: '0'
+    out_of_scope:
+    - Replacement market data (Epic com/site/indicators)
+  - key: com/platform/hardening/scaffold/cleanup
+    type: Task
+    title: 'Clean up the site package: AI Studio leftovers, deps, TS strict'
+    effort: M
+    state: done
+    done_by: https://github.com/zohelo/zohelo/pull/7
+    context: metadata.json and assets/.aistudio described a Gemini demo; unused deps remained.
+    files:
+    - delete: metadata.json
+    - edit: package.json
+    - edit: tsconfig.json
+    steps:
+    - Shipped in PR 7.
+    acceptance:
+    - package name @zohelo/site; strict true; motion, esbuild, autoprefixer removed
+    verify:
+    - run: bun run lint
+      expect: exit 0
+    out_of_scope:
+    - Visible content
+  - key: com/platform/hardening/scaffold/finnhub-secret
+    type: Task
+    title: Remove SOURCE_FINNHUB_API_KEY from the docs
+    effort: S
+    state: open
+    context: The org secret is deleted by the owner in Task com/platform/hardening/pr-gate/ruleset. The docs must
+      not list a secret that no longer exists.
+    files:
+    - edit: docs/credentials.md
+    steps:
+    - In docs/credentials.md delete every row and sentence that mentions SOURCE_FINNHUB_API_KEY or Finnhub.
+    - Run the verify command; open one PR.
+    acceptance:
+    - docs/credentials.md does not mention SOURCE_FINNHUB_API_KEY or Finnhub
+    verify:
+    - run: grep -ciE 'SOURCE_FINNHUB_API_KEY|finnhub' docs/credentials.md
+      expect: '0'
+    out_of_scope:
+    - Other secrets
+    contract: true
+    depends_on:
+    - com/platform/hardening/pr-gate/ruleset
+- key: com/platform/hardening/legal
+  title: Copyright notice
+  done_when:
+  - COPYRIGHT file present; site no longer claims an open-source licence
+  tasks:
+  - key: com/platform/hardening/legal/copyright
+    type: Task
+    title: Add COPYRIGHT (all rights reserved)
+    effort: S
+    state: done
+    done_by: https://github.com/zohelo/zohelo/pull/8
+    context: Owner decision 27 Oct no. 4; the footer said "Open Source / MIT", which was false.
+    files:
+    - create: COPYRIGHT
+    - edit: src/components/Footer.tsx
+    steps:
+    - Shipped in PR 8.
+    acceptance:
+    - COPYRIGHT reads 'Copyright © 2026 Radosław Utkała. All rights reserved.'
+    verify:
+    - run: head -1 COPYRIGHT
+      expect: the copyright line
+    out_of_scope:
+    - Data and content licence (Epic com/site/real-content)
+- key: com/platform/hardening/docs
+  title: Docs match the running platform
+  done_when:
+  - docs/runbooks.md and docs/architecture.md describe today's workflows; every docs page has 'Last verified'
+  tasks:
+  - key: com/platform/hardening/docs/verify
+    type: Task
+    title: Correct the platform docs and add last-verified dates
+    effort: S
+    state: open
+    context: docs/runbooks.md still says bi deploys on "every push" (since zohelo-bi PR 9 only main and manual runs)
+      and that each deploy checks "the API answers" for zohelo.com (Finnhub API removed in PR 6). docs/architecture.md
+      may mention the zohelo.com API.
+    files:
+    - edit: docs/runbooks.md
+    - edit: docs/architecture.md
+    - edit: docs/infrastructure.md
+    - edit: docs/credentials.md
+    - edit: docs/README.md
+    steps:
+    - 'runbooks.md Deploy table: bi row → ''Merge to main in zohelo-bi → Deploy portal; a manual run on a branch
+      deploys a preview.'' zohelo.com checks: ''the site answers''.'
+    - 'Search all docs for ''stocks'', ''quote'', ''Finnhub'', ''every push'', ''GitHub Pages'', ''Google'' and
+      correct each sentence to current behaviour. Current behaviour: read .github/workflows/*.yml of zohelo, zohelo-bi
+      and zohelo-data on main (gh api repos/zohelo/<repo>/contents/.github/workflows) — the workflow files are the
+      truth.'
+    - 'Append to every page: a line ''Last verified: <today''s date>''. docs/README.md: replace ''Last full review''
+      line with the same.'
+    acceptance:
+    - No doc mentions Finnhub, /api/stocks, or bi deploying on every push
+    verify:
+    - run: grep -rniE "finnhub|api/stocks|every push" docs | wc -l
+      expect: '0'
+    - run: grep -L "Last verified" docs/*.md | wc -l
+      expect: '0'
+    out_of_scope:
+    - New doc pages
+    contract: true

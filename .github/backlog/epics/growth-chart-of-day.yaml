@@ -1,0 +1,39 @@
+key: com/growth/chart-of-day
+area: com/growth
+title: Chart of the day (rule-based)
+phase: 1
+priority: P2
+target: 2027-01-23
+why: Daily habit needs one new, finishable thing each weekday. A chart of the largest mover among the catalogued
+  KPIs, with a templated headline, delivers that without AI or an editor.
+outcome: Every weekday the home page shows one chart of the KPI that moved most since its previous value, with a
+  templated takeaway headline, source footer and link to its indicator page.
+in_scope:
+- Selection rule (largest absolute z-score of the latest change among published KPIs)
+- Templated PL/EN headline, chart from @zohelo/design visuals
+out_of_scope:
+- An archive of past charts (decided 27 Oct by the architect; revisit with the newsletter, Phase 2)
+- AI-written text (Phase 2, budget-gated)
+- Social posting
+done_when:
+- After each publish the home chart shows the KPI chosen by the rule, with its headline and source
+depends_on:
+- data/published/published-v1
+- com/design/design-v1
+- com/site/indicators
+deliverables:
+- key: com/growth/chart-of-day/rule
+  title: Selection rule and headline template
+  done_when:
+  - A pure function picks the KPI and renders the headline; unit-tested on fixtures
+  todo:
+  - 'src/growth/chartOfDay.ts: input published kpi latest.json files, output {kpi_key, headline_pl, headline_en};
+    tie-break by kpi_key; skip KPIs flagged provisional; bun test with fixtures.'
+- key: com/growth/chart-of-day/page
+  title: Home block
+  depends_on:
+  - com/growth/chart-of-day/rule
+  done_when:
+  - Home shows today's chart with headline, Chart, SourceFooter and a link to /indicators/<kpi_key>
+  todo:
+  - Home block component using Chart + SourceFooter from @zohelo/design, fed by chartOfDay() at build.

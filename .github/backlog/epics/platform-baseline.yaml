@@ -1,0 +1,90 @@
+key: com/platform/baseline
+area: com/platform
+title: zohelo.com on Cloudflare Pages
+phase: 0
+priority: P1
+why: zohelo.com ran on a Google Cloud VM and its docs described a retired stack. Moving it to Cloudflare Pages put
+  all three products on one platform and one set of org credentials.
+outcome: zohelo.com and www.zohelo.com are served by the Pages project `zohelo`, deployed from `main`, and the platform
+  docs in `docs/` describe the real stack.
+in_scope:
+- Pages project, DNS switch, deploy workflow
+- Platform documentation set (architecture, infrastructure, credentials, runbooks)
+out_of_scope:
+- Site content and design (Phase 1)
+done_when:
+- https://zohelo.com/ answers HTTP 200 from Pages
+- docs/ lists only Cloudflare and GitHub as providers
+deliverables:
+- key: com/platform/baseline/pages
+  title: Site served by Cloudflare Pages
+  done_when:
+  - Deploy zohelo.com workflow green on main
+  - zohelo.com and www.zohelo.com are CNAME to zohelo.pages.dev (proxied)
+  tasks:
+  - key: com/platform/baseline/pages/move
+    type: Task
+    title: Move zohelo.com to Cloudflare Pages
+    effort: L
+    state: done
+    done_by: https://github.com/zohelo/zohelo/pull/1
+    contract: true
+    context: The site was served by a Google Cloud VM. This Task created the Pages project, the deploy workflow
+      and the DNS switch script.
+    files:
+    - create: .github/workflows/deploy.yml
+    - create: scripts/cloudflare-setup.ts
+    steps:
+    - Shipped in PR 1.
+    acceptance:
+    - Deploy workflow deploys main to production and branches to previews
+    verify:
+    - workflow: Deploy zohelo.com on main
+      expect: green; notice "zohelo.com HTTP 200"
+    out_of_scope:
+    - Content changes
+- key: com/platform/baseline/docs
+  title: Platform documentation
+  done_when:
+  - docs/README.md indexes architecture, infrastructure, credentials, runbooks
+  tasks:
+  - key: com/platform/baseline/docs/platform
+    type: Task
+    title: Write the platform documentation set
+    effort: M
+    state: done
+    done_by: https://github.com/zohelo/zohelo/pull/2
+    context: 'One place documents what all zohelo products share: platform, hosting, credentials, runbooks.'
+    files:
+    - create: docs/README.md
+    - create: docs/architecture.md
+    - create: docs/infrastructure.md
+    - create: docs/credentials.md
+    - create: docs/runbooks.md
+    steps:
+    - Shipped in PR 2.
+    acceptance:
+    - Every org variable and secret is listed in docs/credentials.md without values
+    verify:
+    - run: grep -c "PLATFORM_DEPLOY_TOKEN" docs/credentials.md
+      expect: 1 or more
+    out_of_scope:
+    - Product internals (documented in each product repo)
+  - key: com/platform/baseline/docs/client-id
+    type: Task
+    title: Document the bot identified by its Client ID only
+    effort: S
+    state: done
+    done_by: https://github.com/zohelo/zohelo/pull/3
+    context: The org variable ORG_BOT_APP_ID was retired; the GitHub App is identified by ORG_BOT_CLIENT_ID.
+    files:
+    - edit: docs/credentials.md
+    steps:
+    - Shipped in PR 3.
+    acceptance:
+    - docs/credentials.md lists ORG_BOT_CLIENT_ID and not ORG_BOT_APP_ID
+    verify:
+    - run: grep -c ORG_BOT_APP_ID docs/credentials.md
+      expect: '0'
+    out_of_scope:
+    - Workflow changes

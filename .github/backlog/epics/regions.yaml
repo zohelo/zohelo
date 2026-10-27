@@ -1,0 +1,49 @@
+key: com/site/regions
+area: com/site
+title: Regions (16 voivodeships)
+phase: 1
+priority: P1
+target: 2027-01-16
+why: Regional comparisons are what Polish analysts, local press and SMEs search for, and no other source shows GUS
+  and Eurostat regional data side by side on one page per region. The dummy Compass map becomes real.
+outcome: /regions shows a map and ranking of the 16 voivodeships for a chosen headline KPI, and /regions/<teryt>
+  profiles each voivodeship (key KPIs vs Poland, rank, neighbours), pre-rendered in PL and EN.
+in_scope:
+- Simplified voivodeship geometry from 06_published/v1/geo
+- Map + ranking page, 16 profile pages, regional spotlight block on home
+out_of_scope:
+- Powiat and gmina profiles (Phase 3)
+- NUTS regions of other countries
+done_when:
+- 16 profiles × 2 languages pre-rendered; each shows at least 6 KPIs with national comparison and sources
+- CompassSection and its modal are deleted; the home spotlight uses real data
+depends_on:
+- data/published/published-v1
+- com/site/indicators
+- com/design/design-v1
+deliverables:
+- key: com/site/regions/map
+  title: Map and ranking
+  done_when:
+  - /regions renders a choropleth (sequential teal ramp) and a ranking table for a KPI selector
+  todo:
+  - MapChoropleth via Vega-Lite geoshape from geo/voivodeship.geojson; KPI selector limited to KPIs with geography
+    level voivodeship; ranking DataTable.
+- key: com/site/regions/profiles
+  title: Voivodeship profiles
+  depends_on:
+  - com/site/regions/map
+  done_when:
+  - /regions/<teryt> for all 16 TERYT codes with KPIs vs Poland and rank
+  todo:
+  - Route /regions/:teryt; KpiTile grid with national value and rank 1–16; neighbours list from geometry adjacency
+    computed at build.
+- key: com/site/regions/home
+  title: Regional spotlight on home
+  depends_on:
+  - com/site/regions/profiles
+  done_when:
+  - Home spotlight shows one KPI map and top/bottom 3; CompassSection, DataVisualizationModal and polandRegions.ts/financeTrends.ts
+    deleted
+  todo:
+  - Replace CompassSection with the spotlight block; delete the sample files.

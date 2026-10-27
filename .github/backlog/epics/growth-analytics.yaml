@@ -1,0 +1,48 @@
+key: com/growth/analytics
+area: com/growth
+title: Cookieless analytics
+phase: 1
+priority: P2
+target: 2026-11-28
+why: Without visit counts nobody can tell whether the return-visit features work. Analytics must not set cookies
+  or collect personal data, so no consent banner is needed.
+outcome: Cloudflare Web Analytics measures visits and pages on zohelo.com without cookies, and the privacy page
+  says so.
+in_scope:
+- Cloudflare Web Analytics on the Pages project zohelo
+out_of_scope:
+- Custom events, Google Analytics, any cookie-based tool
+done_when:
+- https://zohelo.com/ HTML served to browsers includes the Cloudflare Insights beacon
+- The Web Analytics dashboard shows zohelo.com visits
+deliverables:
+- key: com/growth/analytics/enable
+  title: Web Analytics enabled
+  done_when:
+  - Beacon present on production pages
+  tasks:
+  - key: com/growth/analytics/enable/toggle
+    type: Task
+    title: 'Owner: enable Web Analytics on the zohelo Pages project'
+    effort: S
+    state: open
+    verify_only: true
+    owner_action: dash.cloudflare.com → Workers & Pages → zohelo → Metrics → Web Analytics → Enable. (The deploy
+      token is not scoped for analytics settings, so this is one click by hand.)
+    context: Pages injects the cookieless beacon automatically once Web Analytics is enabled for the project; no
+      code change is needed.
+    files: []
+    steps:
+    - Owner enables it.
+    - Agent checks the live HTML with the verify command and closes the Task.
+    acceptance:
+    - Live HTML contains static.cloudflareinsights.com/beacon
+    verify:
+    - run: curl -s https://zohelo.com/ | grep -c cloudflareinsights
+      expect: 1 or more
+    out_of_scope:
+    - bi and data portals (behind sign-in, not measured)
+    notes:
+    - Label owner:action is added by the backlog sync only when depends_on is done (max 3 open, D8).
+    depends_on:
+    - com/site/site-v1/router/framework
