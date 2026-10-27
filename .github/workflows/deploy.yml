@@ -27,10 +27,10 @@ jobs:
       FINNHUB_API_KEY: ${{ secrets.SOURCE_FINNHUB_API_KEY }}
       BRANCH: ${{ github.ref_name }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           persist-credentials: false
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6  # v2.2.0
         with:
           bun-version: 1.4.2
       - name: Install
@@ -43,9 +43,10 @@ jobs:
         run: |
           if [ "$BRANCH" = main ]; then bun scripts/cloudflare-setup.ts --switch-dns; else bun scripts/cloudflare-setup.ts; fi
       - name: Deploy
+        # wrangler from the lockfile (devDependency), never a floating bunx download.
         run: |
           set -euo pipefail
-          bunx wrangler pages deploy dist --project-name zohelo --branch "$BRANCH" --commit-dirty=true | tee /tmp/deploy.log
+          bun run wrangler pages deploy dist --project-name zohelo --branch "$BRANCH" --commit-dirty=true | tee /tmp/deploy.log
           url=$(grep -Eo 'https://[a-z0-9.-]+\.pages\.dev' /tmp/deploy.log | tail -1)
           echo "DEPLOY_URL=$url" >> "$GITHUB_ENV"
           echo "::notice title=deployed::$url"
