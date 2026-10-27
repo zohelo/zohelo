@@ -74,7 +74,7 @@ export const productsList: ProductItem[] = [
     previewMetrics: [
       { label: 'Infrastructure Cost', val: '$0.00 / month' },
       { label: 'Deployment Time', val: '< 15 minutes' },
-      { label: 'License', val: 'Open Source / MIT' }
+      { label: 'License', val: 'All rights reserved' }
     ]
   }
 ];
