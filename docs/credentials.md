@@ -41,7 +41,6 @@ all of them (owner's choice, 27 October 2026).
 | `PORTAL_SIGNIN_ALLOWED_EMAILS` | emails allowed into data and bi | written by the owner | Access setup in zohelo-data and zohelo-bi | — |
 | `SOURCE_GUS_BDL_API_KEY` | GUS BDL API key (registered: 50,000 requests a week) | api.stat.gov.pl registration | zohelo-data | — |
 | `SOURCE_GUS_BDL_WEB_LOGIN` / `_WEB_PASSWORD` | GUS BDL website account (subgroup exports) | bdl.stat.gov.pl account | zohelo-data | — |
-| `SOURCE_FINNHUB_API_KEY` (optional) | Finnhub key for zohelo.com quotes; without it the site shows fallback quotes | finnhub.io | zohelo | — |
 
 Cloudflare tokens that are not organisation secrets and must stay: `[Basin Catalog] Table
 Maintenance` and `[R2 SQL Studio]` (created and used by Cloudflare itself).

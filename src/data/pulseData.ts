@@ -1947,7 +1947,7 @@ export const pulseIndicators: MarketIndicator[] = [
     change: '+0.9%',
     isPositive: true,
     source: 'Global Markets Feed',
-    lastUpdated: 'Live Market Data',
+    lastUpdated: 'Illustrative value',
     sparkline: [19420, 19480, 19530, 19590, 19610, 19640, 19842.15],
     category: 'index'
   },

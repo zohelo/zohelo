@@ -5,7 +5,7 @@ zohelo products: [docs/](docs/README.md).
 
 ```bash
 bun install
-bun run dev      # http://localhost:3000 (quotes use a sandbox token through the dev proxy)
+bun run dev      # http://localhost:3000
 bun run build
 ```
 

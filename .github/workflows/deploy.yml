@@ -1,8 +1,7 @@
 name: Deploy zohelo.com
 
-# zohelo.com on Cloudflare Pages: the static site plus /api/stocks/quote (a Pages Function in
-# functions/). Push to main deploys production and keeps zohelo.com and www.zohelo.com pointed at
-# it; a manual run on a branch deploys a preview <branch>.<project>.pages.dev.
+# zohelo.com on Cloudflare Pages (a static site, no Pages Functions). Push to main deploys
+# production and keeps zohelo.com and www.zohelo.com pointed at it; a manual run on a branch deploys a preview <branch>.<project>.pages.dev.
 
 on:
   push:
@@ -24,7 +23,6 @@ jobs:
       # zohelo organisation credentials, mapped to the names the tools read.
       CLOUDFLARE_API_TOKEN: ${{ secrets.PLATFORM_DEPLOY_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ vars.PLATFORM_ACCOUNT_ID }}
-      FINNHUB_API_KEY: ${{ secrets.SOURCE_FINNHUB_API_KEY }}
       BRANCH: ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
@@ -60,8 +58,7 @@ jobs:
             sleep 10
           done
           grep -q 'id="root"' /tmp/page.html && [ "$code" = 200 ] || { echo "::error title=site::HTTP $code"; exit 1; }
-          api=$(curl -s -o /dev/null -w '%{http_code}' "$DEPLOY_URL/api/stocks/quote?symbol=AAPL")
-          echo "::notice title=site::page 200; /api/stocks/quote $api (200 with a key, 503 without)"
+          echo "::notice title=site::page 200"
           if [ "$BRANCH" = main ]; then
             live=$(curl -s -o /dev/null -w '%{http_code}' https://zohelo.com/ || true)
             echo "::notice title=zohelo.com::HTTP $live (the certificate can take a few minutes after the first switch)"

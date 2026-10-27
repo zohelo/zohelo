@@ -1,4 +1,5 @@
-export interface FinnhubQuoteResponse {
+// Illustrative quote snapshot shown by the Pulse section (static sample values).
+export interface QuoteSnapshot {
   c: number;  // Current price
   d: number | null;  // Change
   dp: number | null; // Percent change
@@ -16,7 +17,7 @@ export interface StockAssetInfo {
   exchange: string;
   currency: string;
   category: string;
-  fallbackQuote: FinnhubQuoteResponse;
+  fallbackQuote: QuoteSnapshot;
 }
 
 export interface MarketIndicator {

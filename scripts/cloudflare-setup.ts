@@ -1,12 +1,11 @@
 // Cloudflare side of zohelo.com, idempotent; run by .github/workflows/deploy.yml before each deploy.
 //
-// - Pages project `zohelo` and its runtime secret FINNHUB_API_KEY (when the organisation secret
-//   SOURCE_FINNHUB_API_KEY exists; without it the market-data section shows its fallback quotes).
+// - Pages project `zohelo` and its runtime settings (compatibility date).
 // - With --switch-dns (main only): attach zohelo.com and www.zohelo.com to the project and point
 //   their DNS records at it, replacing the record to the old Google Cloud VM. The old values are
 //   printed for a rollback. Mail records (MX, SPF, DKIM, DMARC) are never touched.
 //
-// Env: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, optional FINNHUB_API_KEY.
+// Env: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID.
 
 const PROJECT = "zohelo";
 const ZONE = "zohelo.com";
@@ -43,13 +42,8 @@ if (!project) {
   notice("pages project", `created ${PROJECT} (${project.subdomain})`);
 }
 
-const key = process.env.FINNHUB_API_KEY?.trim();
-const runtime = {
-  compatibility_date: "2026-10-01",
-  env_vars: key ? { FINNHUB_API_KEY: { type: "secret_text", value: key } } : {},
-};
+const runtime = { compatibility_date: "2026-10-01" };
 await cf("PATCH", `${a}/pages/projects/${PROJECT}`, { deployment_configs: { production: runtime, preview: runtime } });
-notice("pages project", `${PROJECT}: market-data key ${key ? "set" : "not available (fallback quotes)"}`);
 
 if (process.argv.includes("--switch-dns")) {
   const target = project.subdomain;
