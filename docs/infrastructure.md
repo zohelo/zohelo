@@ -6,7 +6,7 @@ The domain `zohelo.com` is registered at Cloudflare and its DNS is managed there
 
 | Address | Cloudflare Pages project | Server-side parts (Pages Functions) | Sign-in |
 |---|---|---|---|
-| zohelo.com, www.zohelo.com | `zohelo` | `/api/stocks/quote`: Finnhub proxy (key on the server) | public |
+| zohelo.com, www.zohelo.com | `zohelo` | none (static site) | public |
 | data.zohelo.com | `zohelo-data` | `/api/*`: R2 file index, catalogue, signed downloads (R2 bindings `LANDING`, `LAKEHOUSE`) | Access app `zohelo-data-portal` |
 | bi.zohelo.com | `zohelo-bi` | `/api/*`: semantic manifest, measure catalogue, metric series over R2 SQL | Access app `zohelo-bi` |
 
@@ -31,7 +31,7 @@ they create what is missing and correct what drifted.
 
 | Repository | Script | What it manages |
 |---|---|---|
-| zohelo | `scripts/cloudflare-setup.ts` | Pages project `zohelo`, its Finnhub secret; on main: domains zohelo.com and www, their DNS records |
+| zohelo | `scripts/cloudflare-setup.ts` | Pages project `zohelo`; on main: domains zohelo.com and www, their DNS records |
 | zohelo-data | `portal/cloudflare_setup.py` | Pages project `zohelo-data` (R2 bindings, signing key, allowed emails, Access team domain), Access app; on main: domain data.zohelo.com and its DNS |
 | zohelo-bi | `ops/ensure-platform.ts` | Pages project `zohelo-bi` (R2 SQL read token), Access app, domain bi.zohelo.com and its DNS |
 | zohelo-data | `ops/scheduler_trigger.py` (Ops workflow) | Worker `zohelo-scheduler`: code, cron, app credentials |

@@ -1,16 +1,12 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   TrendingUp,
   TrendingDown,
-  RefreshCw,
-  Clock,
   Activity,
   AlertCircle,
-  ShieldCheck,
   ArrowUpRight,
   ArrowDownRight,
   Info,
-  Radio,
   Sliders,
   Layers,
   Sparkles,
@@ -28,7 +24,7 @@ import {
   MarketTabKey,
   pulseIndicators
 } from '../data/pulseData';
-import { FinnhubQuoteResponse, MarketIndicator, StockAssetInfo } from '../types';
+import { MarketIndicator, QuoteSnapshot, StockAssetInfo } from '../types';
 
 interface PulseSectionProps {
   onSelectIndicator?: (indicator: MarketIndicator) => void;
@@ -38,23 +34,9 @@ export const PulseSection: React.FC<PulseSectionProps> = ({ onSelectIndicator })
   const [activeTab, setActiveTab] = useState<MarketTabKey>('indices');
   const [selectedSymbol, setSelectedSymbol] = useState<string>('SPY');
   
-  // Quotes dictionary
-  const [quotesMap, setQuotesMap] = useState<Record<string, FinnhubQuoteResponse>>(() => {
-    const initial: Record<string, FinnhubQuoteResponse> = {};
-    stockAssets.forEach((asset) => {
-      initial[asset.symbol] = asset.fallbackQuote;
-    });
-    return initial;
-  });
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [lastUpdatedTime, setLastUpdatedTime] = useState<Date | null>(null);
-  const [autoRefresh, setAutoRefresh] = useState<boolean>(true);
+  // Static sample values only (no market-data feed): every asset shows its built-in snapshot.
+  // To be replaced with ECB/NBP reference data in Phase 1.
   const [selectedMacroIndicator, setSelectedMacroIndicator] = useState<MarketIndicator | null>(null);
-  const [priceFlash, setPriceFlash] = useState<'up' | 'down' | null>(null);
-
-  const prevPriceRef = useRef<number | null>(null);
 
   // Active sliding window assets (15-20 per category)
   const slidingWindowAssets: StockAssetInfo[] = useMemo(() => {
@@ -75,7 +57,7 @@ export const PulseSection: React.FC<PulseSectionProps> = ({ onSelectIndicator })
     return stockAssets.find((a) => a.symbol === selectedSymbol) || slidingWindowAssets[0] || stockAssets[0];
   }, [selectedSymbol, slidingWindowAssets]);
 
-  const currentQuote: FinnhubQuoteResponse = quotesMap[selectedSymbol] || currentAsset.fallbackQuote;
+  const currentQuote: QuoteSnapshot = currentAsset.fallbackQuote;
 
   // Localized parsing & formatting helper engine
   const parseAssetDetails = useCallback((symbol: string) => {
@@ -171,81 +153,6 @@ export const PulseSection: React.FC<PulseSectionProps> = ({ onSelectIndicator })
     return `${sign}${val.toFixed(2)}%`;
   }, []);
 
-  // Fetch live market quote from local proxy /api/stocks/quote?symbol=...
-  const fetchLiveQuote = useCallback(async (symbol: string) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/stocks/quote?symbol=${encodeURIComponent(symbol)}`);
-      
-      if (!response.ok) {
-        throw new Error(`Proxy HTTP ${response.status}`);
-      }
-
-      const data: FinnhubQuoteResponse = await response.json();
-
-      // Check if Finnhub returned zeroes (common with sandbox token or unlisted FX/Crypto on free tier) or invalid payload
-      if (!data || typeof data.c !== 'number' || (data.c === 0 && data.pc === 0)) {
-        const asset = stockAssets.find((a) => a.symbol === symbol) || stockAssets[0];
-        setQuotesMap((prev) => ({
-          ...prev,
-          [symbol]: asset.fallbackQuote,
-        }));
-        setError('Sandbox token mode: active with calibrated multi-market baseline telemetry.');
-      } else {
-        const prevPrice = quotesMap[symbol]?.c;
-        if (prevPrice !== undefined && prevPrice !== data.c) {
-          setPriceFlash(data.c >= prevPrice ? 'up' : 'down');
-          setTimeout(() => setPriceFlash(null), 1200);
-        }
-        setQuotesMap((prev) => ({
-          ...prev,
-          [symbol]: data,
-        }));
-        setError(null);
-      }
-      setLastUpdatedTime(new Date());
-    } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : 'Network error';
-      const asset = stockAssets.find((a) => a.symbol === symbol) || stockAssets[0];
-      setQuotesMap((prev) => ({
-        ...prev,
-        [symbol]: asset.fallbackQuote,
-      }));
-      setError(`${errorMsg}. Displaying verified multi-market telemetry.`);
-      setLastUpdatedTime(new Date());
-    } finally {
-      setIsLoading(false);
-    }
-  }, [quotesMap]);
-
-  // Fetch when selectedSymbol changes
-  useEffect(() => {
-    fetchLiveQuote(selectedSymbol);
-  }, [selectedSymbol, fetchLiveQuote]);
-
-  // Sliding Window Cycling Poller:
-  // Polls the focused asset and selectively refreshes quotes within the active 15-20 sliding window
-  useEffect(() => {
-    if (!autoRefresh) return;
-
-    // High-frequency poll for the active focused asset (every 15s)
-    const focusedInterval = setInterval(() => {
-      fetchLiveQuote(selectedSymbol);
-    }, 15000);
-
-    return () => clearInterval(focusedInterval);
-  }, [autoRefresh, selectedSymbol, fetchLiveQuote]);
-
-  // Track price changes for flash highlight
-  useEffect(() => {
-    if (prevPriceRef.current !== null && prevPriceRef.current !== currentQuote.c) {
-      setPriceFlash(currentQuote.c >= prevPriceRef.current ? 'up' : 'down');
-      const timer = setTimeout(() => setPriceFlash(null), 1200);
-      return () => clearTimeout(timer);
-    }
-    prevPriceRef.current = currentQuote.c;
-  }, [currentQuote.c]);
-
   // Calculations & Intraday Metrics
   const currentPrice = currentQuote.c;
   const priceChange = currentQuote.d ?? 0;
@@ -305,14 +212,14 @@ export const PulseSection: React.FC<PulseSectionProps> = ({ onSelectIndicator })
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#3B8B94]"></span>
               </span>
               <h2 className="text-xs font-bold tracking-wider uppercase text-slate-700 font-mono">
-                The Pulse • Multi-Market Sliding-Window Ticker
+                The Pulse • Multi-Market Ticker (sample values)
               </h2>
             </div>
             
             <div className="flex items-center space-x-1.5">
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[#3B8B94]/10 text-[#18484F] border border-[#3B8B94]/25 font-mono">
-                <Radio className="w-2.5 h-2.5 mr-1 text-[#3B8B94] animate-pulse" />
-                60 FPS STREAM
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 font-mono">
+                <AlertCircle className="w-2.5 h-2.5 mr-1 text-amber-600" />
+                ILLUSTRATIVE VALUES
               </span>
               <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono text-slate-500 bg-white border border-slate-200 shadow-2xs">
                 100+ GLOBAL ASSETS
@@ -320,42 +227,9 @@ export const PulseSection: React.FC<PulseSectionProps> = ({ onSelectIndicator })
             </div>
           </div>
 
-          {/* Right Controls */}
-          <div className="flex items-center space-x-2.5 text-xs">
-            <div className="hidden sm:flex items-center space-x-1 font-mono text-[11px] text-slate-500">
-              <Clock className="w-3.5 h-3.5 text-slate-400" />
-              <span>
-                {lastUpdatedTime
-                  ? `${lastUpdatedTime.toLocaleTimeString()} CET`
-                  : 'Synchronizing...'}
-              </span>
-            </div>
-
-            {/* Auto Refresh Toggle */}
-            <button
-              id="pulse-auto-refresh-btn"
-              onClick={() => setAutoRefresh(!autoRefresh)}
-              className={`px-2.5 py-1 rounded text-[11px] font-mono font-semibold transition-all cursor-pointer flex items-center space-x-1.5 border shadow-2xs ${
-                autoRefresh
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100/70'
-                  : 'bg-white text-slate-500 border-slate-200 hover:text-slate-700'
-              }`}
-              title={autoRefresh ? 'Active sliding window polling enabled (every 15s)' : 'Auto-refresh paused'}
-            >
-              <Activity className={`w-3 h-3 ${autoRefresh ? 'text-emerald-600' : 'text-slate-400'}`} />
-              <span>{autoRefresh ? '15s Polling' : 'Paused'}</span>
-            </button>
-
-            {/* Manual Refresh Button */}
-            <button
-              id="pulse-manual-refresh-btn"
-              onClick={() => fetchLiveQuote(selectedSymbol)}
-              disabled={isLoading}
-              className="p-1.5 rounded-lg bg-white border border-slate-200 hover:border-[#3B8B94] text-slate-700 hover:text-[#3B8B94] transition-all cursor-pointer shadow-2xs disabled:opacity-50"
-              title="Poll quote from /api/stocks/quote"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-[#3B8B94]' : ''}`} />
-            </button>
+          {/* Right: static-data note */}
+          <div className="text-[11px] font-mono text-slate-500">
+            Static sample values • not live market data
           </div>
         </div>
 
@@ -420,7 +294,7 @@ export const PulseSection: React.FC<PulseSectionProps> = ({ onSelectIndicator })
             {/* Set A (Active Sliding Window 20 Cards) */}
             <div className="flex items-center space-x-3 pr-3">
               {slidingWindowAssets.map((asset) => {
-                const quote = quotesMap[asset.symbol] || asset.fallbackQuote;
+                const quote = asset.fallbackQuote;
                 const isSelected = selectedSymbol === asset.symbol;
                 const dp = quote.dp ?? asset.fallbackQuote.dp ?? 0;
                 const isCardPos = dp >= 0;
@@ -472,7 +346,7 @@ export const PulseSection: React.FC<PulseSectionProps> = ({ onSelectIndicator })
             {/* Set B (Identical clone for seamless continuous infinite loop) */}
             <div className="flex items-center space-x-3 pr-3" aria-hidden="true">
               {slidingWindowAssets.map((asset) => {
-                const quote = quotesMap[asset.symbol] || asset.fallbackQuote;
+                const quote = asset.fallbackQuote;
                 const isSelected = selectedSymbol === asset.symbol;
                 const dp = quote.dp ?? asset.fallbackQuote.dp ?? 0;
                 const isCardPos = dp >= 0;
@@ -527,7 +401,7 @@ export const PulseSection: React.FC<PulseSectionProps> = ({ onSelectIndicator })
           {/* Marquee Navigation Footer Hint */}
           <div className="px-4 pt-2.5 flex items-center justify-between text-[10px] font-mono text-slate-500 border-t border-slate-100 mt-2">
             <span className="hidden sm:inline">
-              ⇄ Hover ribbon to pause ticker • Click any active card to inspect live telemetry
+              ⇄ Hover ribbon to pause ticker • Click any card to inspect its sample values
             </span>
             <span className="sm:hidden">
               ⇄ Hover/Tap ribbon to inspect asset
@@ -570,23 +444,21 @@ export const PulseSection: React.FC<PulseSectionProps> = ({ onSelectIndicator })
               </div>
             </div>
 
-            {/* Security proxy indicator */}
+            {/* Data note */}
             <div className="hidden lg:flex items-center space-x-1.5 text-[11px] text-slate-500 font-mono">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#3B8B94]" />
-              <span>Proxy Route: /api/stocks/quote?symbol={selectedSymbol}</span>
+              <Info className="w-3.5 h-3.5 text-[#3B8B94]" />
+              <span>Illustrative snapshot • no market-data feed</span>
             </div>
           </div>
 
-          {/* Fallback or Sandbox Token Status Banner if present */}
-          {error && (
-            <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center justify-between text-xs text-amber-800 font-mono">
-              <div className="flex items-center space-x-2">
-                <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                <span>{error}</span>
-              </div>
-              <span className="text-[10px] text-amber-700 uppercase tracking-wider font-semibold">Proxy Active</span>
-            </div>
-          )}
+          {/* Permanent notice: these values are illustrative */}
+          <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center space-x-2 text-xs text-amber-800 font-mono">
+            <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <span>
+              Illustrative values only, not live or current market data. This section will show ECB and
+              NBP reference data.
+            </span>
+          </div>
 
           {/* Main Telemetry & Metrics Display Grid */}
           <div className="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
@@ -617,19 +489,11 @@ export const PulseSection: React.FC<PulseSectionProps> = ({ onSelectIndicator })
               </div>
 
               {/* Price & Dynamic Flashing Highlight Badge */}
-              <div
-                className={`p-4 rounded-xl transition-all duration-500 border ${
-                  priceFlash === 'up'
-                    ? 'bg-emerald-50 border-emerald-300 shadow-xs ring-1 ring-emerald-400'
-                    : priceFlash === 'down'
-                    ? 'bg-rose-50 border-rose-300 shadow-xs ring-1 ring-rose-400'
-                    : 'bg-[#F8FAFC] border-slate-200'
-                }`}
-              >
+              <div className="p-4 rounded-xl border bg-[#F8FAFC] border-slate-200">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <div className="flex items-baseline space-x-3">
                     <span className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-mono tracking-tight">
-                      {isLoading && !currentQuote ? '---.--' : formatPrice(currentPrice, currentAsset.symbol)}
+                      {formatPrice(currentPrice, currentAsset.symbol)}
                     </span>
                   </div>
 
@@ -653,9 +517,9 @@ export const PulseSection: React.FC<PulseSectionProps> = ({ onSelectIndicator })
 
                 {/* Session status tick */}
                 <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 mt-2.5 pt-2.5 border-t border-slate-200">
-                  <span className="flex items-center text-emerald-600 font-semibold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse" />
-                    Market Telemetry Active
+                  <span className="flex items-center text-amber-700 font-semibold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5" />
+                    Illustrative snapshot
                   </span>
                   <span>Currency: {currentAsset.currency}</span>
                 </div>

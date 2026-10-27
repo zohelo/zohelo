@@ -56,7 +56,7 @@ flowchart LR
   builds Silver and Gold with dbt (DuckDB engine). Only zohelo-data writes data.
 - **Serving.** Each site is a Pages project. Its server-side parts are Pages Functions on the
   same origin: the data portal's file API (R2 bindings), the BI query API (R2 SQL, read-only
-  token), zohelo.com's market-data proxy. The browser never receives a storage credential.
+  token). zohelo.com is static. The browser never receives a storage credential.
 - **Sign-in.** Cloudflare Access sits in front of data and bi (and every preview address of
   them); the APIs additionally verify the Access token.
 
