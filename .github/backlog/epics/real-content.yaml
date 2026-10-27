@@ -1,0 +1,253 @@
+key: com/site/real-content
+area: com/site
+title: Real-stack content and legal pages
+phase: 1
+priority: P1
+target: 2026-11-28
+why: 'zohelo.com still claims things that are not true: a GCP e2-micro server, Google Drive, an "Everything-as-Code"
+  modal about a retired stack, a contact form that sends nothing, fake downloads with confetti. A public site with
+  false claims damages trust before any real data arrives. It also has no imprint, privacy or data-terms page.'
+outcome: 'Every statement on zohelo.com is true today: retired-stack claims are gone, sample sections are labelled
+  as illustrative, the contact path works, the docs match reality, and legal pages exist.'
+in_scope:
+- Remove retired-stack claims and the EaC/MetricFlow modal (A-22)
+- Label every sample-data section as illustrative; remove fake downloads
+- Imprint, privacy and data-terms pages
+out_of_scope:
+- Replacing sample sections with real data (indicators, regions, data Epics)
+- New visual design
+done_when:
+- grep for GCP, e2-micro, Google Drive, Everything-as-Code, Atlas Regionów, MetricFlow in src/ and index.html returns
+  nothing
+- Every section with sample values shows the 'Illustrative values' badge
+- /legal/imprint, /legal/privacy, /legal/data-terms are pre-rendered in PL and EN
+decisions:
+- 'owner 27 Oct no. 4: code all rights reserved'
+deliverables:
+- key: com/site/real-content/claims
+  title: No false claims on the site
+  done_when:
+  - The grep in the Epic's done_when returns nothing; no fake download or fake form remains
+  tasks:
+  - key: com/site/real-content/claims/eac
+    type: Task
+    title: Delete the EaC/MetricFlow modal and retired-stack claims
+    effort: M
+    state: open
+    context: 'src/components/MetricFlowModal.tsx (opened from Footer "Everything-as-Code (EaC)" and from metric
+      cards) shows src/data/eacData.ts: a GCP/Google Drive architecture. Footer.tsx shows badges "GCP e2-micro •
+      $0.00/mo NoOps" and "DuckDB + Parquet". index.html title and meta mention "Analytics Lakehouse" and "Atlas
+      Regionów". The real stack is Cloudflare (Pages, R2, Iceberg, R2 SQL) + GitHub Actions + dbt (docs/architecture.md).'
+    files:
+    - delete: src/components/MetricFlowModal.tsx
+    - delete: src/data/eacData.ts
+    - edit: src/App.tsx
+    - edit: src/components/Footer.tsx
+    - edit: src/components/MetricsSection.tsx
+    - edit: index.html
+    steps:
+    - Remove the MetricFlowModal import, its state (isEacModalOpen, inspectMetric) and JSX from App.tsx; remove
+      the props that opened it from Footer and MetricsSection.
+    - Delete the two files.
+    - 'Footer: remove the EaC column and the two badges; brand text: ''Public data on Poland and the world, built
+      on Cloudflare and GitHub.'''
+    - 'index.html (or routes/home.tsx meta if the router Task merged): title ''zohelo — public data on Poland and
+      the world''; description as site.config description en.'
+    - Run the grep from verify and fix any remaining hit in src/.
+    acceptance:
+    - No hit for the terms in verify; site builds; no unused import
+    verify:
+    - run: grep -rniE "gcp|e2-micro|google drive|everything-as-code|metricflow|atlas region" src index.html 2>/dev/null
+        | wc -l
+      expect: '0'
+    - run: bun run lint && bun run build
+      expect: exit 0
+    out_of_scope:
+    - Section layout and styling
+  - key: com/site/real-content/claims/illustrative
+    type: Task
+    title: Label sample sections and remove fake downloads
+    effort: M
+    state: open
+    depends_on:
+    - com/site/real-content/claims/eac
+    context: PulseSection already shows an "Illustrative values" badge (PR 6). MetricsSection, CompassSection (+DataVisualizationModal),
+      ChroniclesSection (+ArticleModal), VaultSection (+DatasetPreviewModal) and ProductsSection show invented numbers,
+      articles, datasets and commercial suites. App.tsx handleDownloadDataset fires confetti and downloads a mock
+      JSON.
+    files:
+    - create: src/components/IllustrativeBadge.tsx
+    - edit: src/components/PulseSection.tsx
+    - edit: src/components/MetricsSection.tsx
+    - edit: src/components/CompassSection.tsx
+    - edit: src/components/ChroniclesSection.tsx
+    - edit: src/components/VaultSection.tsx
+    - edit: src/components/ProductsSection.tsx
+    - edit: src/App.tsx
+    - edit: package.json
+    steps:
+    - Extract the badge markup used in PulseSection into IllustrativeBadge (text 'Illustrative values'; tooltip
+      'Sample data. Real figures arrive with the data release.'); use it in PulseSection.
+    - Add IllustrativeBadge next to the heading of the other five sections.
+    - 'ProductsSection: change each product''s status label to ''Concept''.'
+    - Remove handleDownloadDataset's confetti and mock download; the Vault download button becomes a disabled button
+      'Available with the data release'. Remove canvas-confetti and @types/canvas-confetti.
+    acceptance:
+    - Six sections show the badge; no download produces a file; canvas-confetti not in package.json
+    verify:
+    - run: grep -rl "IllustrativeBadge" src/components | wc -l
+      expect: 7 (component + 6 sections)
+    - run: bun run lint && bun run build
+      expect: exit 0
+    out_of_scope:
+    - Real data (later Epics)
+  - key: com/site/real-content/claims/contact
+    type: Task
+    title: Replace the fake contact form with a real contact link
+    effort: S
+    state: open
+    context: HeroConsultingSection has a form whose submit only shows a toast; nothing is sent. Until a form relay
+      exists, the honest version is a mailto link and LinkedIn link.
+    owner_action: Reply with the public contact e-mail address and LinkedIn URL to show on zohelo.com.
+    files:
+    - edit: src/components/HeroConsultingSection.tsx
+    - edit: src/content/consultantData.ts
+    - edit: src/App.tsx
+    steps:
+    - Remove the form, its state and handleSubmit; remove the onSubmitSuccess prop and its use in App.tsx.
+    - Add contact { email, linkedin } to src/content/consultantData.ts with the values the owner replied; render
+      two buttons 'Napisz e-mail' / 'Write an e-mail' (mailto:) and 'LinkedIn'.
+    acceptance:
+    - No <form> in HeroConsultingSection; both links use the owner-provided values
+    verify:
+    - run: grep -c "<form" src/components/HeroConsultingSection.tsx
+      expect: '0'
+    out_of_scope:
+    - Server-side form handling
+    depends_on:
+    - com/site/real-content/claims/content-dir
+    notes:
+    - Label owner:action is added by the backlog sync only when depends_on is done (max 3 open, D8).
+  - key: com/site/real-content/claims/content-dir
+    type: Task
+    title: Rename src/data to src/content
+    effort: S
+    state: open
+    depends_on:
+    - com/site/real-content/claims/illustrative
+    context: '"data" will mean real published data fetched at build (Indicators Epic). Hand-written sample and editorial
+      files move to src/content to avoid confusion.'
+    files:
+    - edit: src/App.tsx
+    - edit: src/components/ChroniclesSection.tsx
+    - edit: src/components/CommandPalette.tsx
+    - edit: src/components/CompassSection.tsx
+    - edit: src/components/DataVisualizationModal.tsx
+    - edit: src/components/HeroConsultingSection.tsx
+    - edit: src/components/MetricFlowModal.tsx
+    - edit: src/components/MetricsSection.tsx
+    - edit: src/components/ProductsSection.tsx
+    - edit: src/components/PulseSection.tsx
+    - edit: src/components/VaultSection.tsx
+    - delete: src/data/articlesData.ts
+    - delete: src/data/consultantData.ts
+    - delete: src/data/datasetsData.ts
+    - delete: src/data/eacData.ts
+    - delete: src/data/financeTrends.ts
+    - delete: src/data/metricsData.ts
+    - delete: src/data/polandRegions.ts
+    - delete: src/data/productsData.ts
+    - delete: src/data/pulseData.ts
+    - create: src/content/articlesData.ts
+    - create: src/content/consultantData.ts
+    - create: src/content/datasetsData.ts
+    - create: src/content/eacData.ts
+    - create: src/content/financeTrends.ts
+    - create: src/content/metricsData.ts
+    - create: src/content/polandRegions.ts
+    - create: src/content/productsData.ts
+    - create: src/content/pulseData.ts
+    steps:
+    - git mv src/data src/content (moves the nine files listed above unchanged; if the illustrative Task deleted
+      eacData.ts, skip it).
+    - Replace every import path '../data/' with '../content/' and './data/' with './content/'.
+    acceptance:
+    - No import references src/data; build passes
+    verify:
+    - run: grep -rnE "from .\.\.?/data/" src | wc -l
+      expect: '0'
+    - run: bun run lint && bun run build
+      expect: exit 0
+    out_of_scope:
+    - Changing file contents
+- key: com/site/real-content/legal
+  title: Legal pages
+  depends_on:
+  - com/site/site-v1/i18n
+  done_when:
+  - /legal/imprint, /legal/privacy, /legal/data-terms in PL and EN, linked from the footer
+  tasks:
+  - key: com/site/real-content/legal/decision
+    type: Task
+    title: 'Owner: imprint details and licence for zohelo''s derived data'
+    effort: S
+    state: open
+    owner_action: 'Reply with (1) the name and contact e-mail to show in the imprint (address only if you want it
+      public), and (2) the licence for data files zohelo publishes (derived extracts): "CC BY 4.0" (recommended:
+      free reuse with attribution, upstream terms still apply) or "all rights reserved".'
+    context: Code is all rights reserved (decision 4); derived data needs its own answer before /data offers downloads.
+    files: []
+    steps:
+    - Owner replies with both answers.
+    - Agent adds two rows to zohelo-data docs/decisions.md (decision log, D13) ('Imprint details', 'Licence of zohelo
+      derived data') and copies them into this Epic's decisions in the backlog YAML; closes this Task with a comment
+      linking that PR.
+    acceptance:
+    - Both rows exist in the decision log
+    verify:
+    - run: gh api repos/zohelo/zohelo-data/contents/docs/decisions.md --jq .content | base64 -d | grep -ciE 'imprint
+        details|licence of zohelo derived data'
+      expect: '2'
+    out_of_scope:
+    - Writing the pages
+    verify_only: true
+    depends_on:
+    - com/site/site-v1/router/config
+    notes:
+    - Label owner:action is added by the backlog sync only when depends_on is done (max 3 open, D8).
+  - key: com/site/real-content/legal/pages
+    type: Task
+    title: Add imprint, privacy and data-terms pages
+    effort: M
+    state: open
+    depends_on:
+    - com/site/real-content/legal/decision
+    - com/growth/analytics/enable/toggle
+    - com/site/site-v1/router/framework
+    - com/site/site-v1/router/config
+    - com/site/site-v1/i18n/routing
+    context: 'Facts for privacy: no cookies; Cloudflare Web Analytics (cookieless, no personal data); Cloudflare
+      Pages hosting logs; no accounts; contact by e-mail only. Data terms: upstream licences per source (Eurostat
+      reuse with attribution and disclaimer, World Bank CC BY 4.0, GUS terms, NBP per its licence reply) plus the
+      owner''s choice for derived data.'
+    files:
+    - create: src/routes/legal.imprint.tsx
+    - create: src/routes/legal.privacy.tsx
+    - create: src/routes/legal.data-terms.tsx
+    - create: src/content/legal.ts
+    - edit: src/routes.ts
+    - edit: src/site.config.ts
+    - edit: src/i18n/pl.ts
+    - edit: src/i18n/en.ts
+    steps:
+    - 'src/content/legal.ts: the three texts in pl and en (plain, short sections; no legal advice claims).'
+    - Add routes legal/imprint, legal/privacy, legal/data-terms (both languages) and their site.config pages entries
+      with titles/descriptions.
+    - Add the three links to the footer legal column via the dictionaries.
+    acceptance:
+    - Six pages pre-rendered; footer links them; texts match the facts above and the recorded decisions
+    verify:
+    - run: bun run build && ls build/client/legal/privacy/index.html build/client/en/legal/privacy/index.html
+      expect: both exist
+    out_of_scope:
+    - Cookie banner (no cookies are set)

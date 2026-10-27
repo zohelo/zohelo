@@ -1,0 +1,37 @@
+key: com/growth/calendar-page
+area: com/growth
+title: Release calendar page
+phase: 2
+priority: P2
+target: 2027-03-12
+why: Analysts plan around GUS, Eurostat and NBP release dates. A browsable calendar with filters by source and domain,
+  linked to indicator pages, turns the .ics feed into a page people bookmark.
+outcome: /calendar (PL/EN) lists upcoming and recent releases with source, KPIs affected and links; each entry can
+  be added to a personal calendar.
+in_scope:
+- /calendar page from the published release calendar, filters by source and domain
+- Per-entry "add to calendar" (.ics single event)
+out_of_scope:
+- Release-day live pages (later)
+- Push notifications
+done_when:
+- /calendar shows the next 60 days and last 14 days of releases with working filters
+- Each entry links to the affected indicator pages
+depends_on:
+- com/growth/calendar-ics
+- com/site/indicators
+deliverables:
+- key: com/growth/calendar-page/page
+  title: Calendar page
+  done_when:
+  - Route /calendar pre-rendered with entries; client-side filters by source and domain
+  todo:
+  - Route /calendar using CalendarList (add to @zohelo/design if missing), data from the release_calendar extract.
+- key: com/growth/calendar-page/single-event
+  title: Add-to-calendar per entry
+  depends_on:
+  - com/growth/calendar-page/page
+  done_when:
+  - Each entry offers a single-event .ics generated at build
+  todo:
+  - Write build/client/calendar/<release-id>.ics per entry at build.

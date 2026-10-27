@@ -1,0 +1,544 @@
+key: com/design/design-v1
+area: com/design
+title: '@zohelo/design v1'
+phase: 1
+priority: P1
+target: 2026-12-05
+why: zohelo.com (teal), zohelo-bi (blue, Inter) and the data portal (Duck-UI) look like three different companies.
+  A shared package of tokens, fonts, logo, components and chart style makes them one brand and stops each repo re-inventing
+  colours and charts.
+outcome: A versioned package @zohelo/design (tokens, fonts, logo, core components, Vega-Lite chart style) is released
+  from this repo and used by zohelo.com; zohelo-bi and the data portal can install it by version.
+in_scope:
+- DTCG tokens → CSS variables, Tailwind 4 theme, Vega theme (light and dark)
+- Fonts via @fontsource (no Google Fonts calls)
+- Core React components (header, footer, card, KPI tile, table, badges, source footer)
+- Chart wrapper and specs moved from zohelo-bi packages/visuals
+- Logo mark and wordmark SVGs
+- /design page on zohelo.com; release workflow
+out_of_scope:
+- Pivot matrix, map, dimension shelves (built in zohelo-bi, promoted later)
+- Rewriting existing site sections' hard-coded colours (replaced as pages are rebuilt)
+done_when:
+- Release design-v1.0.0 exists with a downloadable tarball
+- zohelo.com builds from the package tokens and fonts; /design shows every token and component in light and dark
+- 'Text colours pass WCAG AA (4.5:1) per the token table; teal #3B8B94 is used only for large text and graphics'
+decisions:
+- plan 27 Oct design package §5.3–5.5 (tokens, palette, fonts, logo); §5.6 'git tag' is superseded by D3 (release
+  tarball)
+- 'architect 27 Oct: one package @zohelo/design in packages/design with subpath exports (., ./tokens.css, ./theme.css,
+  ./fonts.css, ./visuals). Distributed as a tarball attached to the GitHub Release design-vX.Y.Z (git dependencies
+  cannot point at a subdirectory; GitHub Packages npm needs a token even for public packages). Consumers depend
+  on the release URL.'
+- 'architect 27 Oct: data font = Inter Variable with tabular-nums; UI = Plus Jakarta Sans; display = Newsreader;
+  mono = JetBrains Mono'
+- 'architect 27 Oct: components are plain React + Tailwind classes on tokens; no Radix in v1'
+- 'architect 27 Oct: the package is compiled with tsc to dist/ (JS + .d.ts); consumers never compile its TS'
+- 'D4 (27 Oct): visuals move first; zohelo-bi freezes new chart specs until it merges'
+deliverables:
+- key: com/design/design-v1/package
+  title: Package scaffold, tokens and fonts
+  done_when:
+  - packages/design builds to dist/ with tokens.css, theme.css, fonts.css and typed tokens
+  - Root bun run lint type-checks the site and the package
+  tasks:
+  - key: com/design/design-v1/package/scaffold
+    type: Task
+    title: Scaffold packages/design as a bun workspace
+    effort: S
+    state: open
+    context: The repo root is the site (@zohelo/site, Vite, React 19, TS strict, bun 1.4.2). There is no workspace
+      yet. The site stays at the root; the package is a workspace member.
+    files:
+    - edit: package.json
+    - edit: tsconfig.json
+    - create: packages/design/package.json
+    - create: packages/design/tsconfig.json
+    - create: packages/design/src/index.ts
+    - create: packages/design/README.md
+    steps:
+    - 'Root package.json: add "workspaces": ["packages/*"]; add dependency "@zohelo/design": "workspace:*"; change
+      lint to "bun run --cwd packages/design build && tsc --noEmit" and build to "bun run --cwd packages/design
+      build && vite build" (the site imports the package''s dist types and files).'
+    - 'Root tsconfig.json: add "packages" to exclude (the package has its own tsconfig).'
+    - 'packages/design/package.json: name @zohelo/design, version 1.0.0, type module, files ["dist"], exports {
+      ".": { types ./dist/index.d.ts, import ./dist/index.js } }, peerDependencies react ^19, scripts build "tsc
+      -p tsconfig.json".'
+    - 'packages/design/tsconfig.json: extends nothing; target ES2022, module ESNext, moduleResolution bundler, jsx
+      react-jsx, strict, declaration true, outDir dist, rootDir src.'
+    - 'src/index.ts: export const DESIGN_VERSION = ''1.0.0'';'
+    - README.md: one paragraph purpose, install line (release URL pattern), exports list.
+    - Add packages/design/dist to .gitignore.
+    acceptance:
+    - bun install creates the workspace link; bun run lint passes; packages/design/dist/index.js exists after lint
+    verify:
+    - run: bun install && bun run lint && ls packages/design/dist/index.js
+      expect: exit 0, file listed
+    - run: bun run build
+      expect: site builds as before
+    out_of_scope:
+    - Tokens, components (next Tasks)
+    - Moving the site into apps/
+  - key: com/design/design-v1/package/tokens-values
+    type: Task
+    title: Write tokens.json with the v1 token values
+    effort: S
+    state: open
+    contract: true
+    depends_on:
+    - com/design/design-v1/package/scaffold
+    context: 'tokens.json (W3C DTCG: $value, $type) is the single source of every colour, font and size in all three
+      products. Values below are final (design package §5.3, 27 Oct). Dark values go in $extensions.dark.'
+    files:
+    - create: packages/design/tokens.json
+    steps:
+    - 'color (light / dark): brand.teal #3B8B94/#5FB3BC; brand.teal-strong #2C6E76/#7FC6CD; brand.teal-soft #EBF5F6/#163238;
+      brand.azure #3A6FA4/#8FB4E8; text #24292E/#E8EAED; text-muted #5D636B/#A2A9B2; text-faint #8A9099/#737A83;
+      bg #F4F7F9/#111315; surface #FFFFFF/#181B1E; surface-2 #EDF1F4/#202428; border #E2E8F0/#2A2F34; grid #E8ECEF/#262A2F;
+      ok #15803D/#5FD39A; warn #B45309/#F2C14E; danger #B91C1C/#FF8A80; focus #2B5480/#8FB4E8.'
+    - 'font: display ''Newsreader'' (600, 700); ui ''Plus Jakarta Sans'' (400, 500, 600, 700); data ''Inter Variable''
+      (tabular-nums); mono ''JetBrains Mono''. Each $value is a font-family list ending in a generic family (serif,
+      sans-serif, monospace).'
+    - 'size (px): xs 12, sm 13, base 14, body 16, lg 20, xl 24, 2xl 32, display 44. line-height: body 1.5, heading
+      1.2.'
+    - 'space (px): 1 4, 2 8, 3 12, 4 16, 6 24, 8 32, 12 48, 16 64. radius (px): sm 6, md 10, lg 14. shadow: card
+      ''0 4px 16px -2px rgba(15,23,42,0.04), 0 2px 6px -1px rgba(15,23,42,0.02)'', popover ''0 12px 32px -4px rgba(15,23,42,0.12)'';
+      dark: none.'
+    - 'layout: content-max 1280; gutter phone 16, tablet 24, desktop 32.'
+    acceptance:
+    - Every value above is present exactly once; file parses as JSON
+    - No other values are added
+    verify:
+    - run: python3 -c "import json;d=json.load(open('packages/design/tokens.json'));print(d['color']['brand']['teal-strong']['$value'])"
+      expect: '#2C6E76'
+    out_of_scope:
+    - Generating CSS (Task tokens)
+    - Chart palette (lives in visuals/theme.ts)
+  - key: com/design/design-v1/package/tokens
+    type: Task
+    title: Generate tokens.css, Tailwind theme and TS from tokens.json
+    effort: M
+    state: open
+    depends_on:
+    - com/design/design-v1/package/tokens-values
+    - com/design/design-v1/package/scaffold
+    context: tokens.json (Task tokens-values) holds the values. A small bun script turns it into CSS variables,
+      a Tailwind 4 theme and a typed TS object; no Style Dictionary.
+    files:
+    - create: packages/design/scripts/build-tokens.ts
+    - create: packages/design/scripts/build-tokens.test.ts
+    - edit: packages/design/package.json
+    steps:
+    - 'build-tokens.ts reads tokens.json and writes dist/tokens.css: one variable per token named --z-<group>-<path
+      joined by ->, e.g. --z-color-brand-teal-strong, --z-font-ui, --z-size-body, --z-space-4, --z-radius-lg, --z-shadow-card.
+      Light values in :root; dark values in @media (prefers-color-scheme: dark) { :root:not([data-theme=light])
+      {…} } and again in :root[data-theme=dark] {…}.'
+    - 'It writes dist/theme.css: one Tailwind 4 @theme { } block with --color-<name>: var(--z-color-<name>) for
+      every colour token, --font-<name>: var(--z-font-<name>) for every font, --radius-<name>: var(--z-radius-<name>)
+      for every radius.'
+    - 'It writes src/generated/tokens.ts: export const tokens = { light: {…}, dark: {…} } as const with every colour,
+      plus fonts, sizes, space, radius.'
+    - 'package.json: build = "bun scripts/build-tokens.ts && tsc -p tsconfig.json"; exports add "./tokens.css" and
+      "./theme.css" → dist files. Commit src/generated/tokens.ts (consumers'' type checks must not depend on a build
+      step).'
+    - 'build-tokens.test.ts (bun test): tokens.css contains ''--z-color-brand-teal-strong: #2C6E76'' and a [data-theme=dark]
+      block; theme.css contains ''@theme''; tokens.ts dark.bg equals ''#111315''.'
+    acceptance:
+    - Every token in tokens.json appears in tokens.css and tokens.ts; no value appears that is not in tokens.json
+    - bun test passes
+    verify:
+    - run: cd packages/design && bun run build && bun test
+      expect: build exit 0; tests pass
+    out_of_scope:
+    - Chart palette (Task visuals/move)
+    - Using tokens in the site (Task adopt/site-tokens)
+    contract: true
+  - key: com/design/design-v1/package/fonts
+    type: Task
+    title: Ship the font set as fonts.css in the package
+    effort: S
+    state: open
+    depends_on:
+    - com/design/design-v1/package/tokens
+    - com/design/design-v1/package/scaffold
+    context: src/main.tsx imports 13 @fontsource CSS files (Plus Jakarta Sans 400–800, Newsreader 400/600/700 +
+      italics, JetBrains Mono 400–600). Inter Variable is added for data figures.
+    files:
+    - create: packages/design/src/fonts.css
+    - edit: packages/design/package.json
+    - edit: packages/design/scripts/build-tokens.ts
+    - edit: src/main.tsx
+    - edit: package.json
+    steps:
+    - Move the three @fontsource dependencies from the root package.json to packages/design dependencies (same versions);
+      add @fontsource-variable/inter 5.2.8.
+    - 'fonts.css: @import the same 13 files plus ''@fontsource-variable/inter/wght.css''; then .z-figures { font-family:
+      ''Inter Variable'', sans-serif; font-variant-numeric: tabular-nums lining-nums; }'
+    - build-tokens.ts copies src/fonts.css to dist/fonts.css; exports add "./fonts.css".
+    - 'src/main.tsx: replace the 13 imports with import ''@zohelo/design/fonts.css'';'
+    acceptance:
+    - The built site loads the same font files from its own origin (no fonts.googleapis.com request)
+    verify:
+    - run: bun install && bun run lint && bun run build && ls dist/assets | grep -c woff2
+      expect: 10 or more
+    - run: grep -r "googleapis" dist | wc -l
+      expect: '0'
+    out_of_scope:
+    - Changing which fonts the site uses for headings/body
+    contract: true
+- key: com/design/design-v1/visuals
+  title: Chart style and Vega-Lite wrapper
+  done_when:
+  - '@zohelo/design/visuals exports Chart, lineSpec, barSpec and a token-based theme with the §5.4 palette'
+  tasks:
+  - key: com/design/design-v1/visuals/move
+    type: Task
+    title: Move the Vega-Lite Chart and specs from zohelo-bi (first design Task)
+    effort: M
+    state: open
+    context: 'D4: this is the first design Task after the scaffold. Until it merges, zohelo-bi adds no new chart
+      specs; afterwards new specs are added here only. zohelo-bi packages/visuals/src has Chart.tsx, specs.ts (config(theme),
+      lineSpec, barSpec) and index.ts, using vega 6.4.0, vega-embed 7.3.0, vega-lite 6.5.0. Its Theme type takes
+      colours from the caller. Here theme.ts supplies them from fixed values so the move does not wait for the token
+      build.'
+    files:
+    - create: packages/design/src/visuals/Chart.tsx
+    - create: packages/design/src/visuals/specs.ts
+    - create: packages/design/src/visuals/theme.ts
+    - create: packages/design/src/visuals/index.ts
+    - edit: packages/design/package.json
+    steps:
+    - Copy Chart.tsx, specs.ts and index.ts unchanged from zohelo-bi main (gh api repos/zohelo/zohelo-bi/contents/packages/visuals/src/<file>
+      --jq .content | base64 -d) into packages/design/src/visuals/.
+    - 'theme.ts: export function themeFromMode(mode: ''light''|''dark''): Theme. light: text #24292E, muted #5D636B,
+      grid #E8ECEF, accent #3B8B94, mutedMark #BFBFBF, palette [#1C5A61, #F2A33A, #7A1F4F, #5BB8C4, #3A3F47, #A98BDC].
+      dark: text #E8EAED, muted #A2A9B2, grid #262A2F, accent #5FB3BC, mutedMark #737A83, palette [#4F9AA3, #F2A33A,
+      #B5578A, #5BB8C4, #8A9099, #A98BDC]. Export it from src/visuals/index.ts.'
+    - Add dependencies vega 6.4.0, vega-embed 7.3.0, vega-lite 6.5.0 (exact); exports add "./visuals" → { types
+      ./dist/visuals/index.d.ts, import ./dist/visuals/index.js }.
+    - 'Comment on the zohelo-bi Epic ''Design system adoption'' issue: ''Chart specs now live in @zohelo/design/visuals
+      (zohelo PR <n>); add new specs there.'''
+    acceptance:
+    - lineSpec/barSpec signatures identical to zohelo-bi's so bi can switch imports only
+    - No colour literal in specs.ts; colours come from Theme
+    - themeFromMode returns the values above
+    verify:
+    - run: cd packages/design && bun install && bun run build
+      expect: exit 0 and dist/visuals/index.js exists
+    out_of_scope:
+    - Deleting zohelo-bi packages/visuals (bi adoption Task)
+    - New chart types
+    depends_on:
+    - com/design/design-v1/package/scaffold
+- key: com/design/design-v1/components
+  title: Core components
+  depends_on:
+  - com/design/design-v1/package
+  done_when:
+  - Components exported from @zohelo/design, typed, styled only with token classes, working in light and dark
+  tasks:
+  - key: com/design/design-v1/components/basics
+    type: Task
+    title: Add Card, Callout, FreshnessBadge and KpiTile
+    effort: M
+    state: open
+    context: These are the building blocks of KPI pages and dashboards. Numbers use the .z-figures class. Delta
+      direction is shown with ▲/▼ and text, never colour alone (WCAG).
+    files:
+    - create: packages/design/src/components/Card.tsx
+    - create: packages/design/src/components/Callout.tsx
+    - create: packages/design/src/components/FreshnessBadge.tsx
+    - create: packages/design/src/components/KpiTile.tsx
+    - create: packages/design/src/format.ts
+    - create: packages/design/src/format.test.ts
+    - edit: packages/design/src/index.ts
+    steps:
+    - 'format.ts: formatNumber(value, locale ''pl''|''en'', {decimals}) via Intl.NumberFormat (pl → ''12 345,6'',
+      en → ''12,345.6''); formatDelta returns {text, direction: up|down|flat}.'
+    - 'Card: props title?, children, className?; radius lg, surface background, border token, shadow card (none
+      in dark).'
+    - 'Callout: props tone info|warn|danger, children; icon-free, left border in tone colour.'
+    - 'FreshnessBadge: props date (ISO), locale; renders ''dane z 2026-10-01'' / ''data as of 2026-10-01''.'
+    - 'KpiTile: props label, value, unit, delta?, period, locale, href?; value in .z-figures; delta with ▲/▼ + text;
+      uses ok/danger tokens only when a prop goodDirection is given.'
+    - Export all from src/index.ts; bun test for format.ts (pl and en examples above, negative numbers, null → '–').
+    acceptance:
+    - All four components and the two formatters are exported and typed
+    - format tests pass
+    verify:
+    - run: cd packages/design && bun run build && bun test
+      expect: exit 0
+    out_of_scope:
+    - Sparklines (Chart arrives in visuals Deliverable)
+    depends_on:
+    - com/design/design-v1/package/tokens
+    - com/design/design-v1/package/scaffold
+  - key: com/design/design-v1/components/table
+    type: Task
+    title: Add DataTable and SourceFooter
+    effort: M
+    state: open
+    depends_on:
+    - com/design/design-v1/components/basics
+    - com/design/design-v1/package/scaffold
+    context: 'Every chart and table on zohelo products ends with a source line, e.g. "Źródło: GUS BDL (P2392), dane
+      z 2026-10-01 · zohelo". Tables need sticky headers and tabular figures.'
+    files:
+    - create: packages/design/src/components/DataTable.tsx
+    - create: packages/design/src/components/SourceFooter.tsx
+    - edit: packages/design/src/index.ts
+    steps:
+    - 'DataTable<T>: props columns [{key, label, align?, format?(v)}], rows T[], sortable?, caption; header sticky;
+      numeric columns right-aligned with .z-figures; click on a header sorts asc/desc; caption rendered as <caption>
+      for screen readers.'
+    - 'SourceFooter: props sources [{name, code?, url?}], date, licence?, locale; renders PL ''Źródło:'' or EN ''Source:'',
+      joined by '' · '', ends with ''zohelo''.'
+    - Export both.
+    acceptance:
+    - DataTable sorts numbers numerically and text with localeCompare; keyboard-focusable headers
+    - SourceFooter output matches the example string for pl
+    verify:
+    - run: cd packages/design && bun run build
+      expect: exit 0
+    out_of_scope:
+    - Pivot/matrix behaviour (zohelo-bi)
+  - key: com/design/design-v1/components/shell
+    type: Task
+    title: Add AppHeader with product switcher and AppFooter
+    effort: M
+    state: open
+    depends_on:
+    - com/design/design-v1/logo/svg
+    - com/design/design-v1/components/basics
+    - com/design/design-v1/package/scaffold
+    context: 'All three products share a header: logo with product badge (zohelo · zohelo bi · zohelo data), product
+      switcher links (https://zohelo.com, https://bi.zohelo.com, https://data.zohelo.com), a nav slot and a language
+      toggle slot.'
+    files:
+    - create: packages/design/src/components/AppHeader.tsx
+    - create: packages/design/src/components/AppFooter.tsx
+    - edit: packages/design/src/index.ts
+    steps:
+    - 'AppHeader props: product ''com''|''bi''|''data'', nav ReactNode, actions ReactNode (the consumer passes its
+      language toggle and search button here), homeHref. Renders the Logo component with the product badge, the
+      switcher (current product marked aria-current), nav and actions; collapses nav into a menu button below 768
+      px.'
+    - 'AppFooter props: columns [{title, links[{label, href}]}], legal ReactNode; dark surface; bottom line ''Copyright
+      © 2026 Radosław Utkała. All rights reserved.'' passed in by the consumer, not hard-coded.'
+    - Export both.
+    acceptance:
+    - Header works by keyboard; menu button has aria-expanded; no product URL other than the three above
+    verify:
+    - run: cd packages/design && bun run build
+      expect: exit 0
+    out_of_scope:
+    - Using the shell in the site (site-v1 Epic)
+- key: com/design/design-v1/logo
+  title: Logo mark and wordmark
+  done_when:
+  - SVGs for mark, wordmark and the three product lockups in light, dark and mono; favicon
+  tasks:
+  - key: com/design/design-v1/logo/decision
+    type: Task
+    title: 'Owner: choose the logo direction'
+    effort: S
+    state: open
+    owner_action: 'Reply "logo A" (wordmark only, as today) or "logo B" (lowercase Newsreader wordmark "zohelo"
+      + a mark: a "z" made of three horizontal bars of decreasing length, reading as a bar chart). Recommendation:
+      B.'
+    context: Design package open question Q5; the shell and favicon need it.
+    files: []
+    steps:
+    - Owner replies 'logo A' or 'logo B'.
+    - 'Agent adds a row to zohelo-data docs/decisions.md (decision log, D13): date, ''Logo direction'', the answer,
+      ''owner''; then edits this Epic''s decisions in the backlog YAML in the same PR as the decision row, and closes
+      this Task with a comment linking that PR.'
+    acceptance:
+    - The decision log row exists with the owner's answer
+    verify:
+    - run: gh api repos/zohelo/zohelo-data/contents/docs/decisions.md --jq .content | base64 -d | grep -i 'logo
+        direction'
+      expect: one row with A or B
+    out_of_scope:
+    - Drawing the logo
+    verify_only: true
+    depends_on:
+    - com/design/design-v1/package/scaffold
+    notes:
+    - Label owner:action is added by the backlog sync only when depends_on is done (max 3 open, D8).
+  - key: com/design/design-v1/logo/svg
+    type: Task
+    title: Draw the logo SVGs and favicon
+    effort: M
+    state: open
+    depends_on:
+    - com/design/design-v1/logo/decision
+    - com/design/design-v1/package/scaffold
+    context: 'Wordmark in Newsreader 700 converted to outlines (no font dependency in the SVG). Option B mark: three
+      rounded bars, widths 100 %, 70 %, 40 %, stacked to read as a z (top bar right- aligned, bottom bar left-aligned),
+      brand teal #3B8B94.'
+    files:
+    - create: packages/design/assets/logo-mark.svg
+    - create: packages/design/assets/logo-wordmark.svg
+    - create: packages/design/assets/logo-com.svg
+    - create: packages/design/assets/logo-bi.svg
+    - create: packages/design/assets/logo-data.svg
+    - create: packages/design/assets/favicon.svg
+    - create: packages/design/src/components/Logo.tsx
+    - edit: packages/design/package.json
+    steps:
+    - Draw each SVG with viewBox, no embedded fonts or raster images, fill="currentColor" so colour follows CSS.
+    - 'Logo.tsx: props product ''com''|''bi''|''data'', variant ''full''|''mark''; inlines the SVG paths; badge
+      text ''zohelo'', ''zohelo bi'', ''zohelo data''.'
+    - package.json files add "assets"; exports add "./assets/*".
+    - Do not change the site here; the favicon is wired in Task com/site/site-v1/shell/adopt.
+    acceptance:
+    - Every SVG under 4 KB, valid XML, renders at 16 px (favicon) and 200 px
+    verify:
+    - run: for f in packages/design/assets/*.svg; do xmllint --noout "$f" && wc -c < "$f"; done
+      expect: no errors; each under 4096
+    out_of_scope:
+    - OG image template (Phase 2)
+- key: com/design/design-v1/adopt
+  title: Site on the design system and /design page
+  depends_on:
+  - com/design/design-v1/package
+  - com/design/design-v1/components
+  done_when:
+  - src/index.css takes its variables from @zohelo/design; /design lists every token and component
+  tasks:
+  - key: com/design/design-v1/adopt/site-tokens
+    type: Task
+    title: Base the site's CSS on the design tokens
+    effort: S
+    state: open
+    context: src/index.css defines its own --primary-teal, --secondary-azure, --neutral-* variables, body font and
+      three background colours. They become aliases of the package tokens.
+    files:
+    - edit: src/index.css
+    steps:
+    - 'Top of src/index.css: @import ''@zohelo/design/tokens.css''; @import ''tailwindcss''; @import ''@zohelo/design/theme.css'';
+      (replace the current @import "tailwindcss").'
+    - 'Replace the :root values by these aliases, keeping the old names: --primary-teal: var(--z-color-brand-teal);
+      --primary-teal-dark: var(--z-color-brand-teal-strong); --primary-teal-light: var(--z-color-brand-teal-soft);
+      --secondary-azure: var(--z-color-brand-azure); --secondary-azure-dark: var(--z-color-focus); --secondary-azure-light:
+      #EBF2F9 stays as a literal (no token); --neutral-charcoal: var(--z-color-text); --neutral-surface: var(--z-color-surface);
+      --neutral-bg: var(--z-color-bg).'
+    - 'body: background-color var(--z-color-bg) (was #F3F6F8), color var(--z-color-text), font-family var(--z-font-ui).
+      h1, h2, .font-serif-heading: font-family var(--z-font-display). .font-mono-code: var(--z-font-mono). .zohelo-card:
+      background var(--z-color-surface), border-radius var(--z-radius-lg), box-shadow var(--z-shadow-card).'
+    acceptance:
+    - Only --secondary-azure-light keeps a hex value in the :root block
+    - bun run build passes and the preview home page renders
+    verify:
+    - run: bun run lint && bun run build
+      expect: exit 0
+    - workflow: Deploy zohelo.com, manual run on the branch
+      expect: preview answers 200
+    out_of_scope:
+    - Replacing hard-coded hex classes in components
+    depends_on:
+    - com/design/design-v1/package/tokens
+  - key: com/design/design-v1/adopt/design-page
+    type: Task
+    title: Add the /design page
+    effort: M
+    state: open
+    depends_on:
+    - com/design/design-v1/adopt/site-tokens
+    - com/site/site-v1/router/config
+    - com/site/site-v1/i18n/routing
+    - com/site/site-v1/router/framework
+    context: 'A visual test page for designers and agents: every colour token (light and dark swatch with contrast
+      ratio vs surface), type scale, spacing, radius, and every component with sample props. Not linked from the
+      main nav; listed in the sitemap.'
+    files:
+    - create: src/routes/design.tsx
+    - edit: src/routes.ts
+    - edit: src/site.config.ts
+    steps:
+    - Add route /design (and /en/design via the i18n helper) in src/routes.ts and in site.config routes.
+    - 'design.tsx: sections Colours (iterate tokens from @zohelo/design generated tokens; compute WCAG contrast
+      vs surface with a 10-line luminance function), Typography, Spacing & radius, Components (KpiTile, Card, Callout,
+      FreshnessBadge, DataTable, SourceFooter, Chart with a 12-point sample line).'
+    - Add a light/dark toggle that sets data-theme on <html>.
+    acceptance:
+    - Every token in tokens.json appears on the page; build pre-renders /design
+    verify:
+    - run: bun run build && ls build/client/design/index.html
+      expect: file exists
+    out_of_scope:
+    - Linking /design from the header
+- key: com/design/design-v1/release
+  title: Versioned release
+  depends_on:
+  - com/design/design-v1/components
+  - com/design/design-v1/visuals
+  - com/design/design-v1/logo
+  done_when:
+  - Release design-v1.0.0 with asset zohelo-design-1.0.0.tgz downloadable without auth
+  tasks:
+  - key: com/design/design-v1/release/workflow
+    type: Task
+    title: Add the design-release workflow
+    effort: M
+    state: open
+    contract: true
+    context: 'D3: @zohelo/design ships as a tarball on a GitHub Release of zohelo/zohelo; consumers depend on https://github.com/zohelo/zohelo/releases/download/design-vX.Y.Z/zohelo-design-X.Y.Z.tgz.
+      A manual workflow cuts releases so nobody pushes tags by hand.'
+    files:
+    - create: .github/workflows/design-release.yml
+    - create: packages/design/CHANGELOG.md
+    - edit: .github/workflows/check.yml
+    steps:
+    - 'design-release.yml: on workflow_dispatch with input version (string, e.g. 1.0.0); permissions contents: write;
+      one job, timeout 10 min.'
+    - 'First step (fails, not skips): if [ "$GITHUB_REF" != refs/heads/main ]; then echo ''::error::run on main'';
+      exit 1; fi.'
+    - 'Then (SHA-pinned like check.yml): checkout, setup-bun 1.4.2, bun install --frozen-lockfile; fail with ::error
+      unless jq -r .version packages/design/package.json equals the input; cd packages/design && bun run build &&
+      bun pm pack (writes zohelo-design-<version>.tgz).'
+    - 'gh release create design-v<version> packages/design/zohelo-design-<version>.tgz --title ''design v<version>''
+      --notes-file packages/design/CHANGELOG.md --target main (env GH_TOKEN: github.token).'
+    - 'check.yml: add a step ''Lint workflows'': bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash)
+      1.7.7 && ./actionlint -color.'
+    - CHANGELOG.md starts with '## 1.0.0' and the list of exports.
+    acceptance:
+    - actionlint passes in check on this PR
+    - After merge, a run on main with a version different from package.json fails at the version step
+    verify:
+    - workflow: Check on this PR
+      expect: green, step Lint workflows ran
+    - workflow: design-release on main with version 9.9.9 (after merge)
+      expect: fails with the version mismatch error; no release created
+    out_of_scope:
+    - Publishing to any npm registry
+  - key: com/design/design-v1/release/v1
+    type: Task
+    title: Cut design-v1.0.0
+    effort: S
+    state: open
+    verify_only: true
+    depends_on:
+    - com/design/design-v1/release/workflow
+    context: All v1 Deliverables merged; this Task only runs the release and checks it.
+    files: []
+    steps:
+    - Run design-release on main with version 1.0.0.
+    - Check the asset URL answers 200.
+    acceptance:
+    - https://github.com/zohelo/zohelo/releases/download/design-v1.0.0/zohelo-design-1.0.0.tgz downloads
+    verify:
+    - run: curl -sIL -o /dev/null -w '%{http_code}' https://github.com/zohelo/zohelo/releases/download/design-v1.0.0/zohelo-design-1.0.0.tgz
+      expect: '200'
+    out_of_scope:
+    - Adoption in other repos
+- key: com/design/design-v1/adopt-other
+  title: Adopted by zohelo-bi and the data portal
+  depends_on:
+  - com/design/design-v1/release
+  done_when:
+  - zohelo-bi and the data portal depend on the design-v1 release URL and use its tokens and visuals
+  todo:
+  - Tracked in the zohelo-bi Epic 'Design system adoption' and the zohelo-data Epic 'Design shell adoption'; close
+    this Deliverable when both are closed.

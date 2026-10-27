@@ -1,0 +1,46 @@
+key: com/site/data-pages
+area: com/site
+title: Data & sources pages
+phase: 1
+priority: P2
+target: 2027-01-23
+why: Researchers and journalists need to know where every number comes from, under which licence, and how to download
+  it. The Vault section offers fake files; the real offer is the published extracts plus an honest list of sources.
+outcome: /data offers real downloads (published CSV/Parquet/JSON per KPI) with licence and citation text; /sources
+  lists every onboarded source with provider, licence, freshness and the KPIs it feeds.
+in_scope:
+- /data and /sources (PL/EN) from the published catalogue
+- Removal of VaultSection, DatasetPreviewModal and datasetsData.ts
+out_of_scope:
+- Public API (zohelo-bi Phase 2)
+- The 170+ registered but not onboarded sources (shown later, Phase 3)
+done_when:
+- Every download link on /data returns 200 and the file matches the published extract
+- /sources lists all onboarded sources with licence text from dim_licence
+depends_on:
+- data/published/published-v1
+- data/metadata/catalogue-v1
+- com/site/indicators
+- com/site/real-content/legal
+deliverables:
+- key: com/site/data-pages/data
+  title: /data downloads
+  done_when:
+  - Downloads served from the site build (copied published extracts) with licence and citation per file
+  todo:
+  - Copy selected published extracts into build/client/downloads at build (size cap 200 kB per file, else link to
+    bi); citation text template 'zohelo (2026), <KPI>, source <source dataset>, accessed <date>'.
+- key: com/site/data-pages/sources
+  title: /sources page
+  done_when:
+  - 'One row per onboarded source: name, provider, family, licence, last loaded, KPIs fed'
+  todo:
+  - Route /sources from catalog dim_source + dim_licence + freshness; link each KPI to its indicator page.
+- key: com/site/data-pages/vault-removal
+  title: Vault removed
+  depends_on:
+  - com/site/data-pages/data
+  done_when:
+  - VaultSection, DatasetPreviewModal and datasetsData.ts deleted; home links to /data
+  todo:
+  - Delete the three files and their App.tsx wiring; add a home link card to /data.

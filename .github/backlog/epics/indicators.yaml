@@ -1,0 +1,62 @@
+key: com/site/indicators
+area: com/site
+title: Indicators (20 headline KPIs)
+phase: 1
+priority: P1
+target: 2027-01-09
+why: 'Indicator pages are the search engine of the site: one address per KPI ("stopa bezrobocia Polska") with the
+  latest value, a chart, regions and sources. They replace the dummy metric cards and the Pulse ticker with real,
+  cited numbers.'
+outcome: /indicators lists 20 headline KPIs by domain and /indicators/<kpi_key> shows each with latest value, change,
+  chart, regional breakdown where available, definition, sources, licence and download, in PL and EN, pre-rendered
+  from the published layer.
+in_scope:
+- Build-time data from 06_published/v1 (catalog, kpi/<key>/latest.json and series.parquet)
+- Index page, KPI page template, Dataset JSON-LD, today strip on home (6 KPI chips)
+- Replacing MetricsSection and PulseSection with real KPIs (markets = NBP/ECB rates, decision 3)
+out_of_scope:
+- All catalogued KPIs (Phase 3 growth; the template handles them automatically)
+- Interactive pivot (zohelo-bi)
+done_when:
+- 20 KPI pages × 2 languages pre-rendered; every number shows source, dataset code and date
+- The home today strip shows CPI, unemployment, GDP growth, EUR/PLN, average wage, NBP reference rate with real
+  values
+- No Illustrative badge remains on the metrics or pulse sections
+depends_on:
+- data/published/published-v1
+- data/metadata/catalogue-v1
+- com/site/site-v1
+- com/design/design-v1
+decisions:
+- 'owner 27 Oct no. 3: markets section uses public rates (NBP/ECB), no stock quotes'
+- 'plan §3.5: zohelo.com never calls the lakehouse at runtime; it fetches published files at build'
+deliverables:
+- key: com/site/indicators/data
+  title: Published data available at build
+  done_when:
+  - Build fails clearly when published files are missing; local dev works from a committed fixture
+  todo:
+  - scripts/fetch-published.ts (shared with com/growth/what-changed/build-data) + fixtures/published/ with 3 KPIs
+    for local dev and the PR check (check.yml has no credentials).
+  - src/published.ts typed readers for catalog.json and latest.json (types from the published-layer contract in
+    zohelo-data docs).
+- key: com/site/indicators/pages
+  title: Index and KPI page template
+  depends_on:
+  - com/site/indicators/data
+  done_when:
+  - /indicators and /indicators/<kpi_key> pre-rendered for the 20 KPIs listed in site.config
+  todo:
+  - 'Route /indicators: grouped by domain (dim_domain from catalog), KpiTile per KPI.'
+  - 'Route /indicators/:kpi: KpiTile, line Chart (series), regional DataTable when kpi_dimension has geography,
+    definition, SourceFooter, licence, CSV download link to the published extract, Dataset JSON-LD; prerender list
+    from site.config indicators.'
+- key: com/site/indicators/home
+  title: Today strip and real metrics on home
+  depends_on:
+  - com/site/indicators/pages
+  done_when:
+  - Home today strip and the metrics/pulse sections read published values; Illustrative badges removed there
+  todo:
+  - Replace MetricsSection with the today strip (6 KpiTiles); replace PulseSection with a rates block (NBP EUR/PLN,
+    USD/PLN, CHF/PLN, reference rate) from published KPIs; delete src/content/pulseData.ts and metricsData.ts.

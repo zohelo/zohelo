@@ -1,0 +1,50 @@
+key: com/growth/newsletter
+area: com/growth
+title: Newsletter and Monday brief
+phase: 2
+priority: P1
+target: 2027-03-05
+why: E-mail is the strongest return trigger for a data site. A Monday brief "Polska w liczbach" (5 KPIs that moved,
+  one regional story, next week's releases) generated from the same published data brings readers back weekly without
+  editorial work.
+outcome: Readers subscribe with double opt-in; every Monday 07:00 a templated brief is sent and archived at /brief,
+  generated without AI from the published layer.
+in_scope:
+- Provider on a free tier, double opt-in form, GDPR text
+- Monday brief template (PL, EN summary), scheduled send, /brief archive
+out_of_scope:
+- AI-written commentary (budget-gated, separate decision)
+- Accounts and watchlists
+done_when:
+- A test subscriber receives the double opt-in mail and the Monday brief
+- /brief lists every sent brief; the privacy page covers the newsletter
+depends_on:
+- com/growth/what-changed
+- com/growth/calendar-ics
+- com/site/real-content/legal
+deliverables:
+- key: com/growth/newsletter/decision
+  title: Provider and sender identity decided
+  done_when:
+  - Owner has chosen provider and sender name/address; recorded in decisions
+  todo:
+  - 'Owner decision (design package Q2): provider Buttondown / MailerLite free tier / Cloudflare Email Routing +
+    Worker; sender name and e-mail for the GDPR imprint.'
+- key: com/growth/newsletter/signup
+  title: Signup with double opt-in
+  depends_on:
+  - com/growth/newsletter/decision
+  done_when:
+  - Signup form on home and /newsletter posts to the provider; confirmation required
+  todo:
+  - Form component posting to the provider's embed endpoint (no own storage of e-mails); privacy page section.
+- key: com/growth/newsletter/brief
+  title: Monday brief generated and sent
+  depends_on:
+  - com/growth/newsletter/signup
+  done_when:
+  - Scheduled workflow builds the brief from published data and sends it via the provider API every Monday 07:00
+    Europe/Warsaw
+  todo:
+  - scripts/brief.ts → Markdown + HTML; workflow brief.yml (schedule) with provider API key as org secret; archive
+    to content/briefs/YYYY-MM-DD.md via PR by the bot.
