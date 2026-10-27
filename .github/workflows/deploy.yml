@@ -52,8 +52,12 @@ jobs:
       - name: Check the site answers
         run: |
           set -euo pipefail
-          sleep 15
-          code=$(curl -s -o /tmp/page.html -w '%{http_code}' "$DEPLOY_URL/")
+          code=000
+          for _ in $(seq 1 24); do  # a new preview hostname gets its certificate within a minute or two
+            code=$(curl -s -o /tmp/page.html -w '%{http_code}' "$DEPLOY_URL/" || true)
+            [ "$code" = 200 ] && break
+            sleep 10
+          done
           grep -q 'id="root"' /tmp/page.html && [ "$code" = 200 ] || { echo "::error title=site::HTTP $code"; exit 1; }
           api=$(curl -s -o /dev/null -w '%{http_code}' "$DEPLOY_URL/api/stocks/quote?symbol=AAPL")
           echo "::notice title=site::page 200; /api/stocks/quote $api (200 with a key, 503 without)"
