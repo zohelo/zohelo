@@ -37,10 +37,91 @@ deliverables:
   done_when:
   - Home shows the 10 latest changes; /changes shows 30 days; rss.xml generated at build
   todo:
-  - Route /changes and the home block from recentChanges()/latestChanges() and ChangesList (Tasks changes-model,
-    changes-list), reading feed/changes.json from publishedDir() and left out of the build when it is null; scripts/rss.ts
-    writing build/client/rss.xml and en/rss.xml with renderRss() from Task rss-writer.
+  - Route /changes reading .published/feed/changes.json and rendering ChangesList (Task changes-list); home block
+    with the 10 latest changes.
   tasks:
+  - key: com/growth/what-changed/page/rss-build
+    type: Task
+    title: Write rss.xml and en/rss.xml at build from the published feed
+    effort: S
+    state: open
+    contract: false
+    context: 'renderRss() (src/growth/rss.ts) turns feed items into RSS 2.0 and readChanges() (src/published.ts) reads
+      feed/changes.json from a directory. Nothing calls them at build yet. The build will later get the published
+      layer in .published/ (scripts/fetch-published.ts, not written yet); until then that directory does not exist
+      and the build must still pass. This Task adds the build step, testable now with PUBLISHED_DIR=fixtures/published.'
+    files:
+    - create: scripts/rss.ts
+    - edit: package.json
+    - edit: .gitignore
+    steps:
+    - 'scripts/rss.ts (same style as scripts/sitemap.ts): dir = process.env.PUBLISHED_DIR ?? ''.published''; out =
+      join(import.meta.dir, ''..'', ''build'', ''client''). When join(dir, ''feed'', ''changes.json'') does not exist,
+      console.log(`rss: ${dir}/feed/changes.json missing, no feed written`) and return with exit code 0.'
+    - 'Otherwise changes = readChanges(dir); builtAt = changes.generated_at (no clock); write out/rss.xml = renderRss(changes.items,
+      ''pl'', builtAt) and out/en/rss.xml = renderRss(changes.items, ''en'', builtAt) (mkdirSync(join(out, ''en''),
+      { recursive: true }) first); console.log(`rss: ${changes.items.length} items written to build/client/rss.xml
+      and build/client/en/rss.xml`).'
+    - 'package.json, script build: append '' && bun scripts/rss.ts'' after ''bun scripts/sitemap.ts''.'
+    - '.gitignore: add the line ''.published/''.'
+    acceptance:
+    - bun run build passes without .published/ and prints the 'missing' line
+    - With PUBLISHED_DIR=fixtures/published both feeds are written, well-formed, with 2 items each
+    verify:
+    - run: bun run build 2>&1 | grep '^rss:'
+      expect: 'rss: .published/feed/changes.json missing, no feed written'
+    - run: PUBLISHED_DIR=fixtures/published bun scripts/rss.ts && xmllint --noout build/client/rss.xml build/client/en/rss.xml
+        && grep -o '<item>' build/client/en/rss.xml | wc -l
+      expect: 'rss: 2 items written …; xmllint silent; 2'
+    out_of_scope:
+    - scripts/fetch-published.ts, deploy.yml and the /changes route
+    - A <link rel="alternate"> to the feed in the page head
+    depends_on:
+    - com/growth/what-changed/page/rss-writer
+    - com/site/indicators/data/readers
+    - com/site/site-v1/seo/sitemap
+  - key: com/growth/what-changed/page/changes-list
+    type: Task
+    title: Add the ChangesList component for the what-changed feed
+    effort: M
+    state: open
+    contract: false
+    context: 'The /changes page (30 days) and the home block (10 latest) both list items of feed/changes.json (types
+      ChangeItem and Source in src/published.ts). This Task adds one component for both; routes come later. Styling
+      uses the design token classes (text-text, text-text-muted, border-border, font-ui, font-mono) as in @zohelo/design
+      components.'
+    files:
+    - create: src/growth/ChangesList.tsx
+    - create: tests/changesList.test.tsx
+    steps:
+    - 'export function ChangesList({ items, sources, locale, limit }: { items: ChangeItem[]; sources: Source[]; locale:
+      Locale; limit?: number }) (`import type` from ''../published'' — it imports node:fs; Locale and localizedPath
+      from ''../i18n'').'
+    - 'Order items by at descending (equal at keep input order, do not mutate items), then take the first limit (all
+      when limit is undefined).'
+    - 'Render <ol className="divide-y divide-border"> with one <li className="py-3"> per item: <time dateTime={at}
+      className="font-ui text-[length:var(--z-size-xs)] text-text-muted">{at.slice(0, 10)}</time>; the title (title_pl
+      / title_en) as <a href={localizedPath(`/indicators/${kpi_keys[0]}`, locale)}> when kpi_keys is non-empty, else
+      a <span>; then <div className="font-mono text-[length:var(--z-size-xs)] text-text-muted">{`${name} · ${dataset_key}`}</div>
+      (one template string), name = name_pl / name_en of the matching source, else source_key.'
+    - 'No items: render <p className="text-text-muted"> ''Brak zmian w ostatnich 30 dniach.'' / ''No changes in the
+      last 30 days.'' instead of the list.'
+    - 'tests/changesList.test.tsx (bun:test, renderToStaticMarkup, readChanges and readCatalog of fixtures/published):
+      pl markup contains ''Eurostat: zaktualizowano stopę bezrobocia (przykład)'', href="/indicators/unemployment_rate"
+      and ''Narodowy Bank Polski · fx_a''; en contains href="/en/indicators/fx_rate"; limit 1 gives one <li; inline
+      items with at 2026-01-02 and 2026-01-03 render the 01-03 one first; empty kpi_keys gives no <a; [] gives the
+      Polish empty text.'
+    acceptance:
+    - Every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/changesList.test.tsx
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The /changes route, the home block and the 30-day filter (the feed holds 30 days)
+    - FreshnessBadge or pagination
+    depends_on:
+    - com/site/indicators/data/readers
+    - com/site/site-v1/i18n/routing
   - key: com/growth/what-changed/page/rss-writer
     type: Task
     title: Add a pure RSS 2.0 writer for the what-changed feed
@@ -82,78 +163,6 @@ deliverables:
     - Serving or linking the feed
     depends_on:
     - data/published/published-v1/contract/schemas
-  - key: com/growth/what-changed/page/changes-model
-    type: Task
-    title: Add the what-changed list rules (30 days, latest 10, links)
-    effort: S
-    state: open
-    contract: false
-    context: 'The /changes page shows the changes of the last 30 days and the home block the 10 latest (Deliverable
-      done_when), from feed/changes.json (type Changes in src/published.ts; zohelo-data docs/published.md). Each entry
-      links to the indicator page of its first KPI, the same rule src/growth/rss.ts uses. This Task adds only the
-      pure functions; routes come later.'
-    files:
-    - create: src/growth/changes.ts
-    - create: tests/changes.test.ts
-    steps:
-    - 'Export type ChangeEntry = { at: string; date: string; title: string; href: string; source_key: string }. Import
-      types Changes, ChangeItem from ''../published''; Locale and localizedPath from ''../i18n''.'
-    - 'export function changeEntry(item: ChangeItem, locale: Locale): ChangeEntry. date = at.slice(0, 10); title =
-      title_pl/title_en; href = localizedPath(`/indicators/${kpi_keys[0]}`, locale), or localizedPath(''/changes'',
-      locale) when kpi_keys is empty.'
-    - 'A private sortItems(items) returns a copy sorted by at descending (Array.prototype.sort is stable, so equal
-      at keep input order).'
-    - 'export function recentChanges(changes: Changes, now: string, locale: Locale, days = 30): ChangeEntry[] = sorted
-      items with Date.parse(at) >= Date.parse(now) - days * 86400000, mapped with changeEntry.'
-    - 'export function latestChanges(changes: Changes, locale: Locale, count = 10): ChangeEntry[] = the first count
-      sorted items, mapped with changeEntry.'
-    - 'tests/changes.test.ts (bun:test, inline items): an item 31 days before now is dropped and one 29 days before
-      kept; newer first, equal at keep input order; 12 items give 10 from latestChanges; pl href ''/indicators/unemployment_rate'',
-      en ''/en/indicators/unemployment_rate''; empty kpi_keys gives ''/changes'' (pl) and ''/en/changes'' (en); date
-      is ''2026-01-01'' for at ''2026-01-01T00:00:00Z''; the input items array keeps its order.'
-    acceptance:
-    - The functions are pure and do not mutate their input
-    - Every rule above is covered by a test
-    verify:
-    - run: bun run lint && bun test tests/changes.test.ts
-      expect: exit 0; 0 fail
-    out_of_scope:
-    - The /changes route, the home block and scripts/rss.ts
-    - Changing src/growth/rss.ts
-    depends_on:
-    - com/site/indicators/data/readers
-  - key: com/growth/what-changed/page/changes-list
-    type: Task
-    title: Add the ChangesList component
-    effort: S
-    state: open
-    contract: false
-    context: 'The home block and /changes render the same list (date, linked title), newest first. The entries are
-      computed elsewhere (todo above); this Task adds only the presentational component, styled with the token classes
-      already used in src/routes/portfolio.tsx and packages/design (text-text, text-text-muted, font-ui, z-figures,
-      border-border). The site forces the light theme (decision D21).'
-    files:
-    - create: src/components/ChangesList.tsx
-    - create: tests/changesList.test.tsx
-    steps:
-    - 'Export type ChangesListItem = { at: string; date: string; title: string; href: string } and function ChangesList({
-      items, locale }: { items: ChangesListItem[]; locale: ''pl'' | ''en'' }). No state, effects or data loading.'
-    - 'Empty items: render <p className="font-ui text-text-muted"> with ''Brak zmian w ostatnich 30 dniach.'' (pl)
-      or ''No changes in the last 30 days.'' (en).'
-    - 'Otherwise <ol className="divide-y divide-border"> with one <li className="flex gap-4 py-3"> per item, in the
-      given order: <time dateTime={at} className="z-figures shrink-0 text-text-muted">{date}</time>, then <a href={href}
-      className="text-text underline-offset-2 hover:underline">{title}</a>. key = `${at}-${href}-${index}`.'
-    - 'tests/changesList.test.tsx (bun:test, renderToStaticMarkup from react-dom/server): two items render two <li>
-      in the given order with dateTime, date, title and href; a title ''A <b>'' is escaped (''A &lt;b&gt;''); empty
-      items render the Polish and the English message.'
-    acceptance:
-    - Every rule above is covered by a test
-    verify:
-    - run: bun run lint && bun test tests/changesList.test.tsx
-      expect: exit 0; 0 fail
-    out_of_scope:
-    - Computing the entries (Task changes-model), routes and the home page
-    - New tokens or components in packages/design
 - key: com/growth/what-changed/trigger
   title: Rebuild after each publish
   repo: zohelo-data

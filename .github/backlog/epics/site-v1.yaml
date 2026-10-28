@@ -264,6 +264,83 @@ deliverables:
       expect: well-formed; count = 2 × pages
     out_of_scope:
     - Submitting to search consoles (owner, later)
+  - key: com/site/site-v1/seo/home-title
+    type: Task
+    title: Drop the duplicate brand from the home page title
+    effort: S
+    state: open
+    contract: false
+    context: 'Today build/client/index.html has <title>zohelo — Polska w danych · zohelo</title> (and the same og:title):
+      the ''/'' entry in src/site.config.ts already holds the brand, and pageMeta() in src/seo.ts appends '' · zohelo''
+      to every title. Target: page titles in site.config never contain the brand; the home page reads ''Polska w danych
+      · zohelo'' / ''Poland in data · zohelo''. og:title comes from the same string in pageMeta, so it follows.'
+    files:
+    - edit: src/site.config.ts
+    - create: tests/seo.test.ts
+    steps:
+    - 'src/site.config.ts, the pages entry with path ''/'': set title to { pl: ''Polska w danych'', en: ''Poland in
+      data'' }. Change nothing else in the file.'
+    - 'tests/seo.test.ts (bun:test), importing pages and site from ''../src/site.config'' and pageMeta from ''../src/seo'':
+      (a) for every page and both locales, page.title[locale].toLowerCase() does not contain site.name; (b) pageMeta({
+      path: ''/'', locale: ''pl'', title: home.title.pl, description: home.description.pl })[0] equals { title: ''Polska
+      w danych · zohelo'' } and its og:title descriptor has content ''Polska w danych · zohelo''; (c) the same for
+      en gives ''Poland in data · zohelo''.'
+    acceptance:
+    - build/client/index.html has <title>Polska w danych · zohelo</title>; build/client/en/index.html has <title>Poland
+      in data · zohelo</title>
+    - og:title equals the title on both pages
+    verify:
+    - run: bun run lint && bun test tests/seo.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -o '<title>[^<]*</title>' build/client/index.html build/client/en/index.html
+      expect: '<title>Polska w danych · zohelo</title> and <title>Poland in data · zohelo</title>'
+    - run: grep -o 'zohelo — ' build/client/index.html | wc -l
+      expect: '0'
+    out_of_scope:
+    - The ' · zohelo' suffix in pageMeta and the home JSON-LD (name stays site.name)
+    - Titles of other pages
+    depends_on:
+    - com/site/site-v1/seo/meta
+  - key: com/site/site-v1/seo/route-meta
+    type: Task
+    title: Use pageMeta on the portfolio and design pages
+    effort: S
+    state: open
+    contract: false
+    context: 'src/routes/home.tsx builds its head tags with pageMeta() from src/seo.ts (title, description, canonical,
+      hreflang pl/en/x-default, Open Graph, Twitter card). src/routes/portfolio.tsx and src/routes/design.tsx still
+      return only a hand-written title and description, so they have no canonical, hreflang or og tags although both
+      are in the sitemap. Target: both use pageMeta with their src/site.config.ts entry. The design page stays indexable
+      (no robots tag).'
+    files:
+    - edit: src/routes/portfolio.tsx
+    - edit: src/routes/design.tsx
+    steps:
+    - 'src/routes/portfolio.tsx: add import { pageMeta } from ''../seo''; meta() keeps `const locale = localeOf(location.pathname)`
+      and returns pageMeta({ path: page.path, locale, title: page.title[locale], description: page.description[locale]
+      }).'
+    - src/routes/design.tsx, the same change to its meta(); add no robots descriptor.
+    - Leave the page components and the dict in portfolio.tsx unchanged.
+    acceptance:
+    - The four pages /portfolio, /en/portfolio, /design, /en/design each have one canonical, three hreflang alternates
+      and og:title equal to the title
+    - No robots meta on the design pages
+    verify:
+    - run: bun run lint
+      expect: exit 0
+    - run: bun run build && for f in portfolio design en/portfolio en/design; do grep -o 'rel="canonical"[^>]*' build/client/$f/index.html;
+        grep -o 'hreflang=' build/client/$f/index.html | wc -l; done
+      expect: 'canonical hrefs https://zohelo.com/portfolio, /design, /en/portfolio, /en/design (absolute), each
+        followed by 3'
+    - run: grep -o 'name="robots"' build/client/design/index.html | wc -l
+      expect: '0'
+    out_of_scope:
+    - src/seo.ts, src/site.config.ts and the not-found page
+    - Page content and styling
+    depends_on:
+    - com/site/site-v1/seo/meta
+    - com/site/about/pages/portfolio-stub
+    - com/design/design-v1/adopt/design-page
 - key: com/site/site-v1/og
   title: Sharing cards
   depends_on:

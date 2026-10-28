@@ -79,48 +79,48 @@ deliverables:
   done_when:
   - Home shows today's chart with headline, Chart, SourceFooter and a link to /indicators/<kpi_key>
   todo:
-  - Add a line Chart (client-only, from @zohelo/design/visuals) to ChartOfDayBlock (Task block) once kpi series are
-    readable at build; place the block on home, fed by chartOfDay() at build when publishedDir() is set.
+  - Place ChartOfDayBlock (Task block) on home, fed by chartOfDay() at build from .published/, with a line Chart child
+    from a .client module rendered after hydration (decision D25) once series.parquet has a reader.
   tasks:
   - key: com/growth/chart-of-day/page/block
     type: Task
-    title: Add the chart-of-the-day home block (headline, change, source)
+    title: Add the chart-of-the-day home block component
     effort: S
     state: open
     contract: false
-    context: 'chartOfDay() in src/growth/chartOfDay.ts picks the KPI with the largest relative change and writes PL/EN
-      headlines (type ChartOfDay). The home page will show it as a block. The line chart needs series history that
-      the build cannot read yet (series.parquet), so this Task builds the block without a chart: heading, headline,
-      change in per cent, link to the indicator page and the SourceFooter from @zohelo/design.'
+    context: 'chartOfDay() (src/growth/chartOfDay.ts) picks the KPI with the largest change and returns { kpi_key,
+      source_key, period, headline_pl, headline_en, change_pct }. The home block shows it with a chart, the source
+      line and a link to the indicator page. Charts may only render after hydration from a .client module (decision
+      D25) and series data has no reader yet, so the block takes the chart as children. Card, SourceFooter and formatDelta
+      come from @zohelo/design.'
     files:
-    - create: src/components/ChartOfDayBlock.tsx
+    - create: src/growth/ChartOfDayBlock.tsx
     - create: tests/chartOfDayBlock.test.tsx
     steps:
-    - 'export function ChartOfDayBlock({ pick, locale, source, href }: { pick: ChartOfDay; locale: ''pl'' | ''en'';
-      source: { name: string; code?: string }; href: string }). Import type ChartOfDay from ''../growth/chartOfDay'';
-      formatDelta and SourceFooter from ''@zohelo/design''. No state or effects.'
-    - 'Render <section aria-labelledby="chart-of-day" className="rounded-lg border border-border bg-surface p-6">
-      containing <h2 id="chart-of-day" className="font-ui text-[length:var(--z-size-sm)] text-text-muted"> ''Wykres
-      dnia'' (pl) / ''Chart of the day'' (en), then <p className="mt-2 font-display text-[length:var(--z-size-xl)]
-      text-text"> with headline_pl/headline_en.'
-    - 'Then <p className="z-figures mt-2 text-text-muted">: formatDelta(pick.change_pct, locale, { decimals: 1 }).text
-      followed by '' %'' in pl and ''%'' in en (''+10,3 %'', ''+10.3%'').'
-    - 'Then <a href={href} className="mt-4 inline-block text-text underline"> ''Zobacz wskaźnik'' (pl) / ''See the
-      indicator'' (en), and <SourceFooter sources={[source]} date={pick.period} locale={locale} />.'
-    - 'tests/chartOfDayBlock.test.tsx (bun:test, renderToStaticMarkup from react-dom/server; run bun run lint first
-      so @zohelo/design is built): pick { kpi_key: ''unemployment_rate'', source_key: ''eurostat'', period: ''2025'',
-      headline_pl: ''Stopa bezrobocia (BAEL): wzrost z 2,9 do 3,2 (2025)'', headline_en: ''Unemployment rate (LFS):
-      up from 2.9 to 3.2 (2025)'', change_pct: 10.3448 } renders ''Wykres dnia'', the pl headline, ''+10,3 %'', the
-      href and ''Źródło:''; en renders ''Chart of the day'', ''+10.3%'' and ''Source:''; change_pct -4 renders ''-4,0
-      %''.'
+    - 'export function ChartOfDayBlock({ pick, sourceName, date, locale, children }: { pick: ChartOfDay; sourceName:
+      string; date: string; locale: Locale; children?: ReactNode }) (ChartOfDay type from ''./chartOfDay'', Locale
+      and localizedPath from ''../i18n'').'
+    - 'Render <Card title={locale === ''pl'' ? ''Wykres dnia'' : ''Chart of the day''}> containing: <p className="font-display
+      text-[length:var(--z-size-xl)] text-text"> with headline_pl / headline_en; <p className="z-figures mt-1 text-text-muted">
+      with `${d.text} %` where d = formatDelta(pick.change_pct, locale, { decimals: 1 }); children inside <div className="mt-4">
+      when given; <SourceFooter sources={[{ name: sourceName }]} date={date} locale={locale} />; <a href={localizedPath(`/indicators/${pick.kpi_key}`,
+      locale)} className="mt-3 inline-block font-ui text-brand-teal underline"> ''Zobacz wskaźnik'' / ''See the indicator''.'
+    - 'tests/chartOfDayBlock.test.tsx (bun:test, renderToStaticMarkup; pick = chartOfDay([readKpiLatest(''fixtures/published'',
+      ''unemployment_rate'')], names from readCatalog(''fixtures/published'').kpis)!; sourceName ''Eurostat'', date
+      ''2026-01-01''): pl markup contains ''Wykres dnia'', ''Stopa bezrobocia (BAEL): wzrost z 2,9 do 3,2 (2025)'',
+      ''+10,3 %'' and href="/indicators/unemployment_rate", and its text without tags (replace(/<[^>]+>/g, '''')) contains
+      ''Źródło: Eurostat, dane z 2026-01-01''; en contains ''Chart of the day'',
+      ''Unemployment rate (LFS): up from 2.9 to 3.2 (2025)'', ''+10.3 %'' and href="/en/indicators/unemployment_rate";
+      a child <span>chart</span> is rendered.'
     acceptance:
     - Every rule above is covered by a test
     verify:
     - run: bun run lint && bun test tests/chartOfDayBlock.test.tsx
       expect: exit 0; 0 fail
     out_of_scope:
-    - The line chart and placing the block on home (todo above)
-    - Changing chartOfDay() or packages/design
+    - Placing the block on home, the chart itself and reading series.parquet
+    - Changing chartOfDay()
     depends_on:
     - com/growth/chart-of-day/rule/select
+    - com/design/design-v1/components/basics
     - com/design/design-v1/components/table
