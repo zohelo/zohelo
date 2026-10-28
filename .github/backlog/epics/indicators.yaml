@@ -89,10 +89,129 @@ deliverables:
   done_when:
   - /indicators and /indicators/<kpi_key> pre-rendered for the 20 KPIs listed in site.config
   todo:
-  - 'Route /indicators: grouped by domain (dim_domain from catalog), KpiTile per KPI.'
+  - 'Route /indicators: one section per indicatorGroups() group (Task groups), a KpiTile per KPI from latestTile()
+    (Task latest-tile); needs .published/ at build.'
   - 'Route /indicators/:kpi: KpiTile, line Chart (series), regional DataTable when kpi_dimension has geography,
-    definition, SourceFooter, licence, CSV download link to the published extract, Dataset JSON-LD; prerender list
-    from site.config indicators.'
+    definition, SourceFooter, licence, CSV download link to the published extract, Dataset JSON-LD from datasetJsonLd()
+    (Task dataset-jsonld); prerender list from site.config indicators.'
+  tasks:
+  - key: com/site/indicators/pages/groups
+    type: Task
+    title: Group catalog KPIs by domain for the indicators index
+    effort: S
+    state: open
+    contract: false
+    context: 'The /indicators page will list KPIs grouped by their top-level domain. src/published.ts already reads
+      catalog/catalog.json (types Catalog, CatalogKpi, Domain, Unit); fixtures/published/catalog/catalog.json has
+      5 KPIs in 4 domains. This Task adds only the pure grouping function; the route comes later.'
+    files:
+    - create: src/indicators/groups.ts
+    - create: tests/indicatorGroups.test.ts
+    steps:
+    - 'src/indicators/groups.ts: export type IndicatorLink = { kpi_key: string; name: string; unit: string; last_period:
+      string; href: string } and IndicatorGroup = { domain_key: string; name: string; kpis: IndicatorLink[] }.'
+    - 'export function indicatorGroups(catalog: Catalog, locale: Locale): IndicatorGroup[] (`import type { Catalog } from ''../published''`,
+      Locale and localizedPath from ''../i18n''). Keep KPIs with status ''published''. Group key = kpi.domain_path[0];
+      the group is the catalog.domains entry with that domain_key and level ''domain''; KPIs without one are left out.'
+    - 'name = name_pl or name_en by locale (KPI and domain); unit = symbol of the catalog.units entry with the KPI''s
+      unit_key, else the unit_key; href = localizedPath(`/indicators/${kpi_key}`, locale).'
+    - 'Order groups by domain sort ascending, ties by domain_key; KPIs inside a group by name with localeCompare(other,
+      locale). Groups with no KPIs are not returned. Do not mutate the catalog.'
+    - 'tests/indicatorGroups.test.ts (bun:test, readCatalog(''fixtures/published'')): pl group keys are [''economy'',
+      ''finance'', ''labour'', ''population'']; economy KPI names are [''Inflacja (ceny konsumpcyjne)'', ''PKB w cenach
+      bieżących'']; en economy names are [''GDP, current prices'', ''Inflation, consumer prices'']; en fx_rate href
+      is ''/en/indicators/fx_rate'' and pl is ''/indicators/fx_rate''; unemployment_rate unit is ''%''; in a structuredClone
+      with fx_rate status ''draft'' the finance group is gone; a KPI whose domain_path[0] is ''nope'' is left out.'
+    acceptance:
+    - indicatorGroups is pure and every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/indicatorGroups.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The /indicators route, KpiTile values and site.config entries
+    - Groups below the domain level
+    depends_on:
+    - com/site/indicators/data/readers
+  - key: com/site/indicators/pages/latest-tile
+    type: Task
+    title: Derive KpiTile values from a KPI's latest.json
+    effort: S
+    state: open
+    contract: false
+    context: 'Indicator pages and the home today strip show each KPI as a KpiTile from @zohelo/design (props label,
+      value, unit, delta, period). The national value comes from kpi/<kpi_key>/latest.json (reader readKpiLatest
+      in src/published.ts), which holds one row per source × geography. This Task adds the pure function that picks
+      the row and builds the props.'
+    files:
+    - create: src/indicators/tile.ts
+    - create: tests/indicatorTile.test.ts
+    steps:
+    - 'src/indicators/tile.ts: export type LatestTile = { label: string; value: number | null; unit: string; delta:
+      number | null; period: string; sourceKey: string | null; checkedAt: string | null; provisional: boolean }.'
+    - 'export function latestTile(kpi: CatalogKpi, latest: KpiLatest, units: Unit[], locale: Locale): LatestTile
+      (`import type` from ''../published'', Locale from ''../i18n''). Rows = latest.values with geography_key ''PL''. Source
+      = the first of kpi.source_keys that has a row, else the smallest source_key among the rows. Row = that source''s
+      row with the greatest period (string compare).'
+    - 'label = kpi.name_pl or name_en; unit = symbol of the units entry with kpi.unit_key, else kpi.unit_key; value,
+      period, sourceKey = source_key, checkedAt = checked_at from the row; delta = value - previous_value when previous_value
+      is present, else null; provisional = flags includes ''p''.'
+    - 'No PL row: value null, delta null, period kpi.last_period, sourceKey null, checkedAt null, provisional false.'
+    - 'tests/indicatorTile.test.ts (bun:test): from fixtures/published (readCatalog, readKpiLatest ''unemployment_rate'')
+      pl gives label ''Stopa bezrobocia (BAEL)'', value 3.2, unit ''%'', delta toBeCloseTo(0.3), period ''2025'',
+      sourceKey ''eurostat'', checkedAt ''2026-01-01T00:00:00Z''; en label ''Unemployment rate (LFS)''. Inline data:
+      world_bank_wdi and eurostat PL rows pick eurostat (first in source_keys); 2024 and 2025 rows pick 2025; no previous_value
+      gives delta null; flags [''p''] gives provisional true; no PL row gives value null and period kpi.last_period.'
+    acceptance:
+    - latestTile is pure and every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/indicatorTile.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - Rendering KpiTile on a page; goodDirection per KPI
+    - Regional rows (src/regions/ranking.ts covers them)
+    depends_on:
+    - com/site/indicators/data/readers
+  - key: com/site/indicators/pages/dataset-jsonld
+    type: Task
+    title: Build Dataset JSON-LD for indicator pages
+    effort: S
+    state: open
+    contract: false
+    context: 'Each /indicators/<kpi_key> page will carry schema.org Dataset JSON-LD so search engines list it as
+      a dataset. src/seo.ts has absoluteUrl() and pageMeta(); src/published.ts has the Catalog types. This Task
+      adds the pure builder; the route embeds it later the way src/routes/home.tsx embeds its WebSite JSON-LD.'
+    files:
+    - edit: src/seo.ts
+    - create: tests/datasetJsonLd.test.ts
+    steps:
+    - 'src/seo.ts: export function datasetJsonLd(kpi: CatalogKpi, catalog: Catalog, locale: Locale): Record<string,
+      unknown> (`import type { Catalog, CatalogKpi } from ''./published''`: seo.ts is in the client bundle and published.ts
+      imports node:fs). Sources = catalog.sources whose source_key is in kpi.source_keys, in
+      kpi.source_keys order; unknown keys are skipped. unit = catalog.units entry with kpi.unit_key.'
+    - 'Return { ''@context'': ''https://schema.org'', ''@type'': ''Dataset'', name, description, url: absoluteUrl(`/indicators/${kpi.kpi_key}`,
+      locale), identifier: kpi.kpi_key, inLanguage: locale, temporalCoverage: `${first_period}/${last_period}`,
+      dateModified: kpi.loaded_at, spatialCoverage: { ''@type'': ''Place'', name: ''Polska'' | ''Poland'' }, creator:
+      { ''@type'': ''Organization'', name: site.name, url: site.url }, isBasedOn: sources.map(s => ({ ''@type'':
+      ''CreativeWork'', name: s.name_pl | s.name_en })) }.'
+    - 'description pl: `${name_pl}: dane od ${first_period} do ${last_period}. Źródła: ${names joined '', ''}. Jednostka:
+      ${unit.name_pl}.`; en: `${name_en}: data from ${first_period} to ${last_period}. Sources: ${names}. Unit: ${unit.name_en}.`'
+    - 'Add license: <licence url> only when all sources have the same licence_key and catalog.licences has it.'
+    - 'tests/datasetJsonLd.test.ts (bun:test, readCatalog(''fixtures/published'')): unemployment_rate pl has url
+      ''https://zohelo.com/indicators/unemployment_rate'', temporalCoverage ''2000/2025'', isBasedOn names [''Eurostat'',
+      ''Bank Światowy – WDI''], license ''https://creativecommons.org/licenses/by/4.0/''; en url ''https://zohelo.com/en/indicators/unemployment_rate'';
+      population has no license key (gus_terms differs); description starts with ''Stopa bezrobocia (BAEL): dane
+      od 2000''.'
+    acceptance:
+    - datasetJsonLd is pure; JSON.stringify of its result round-trips; every rule above has a test
+    verify:
+    - run: bun run lint && bun test tests/datasetJsonLd.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - pageMeta and the indicator route
+    - distribution (CSV download) entries
+    depends_on:
+    - com/site/indicators/data/readers
+    - com/site/site-v1/seo/meta
 - key: com/site/indicators/home
   title: Today strip and real metrics on home
   depends_on:
