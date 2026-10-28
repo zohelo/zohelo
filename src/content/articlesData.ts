@@ -10,8 +10,7 @@ export const articlesList: ArticleItem[] = [
     category: 'Macroeconomic Bulletin',
     readTime: '6 min read',
     publishDate: 'February 2025',
-    author: 'Radosław Utkała',
-    authorRole: 'Founder & Principal Consultant',
+    author: 'zohelo — przykład / sample',
     tags: ['GDP Growth', 'Industrial Production', 'GUS Quarterly', 'Fiscal Deficit'],
     fullContent: [
       'The first quarter of 2025 signals a decisive transition for the Polish economy from consumption-led recovery toward capital-intensive investment cycles. According to updated national accounts from the Central Statistical Office (GUS), real GDP expanded at an annualized rate of 3.2% YoY, outpacing the Eurozone average of 1.1%.',
@@ -30,11 +29,10 @@ export const articlesList: ArticleItem[] = [
     subtitle: 'An empirical econometric study of 1,200 enterprises across 16 Voivodeships',
     summary: 'Driving data-driven insights paper: the empirical impact of digital transformation on Polish SMEs productivity, export competitiveness, and cloud adoption.',
     iconType: 'paper',
-    category: 'Peer-Reviewed Research',
+    category: 'Research note (sample)',
     readTime: '12 min read',
     publishDate: 'January 2025',
-    author: 'Dr. M. Wiśniewski & R. Utkała',
-    authorRole: 'Open Reporting Research Lab',
+    author: 'zohelo — przykład / sample',
     tags: ['Digital Economy', 'SME Productivity', 'Econometrics', 'Cloud Adoption'],
     fullContent: [
       'This empirical paper assesses the microeconomic impact of digital modernization across small and medium enterprises (SMEs) in Poland between 2020 and 2024. Utilizing panel regressions on a sample of 1,200 manufacturing and service firms, we identify a statistically significant 18.4% productivity premium for firms integrating unified data warehousing and automated ERP pipelines.',
@@ -56,8 +54,7 @@ export const articlesList: ArticleItem[] = [
     category: 'Strategic Policy Paper',
     readTime: '8 min read',
     publishDate: 'December 2024',
-    author: 'Zohelo Macro Team',
-    authorRole: 'Economic Intelligence Unit',
+    author: 'zohelo — przykład / sample',
     tags: ['CEE Region', 'Supply Chains', 'Nearshoring', 'NBP Policy'],
     fullContent: [
       'Central and Eastern Europe stands at a pivotal geo-economic juncture. As Western European manufacturers recalibrate their supply chains toward nearshore regional partners, Poland, the Czech Republic, and Hungary continue to capture strategic high-value manufacturing contracts.',
@@ -79,8 +76,7 @@ export const articlesList: ArticleItem[] = [
     category: 'Applied Data Science',
     readTime: '9 min read',
     publishDate: 'November 2024',
-    author: 'Radosław Utkała',
-    authorRole: 'Founder & Principal Consultant',
+    author: 'zohelo — przykład / sample',
     tags: ['Public Sector AI', 'DuckDB', 'Municipal Budgeting', 'NoOps Pipeline'],
     fullContent: [
       'Public administration entities in Poland generate vast troves of structured data—spanning the GUS Local Data Bank (BDL), Public Information Bulletins (BIP), and regional treasury audits—yet less than 5% of these assets are actively utilized for evidence-based policymaking.',
