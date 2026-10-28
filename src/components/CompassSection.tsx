@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { MapPin, TrendingUp, BarChart3, Layers, ArrowRight, ShieldCheck, ChevronRight } from 'lucide-react';
-import { polandVoivodeships } from '../data/polandRegions';
-import { publicFinanceTrends, domainCategories } from '../data/financeTrends';
+import { polandVoivodeships } from '../content/polandRegions';
+import { publicFinanceTrends, domainCategories } from '../content/financeTrends';
 import { VoivodeshipData } from '../types';
+import { IllustrativeBadge } from './IllustrativeBadge';
 
 interface CompassSectionProps {
   onOpenExploreVisualization: (selectedRegion?: VoivodeshipData) => void;
@@ -43,9 +44,12 @@ export const CompassSection: React.FC<CompassSectionProps> = ({ onOpenExploreVis
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500">
-              The Compass
-            </h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500">
+                The Compass
+              </h2>
+              <IllustrativeBadge />
+            </div>
             <p className="text-xs text-slate-400 mt-0.5">
               Regional Economic & Demographic Intelligence (16 Voivodeships)
             </p>

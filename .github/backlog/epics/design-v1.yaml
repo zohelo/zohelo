@@ -490,6 +490,7 @@ deliverables:
     - create: .github/workflows/design-release.yml
     - create: packages/design/CHANGELOG.md
     - edit: .github/workflows/check.yml
+    - edit: .github/workflows/branch-cleanup.yml
     steps:
     - 'design-release.yml: on workflow_dispatch with input version (string, e.g. 1.0.0); permissions contents: write;
       one job, timeout 10 min.'
@@ -501,10 +502,13 @@ deliverables:
     - 'gh release create design-v<version> packages/design/zohelo-design-<version>.tgz --title ''design v<version>''
       --notes-file packages/design/CHANGELOG.md --target main (env GH_TOKEN: github.token).'
     - 'check.yml: add a step ''Lint workflows'': bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash)
-      1.7.7 && ./actionlint -color.'
+      1.7.7 && ./actionlint -format ''{{range $err := .}}::error file={{$err.Filepath}},line={{$err.Line}},col={{$err.Column}}::{{$err.Message}}{{println}}{{end}}''
+      (findings become annotations; job logs are not readable from sessions).'
+    - 'branch-cleanup.yml (SC2016 on jq''s intended `$ENV.REPO`): add `# shellcheck disable=SC2016 # jq reads $ENV.REPO`
+      directly above the line starting `merged=$(gh api`, same indentation; nothing else.'
     - CHANGELOG.md starts with '## 1.0.0' and the list of exports.
     acceptance:
-    - actionlint passes in check on this PR
+    - actionlint passes in check on this PR (the SC2016 line was its only finding on 28 Oct)
     - After merge, a run on main with a version different from package.json fails at the version step
     verify:
     - workflow: Check on this PR

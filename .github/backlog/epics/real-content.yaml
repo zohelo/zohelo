@@ -84,6 +84,8 @@ deliverables:
     - edit: src/components/VaultSection.tsx
     - edit: src/components/ProductsSection.tsx
     - edit: src/App.tsx
+    - edit: src/components/DatasetPreviewModal.tsx
+    - edit: src/components/HeroConsultingSection.tsx
     - edit: package.json
     steps:
     - Extract the badge markup used in PulseSection into IllustrativeBadge (text 'Illustrative values'; tooltip
@@ -92,8 +94,12 @@ deliverables:
     - 'ProductsSection: change each product''s status label to ''Concept''.'
     - Remove handleDownloadDataset's confetti and mock download; the Vault download button becomes a disabled button
       'Available with the data release'. Remove canvas-confetti and @types/canvas-confetti.
+    - 'DatasetPreviewModal.tsx: delete the canvas-confetti import; its download button becomes the same disabled button
+      ''Available with the data release''. HeroConsultingSection.tsx: delete the canvas-confetti import and the confetti({...})
+      call in the submit handler, nothing else (the form itself is Task claims/contact).'
     acceptance:
     - Six sections show the badge; no download produces a file; canvas-confetti not in package.json
+    - '`git grep -n canvas-confetti -- src package.json` finds nothing'
     verify:
     - run: grep -rl "IllustrativeBadge" src/components | wc -l
       expect: 7 (component + 6 sections)

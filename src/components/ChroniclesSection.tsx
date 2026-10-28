@@ -1,7 +1,8 @@
 import React from 'react';
 import { BarChart2, FileText, Megaphone, Network, BookOpen, Clock, ArrowUpRight } from 'lucide-react';
-import { articlesList } from '../data/articlesData';
+import { articlesList } from '../content/articlesData';
 import { ArticleItem } from '../types';
+import { IllustrativeBadge } from './IllustrativeBadge';
 
 interface ChroniclesSectionProps {
   onOpenArticle: (article: ArticleItem) => void;
@@ -30,9 +31,12 @@ export const ChroniclesSection: React.FC<ChroniclesSectionProps> = ({ onOpenArti
         {/* Section Header matching Mockup: "THE CHRONICLES" */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500">
-              The Chronicles
-            </h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500">
+                The Chronicles
+              </h2>
+              <IllustrativeBadge />
+            </div>
             <p className="text-xs text-slate-400 mt-0.5">
               Data Journalism & Econometric Research Papers
             </p>
