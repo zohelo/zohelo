@@ -134,6 +134,50 @@ deliverables:
     - com/site/real-content/claims/content-dir
     notes:
     - Label owner:action is added by the backlog sync only when depends_on is done (max 3 open, D8).
+  - key: com/site/real-content/claims/chronicles
+    type: Task
+    title: Remove the Chronicles section and its sample articles
+    effort: S
+    state: open
+    context: 'The home Chronicles section (src/components/ChroniclesSection.tsx, data src/content/articlesData.ts)
+      shows sample articles under the owner''s name with invented figures, an invented co-author and a
+      "Peer-Reviewed" label; a badge does not fix that (O5). Target: no Chronicles section, article modal or article
+      search. The real journal comes later (docs/portfolio/zohelo-journal.md).'
+    files:
+    - delete: src/components/ChroniclesSection.tsx
+    - delete: src/components/ArticleModal.tsx
+    - delete: src/content/articlesData.ts
+    - edit: src/App.tsx
+    - edit: src/components/CommandPalette.tsx
+    - edit: src/components/Header.tsx
+    - edit: src/components/Footer.tsx
+    - edit: src/i18n/pl.ts
+    - edit: src/i18n/en.ts
+    - edit: src/types.ts
+    steps:
+    - Delete src/components/ChroniclesSection.tsx, src/components/ArticleModal.tsx and src/content/articlesData.ts.
+    - 'src/App.tsx: delete the ChroniclesSection and ArticleModal imports, the readArticle useState line, the
+      "5. The Chronicles" comment with the <ChroniclesSection .../> element, the <ArticleModal .../> element, and
+      the onSelectArticle prop of <CommandPalette>; drop ArticleItem from the ./types import.'
+    - 'src/components/CommandPalette.tsx: delete the articlesList import, ArticleItem from the ../types import, the
+      onSelectArticle prop (interface and destructuring), filteredArticles and the result group that renders it,
+      and the { name: ''The Chronicles'', id: ''chronicles'' } entry; the input placeholder becomes "Search
+      indicators, 16 voivodeships or datasets...".'
+    - 'src/components/Header.tsx: delete the entry { label: t.nav.research, target: ''chronicles'' }.'
+    - 'src/components/Footer.tsx: delete the <li> whose button calls onNavigate(''chronicles'').'
+    - 'src/i18n/pl.ts and src/i18n/en.ts: delete nav.research and footer.chronicles (the Dict type follows pl.ts).'
+    - 'src/types.ts: delete the ArticleItem interface.'
+    acceptance:
+    - No Chronicles section; header, footer and command palette have no Research or Chronicles entry
+    - lint, tests and build pass; the grep in Verify prints nothing
+    verify:
+    - run: grep -rniE "chronicles|articlesList|ArticleItem|ArticleModal" src
+      expect: no output (exit 1)
+    - run: bun install --frozen-lockfile && bun run lint && bun test && bun run build
+      expect: all succeed
+    out_of_scope:
+    - The journal itself (/journal routes; discovery Epic com/portfolio/journal)
+    - Other home sections (Pulse, Metrics, Compass, Vault, Products) and the contact form
   - key: com/site/real-content/claims/content-dir
     type: Task
     title: Rename src/data to src/content
