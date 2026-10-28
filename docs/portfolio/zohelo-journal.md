@@ -59,11 +59,11 @@ No advertising networks: they cost page weight and trust, and they would need an
 
 ## First roadmap (after approval)
 
-| Step | Scope | Effort guess |
-|---|---|---|
-| v0 | `/journal` and `/journal/:slug` routes in zohelo, stories as Markdown in the repo, written by hand by the journal Developer for 4 release types; the home Chronicles section lists the latest 3 | 1–2 weeks |
-| v1 | On release day a scheduled session opens a draft-story PR from `feed/changes.json`; Domain expert review and QE number check before merge; stories in the RSS feed | 2–3 weeks, after `data/published/published-v1` (target Jan 2027) |
-| v2 | Weekly brief through the newsletter; EN versions; regional stories with maps | after `com/growth/newsletter` and `com/site/regions` |
+| Step | Scope                                                                                                                                                                                           | Effort guess                                                     |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| v0   | `/journal` and `/journal/:slug` routes in zohelo, stories as Markdown in the repo, written by hand by the journal Developer for 4 release types; the home Chronicles section lists the latest 3 | 1–2 weeks                                                        |
+| v1   | On release day a scheduled session opens a draft-story PR from `feed/changes.json`; Domain expert review and QE number check before merge; stories in the RSS feed                              | 2–3 weeks, after `data/published/published-v1` (target Jan 2027) |
+| v2   | Weekly brief through the newsletter; EN versions; regional stories with maps                                                                                                                    | after `com/growth/newsletter` and `com/site/regions`             |
 
 ## Risks
 
@@ -103,6 +103,35 @@ No advertising networks: they cost page weight and trust, and they would need an
 
 ## Consultation
 
-- Domain expert (business value, story types, editorial rules): requested 28 Oct 2026; answer pending.
-- Architect (feasibility, repo choice, cost within free tiers, reuse of `feed/changes.json`): requested
-  28 Oct 2026; answer pending.
+**Architect** (zohelo#210, 28 Oct 2026, two runs that agree):
+
+- Repo: a section of the zohelo repo (keys `com/journal/`), not a new repo, for v0 and v1. It reuses the build,
+  @zohelo/design, i18n, the RSS writer and the deploy. A separate repo only pays off with its own domain or a CMS. An
+  owner-approved Developer for the journal owns `com/journal/` keys, as Developer 2 owns `data/src-` keys.
+- v0 is low risk (1–2 weeks): Markdown stories in `content/journal/<lang>/<slug>.md`, prerendered as `/journal` and
+  `/journal/:slug`; charts through `.client` modules (D25).
+- v1 drafting waits for the published layer (`feed/changes.json`, `kpi/*/latest.json`) and needs the release calendar
+  (Epic com/growth/calendar-ics). Drafting is a scheduled Claude session that opens a PR, never a workflow calling a
+  paid model API.
+- Cost: hosting is free; the real cost is Claude usage, affordable at one drafting session per major release
+  (about 5–10 a month), not per changed value.
+- Guard rail for v1: every number is a placeholder (`{{kpi:<key>:<geo>:<period>}}`) resolved from the published layer
+  at build; the build fails on an unknown key, so a story cannot drift from the data.
+
+**Domain expert** (economy, labour points included; zohelo#210, 28 Oct 2026; approved with these changes):
+
+- Value comes from context and consistency, not speed: target band, core vs headline, CEE peers, the regional angle,
+  the same chart and wording every month, linked to the KPI page.
+- Story order: (1) release notes only for releases we hold (Eurostat HICP vs EU, Eurostat LFS monthly SA, NBP
+  decisions and rates; GUS CPI and GDP flash once loaded); (2) explainers ("HICP vs CPI", "real vs nominal",
+  "two unemployment rates"); (3) regional angle (registered unemployment, wages, population); (4) weekly brief.
+- Audience: business journalists and analysts (cite a number fast), small firms and local government, students and
+  teachers (explainers), EN readers (Poland vs EU on harmonised measures).
+- Editorial rules for every story: name the measure (HICP is never "inflacja"; LFS and registered unemployment are
+  never swapped); name the base (y/y, m/m, annual average); real vs nominal; q/q and m/m only on seasonally adjusted
+  data; flash and provisional values called so, revisions stated; period, publication date, source and KPI link on
+  every number; NBP target band on inflation stories, the same measure for all peers; no forecasts or advice in v0.
+- Data prerequisites: peer geographies (EU27, CEE) in the published values; Bug zohelo-data#2148 fixed before any
+  GDP story; for v1, `feed/changes.json` carries measure, unit, base, seasonal adjustment and status per value, so
+  the rules can be checked automatically. The Quality Engineer's number check verifies measure, base, period and
+  flag with the value.
