@@ -27,8 +27,8 @@ deliverables:
   done_when:
   - /regions renders a choropleth (sequential teal ramp) and a ranking table for a KPI selector
   todo:
-  - 'Route /regions: src/components/MapChoropleth.client.tsx rendering choroplethSpec() (Task choropleth-spec) after
-    hydration (decision D25); KPI selector limited to KPIs with geography level voivodeship; RankingTable (Task ranking-table).'
+  - 'Route /regions: MapChoropleth rendered after hydration (Task map-client, decision D25); KPI selector from regionalKpis()
+    (Task kpi-options); RankingTable (Task ranking-table).'
   tasks:
   - key: com/site/regions/map/choropleth-spec
     type: Task
@@ -154,6 +154,84 @@ deliverables:
     - Sort direction for KPIs where lower is better (the page decides colours)
     depends_on:
     - data/published/published-v1/contract/schemas
+  - key: com/site/regions/map/kpi-options
+    type: Task
+    title: List the KPIs with voivodeship data for the map selector
+    effort: S
+    state: open
+    contract: false
+    context: 'On /regions the reader chooses which KPI colours the map; only KPIs with voivodeship data can be chosen
+      (Deliverable todo). catalog/catalog.json (type Catalog in src/published.ts) lists each KPI''s geo_levels. This
+      Task adds only the pure function that builds the selector options; the selector and the route come later.'
+    files:
+    - create: src/regions/kpiOptions.ts
+    - create: tests/kpiOptions.test.ts
+    steps:
+    - 'src/regions/kpiOptions.ts: export type KpiOption = { kpi_key: string; name: string; unit: string } and function
+      regionalKpis(catalog: Catalog, locale: Locale): KpiOption[] (`import type { Catalog } from ''../published''`:
+      published.ts imports node:fs; `import type { Locale } from ''../i18n''`).'
+    - 'Keep KPIs with status ''published'' whose geo_levels include ''voivodeship''. name = name_pl or name_en by locale;
+      unit = symbol of the catalog.units entry with the KPI''s unit_key, else the unit_key.'
+    - Sort by name with a.name.localeCompare(b.name, locale). Do not mutate the catalog.
+    - 'tests/kpiOptions.test.ts (bun:test, readCatalog(''fixtures/published'')): pl gives [{ kpi_key: ''population'',
+      name: ''Ludność'', unit: ''os.'' }, { kpi_key: ''unemployment_rate'', name: ''Stopa bezrobocia (BAEL)'', unit:
+      ''%'' }]; en names are [''Population'', ''Unemployment rate (LFS)'']; inflation (geo_levels [''country'']) is
+      not returned; in a structuredClone with population status ''draft'' only unemployment_rate is left; with units
+      [] the unemployment_rate unit is ''pct_labour_force''; the catalog toEqual a structuredClone taken before the
+      call.'
+    acceptance:
+    - regionalKpis is pure and every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/kpiOptions.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The selector UI and the /regions route
+    - Ordering by data coverage or a default KPI
+    depends_on:
+    - com/site/indicators/data/readers
+    - com/site/site-v1/i18n/routing
+  - key: com/site/regions/map/map-client
+    type: Task
+    title: Add the client-only voivodeship map component
+    effort: S
+    state: open
+    contract: false
+    context: 'The /regions map is choroplethSpec() (Task choropleth-spec) drawn by Chart from @zohelo/design/visuals.
+      Charts live in .client modules rendered after hydration (D25; see src/components/SampleChart.client.tsx). Chart
+      calls build() in an effect, so build may read CSS tokens. The route comes later.'
+    files:
+    - create: src/regions/mapSpec.ts
+    - create: src/components/MapChoropleth.client.tsx
+    - create: tests/mapSpec.test.ts
+    steps:
+    - 'src/regions/mapSpec.ts: export type MapRow = { geography_key: string; value: number } and function mapSpec(geo:
+      object, rows: MapRow[], o: { valueTitle: string; locale: Locale; colors: [string, string]; noData: string })
+      returning choroplethSpec(geo, rows, { key: ''geography_key'', value: ''value'', name: o.locale === ''pl'' ? ''name_pl''
+      : ''name_en'', valueTitle: o.valueTitle, colors: o.colors, noData: o.noData }) (choroplethSpec from ''@zohelo/design/visuals'';
+      `import type { Locale } from ''../i18n''`).'
+    - 'src/components/MapChoropleth.client.tsx (opening comment as in SampleChart.client.tsx): export function MapChoropleth({
+      geo, rows, valueTitle, locale, label }: { geo: object; rows: MapRow[]; valueTitle: string; label: string; locale:
+      Locale }). build = useCallback(() => { const css = getComputedStyle(document.documentElement); const v = (n: string,
+      f: string) => css.getPropertyValue(n).trim() || f; return mapSpec(geo, rows, { valueTitle, locale, colors: [v(''--z-color-brand-teal-soft'',
+      ''#EBF5F6''), v(''--z-color-brand-teal-strong'', ''#2C6E76'')], noData: v(''--z-color-border'', ''#E2E8F0'')
+      }); }, [geo, rows, valueTitle, locale]); return <Chart build={build} label={label} />.'
+    - 'tests/mapSpec.test.ts (bun:test; geo = JSON.parse(readFileSync(''fixtures/published/geo/voivodeship.geojson'',
+      ''utf8'')); rows [{ geography_key: ''TERC:12'', value: 2.6 }]; colors [''#aaaaaa'', ''#bbbbbb'']; noData ''#cccccc'';
+      cast the result to Record<string, any>): pl encoding.tooltip[0].field is ''properties.name_pl'' and en ''properties.name_en'';
+      data.values is geo; transform[0].from.data.values equals rows; encoding.color.scale.range equals colors; encoding.color.condition.value
+      is ''#cccccc''. Tests never import the .client module (bun has no getComputedStyle).'
+    acceptance:
+    - The mapSpec rules are tested; no page imports MapChoropleth yet
+    verify:
+    - run: bun run lint && bun test tests/mapSpec.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run build
+      expect: exit 0
+    out_of_scope:
+    - The /regions route and selector; changes to choroplethSpec or Chart
+    depends_on:
+    - com/site/regions/map/choropleth-spec
+    - com/site/site-v1/i18n/routing
 - key: com/site/regions/profiles
   title: Voivodeship profiles
   depends_on:
@@ -161,8 +239,52 @@ deliverables:
   done_when:
   - /regions/<teryt> for all 16 TERYT codes with KPIs vs Poland and rank
   todo:
-  - Route /regions/:teryt; KpiTile grid with national value and rank 1–16; neighbours list from geometry adjacency
-    computed at build.
+  - Route /regions/:teryt from regionProfile() (Task model) as a KpiTile grid with national value and rank 1–16; neighbours
+    list from geometry adjacency computed at build.
+  tasks:
+  - key: com/site/regions/profiles/model
+    type: Task
+    title: Build a voivodeship profile from KPI rankings
+    effort: S
+    state: open
+    contract: false
+    context: 'Each /regions/<teryt> page shows the region''s KPIs with its rank 1–16 and the value for Poland. rankRegions()
+      (src/regions/ranking.ts) ranks the voivodeships for one KPI; their geography keys are ''TERC:<code>'' (zohelo-data
+      docs/published.md). This Task adds pure helpers; the route comes later.'
+    files:
+    - create: src/regions/profile.ts
+    - create: tests/profile.test.ts
+    steps:
+    - 'export const VOIVODESHIP_TERYT = [''02'', ''04'', ''06'', ''08'', ''10'', ''12'', ''14'', ''16'', ''18'', ''20'',
+      ''22'', ''24'', ''26'', ''28'', ''30'', ''32''] as const.'
+    - 'export function geographyKeyOf(teryt: string): string returns `TERC:${teryt}`; terytOf(geographyKey: string):
+      string | null returns the part after ''TERC:'' when it is in VOIVODESHIP_TERYT, else null; regionPath(teryt:
+      string, locale: Locale): string returns localizedPath(`/regions/${teryt}`, locale) (Locale and localizedPath
+      from ''../i18n'').'
+    - 'export type ProfileRow = { kpi_key: string; source_key: string; period: string; value: number; rank: number;
+      of: number; national: number | null; provisional: boolean } and function regionProfile(geographyKey: string,
+      rankings: RegionRanking[]): ProfileRow[] (`import type { RegionRanking } from ''./ranking''`). One row per ranking
+      that has a region with that geography_key, in input order: kpi_key, source_key, period, national from the ranking;
+      value, rank, provisional from the region; of = ranking.regions.length. Other rankings are skipped; inputs are
+      not mutated.'
+    - 'tests/profile.test.ts (bun:test; rankings from rankRegions on inline files { kpi_key, values } with source_key
+      ''gus_bdl'', period ''2025'', flags [] as in tests/ranking.test.ts): VOIVODESHIP_TERYT has 16 entries; geographyKeyOf(''12'')
+      is ''TERC:12''; terytOf(''TERC:12'') is ''12''; terytOf(''TERC:1261'') and terytOf(''PL'') are null; regionPath(''12'',
+      ''en'') is ''/en/regions/12'' and pl ''/regions/12''; unemployment_rate with TERC:02 7, TERC:12 5, TERC:30 9
+      and PL 6.1 gives for TERC:12 [{ kpi_key: ''unemployment_rate'', source_key: ''gus_bdl'', period: ''2025'', value:
+      5, rank: 3, of: 3, national: 6.1, provisional: false }]; a second ranking with TERC:12 adds a second row; one
+      without it adds none.'
+    acceptance:
+    - The helpers are pure and every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/profile.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The /regions/:teryt route and site.config entries
+    - Region names (readGeo, Task ranking-table) and the neighbours list
+    depends_on:
+    - com/site/regions/map/ranking
+    - com/site/site-v1/i18n/routing
 - key: com/site/regions/home
   title: Regional spotlight on home
   depends_on:
@@ -171,4 +293,36 @@ deliverables:
   - Home spotlight shows one KPI map and top/bottom 3; CompassSection, DataVisualizationModal and polandRegions.ts/financeTrends.ts
     deleted
   todo:
-  - Replace CompassSection with the spotlight block; delete the sample files.
+  - Replace CompassSection with the spotlight block (map and spotlight(), Task spotlight); delete the sample files.
+  tasks:
+  - key: com/site/regions/home/spotlight
+    type: Task
+    title: Pick the top and bottom regions for the home spotlight
+    effort: S
+    state: open
+    contract: false
+    context: 'The home regional spotlight shows one KPI map with the top 3 and bottom 3 voivodeships (Deliverable done_when).
+      rankRegions() (src/regions/ranking.ts) returns the regions sorted by value descending, each with its rank.
+      This Task adds only the pure selection; the block, the map and the choice of KPI come later.'
+    files:
+    - create: src/regions/spotlight.ts
+    - create: tests/spotlight.test.ts
+    steps:
+    - 'src/regions/spotlight.ts: export function spotlight(ranking: RegionRanking, n = 3): { top: RankedRegion[];
+      bottom: RankedRegion[] } (`import type { RankedRegion, RegionRanking } from ''./ranking''`).'
+    - 'top = ranking.regions.slice(0, n); bottom = ranking.regions.slice(Math.max(n, ranking.regions.length - n)).
+      So no region is in both lists and both keep ranking order (highest value first). Return new arrays; do not
+      mutate the ranking.'
+    - 'tests/spotlight.test.ts (bun:test; rankings from rankRegions on inline files as in tests/ranking.test.ts):
+      16 regions TERC:02 … TERC:32 with values 16 … 1 give top ranks [1, 2, 3] and bottom ranks [14, 15, 16]; n 1
+      gives top [1] and bottom [16]; 4 regions give 3 top and bottom ranks [4]; 2 regions give 2 top and bottom [];
+      the ranking toEqual a structuredClone taken before the call.'
+    acceptance:
+    - spotlight is pure and every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/spotlight.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The spotlight block, the map, CompassSection and which KPI the spotlight shows
+    depends_on:
+    - com/site/regions/map/ranking
