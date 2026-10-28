@@ -85,6 +85,11 @@ export type GeoProperties = { geography_key: string; name_pl: string; name_en: s
 
 export type GeoCollection = { type: 'FeatureCollection'; features: { properties: GeoProperties }[] };
 
+/** The directory holding the build's copy of the layer: PUBLISHED_DIR, default .published/. */
+export function publishedDir(): string {
+  return process.env.PUBLISHED_DIR ?? '.published';
+}
+
 function readJson(path: string): unknown {
   if (!existsSync(path)) throw new Error(`published file missing: ${path}`);
   return JSON.parse(readFileSync(path, 'utf8'));
