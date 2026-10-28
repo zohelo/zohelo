@@ -1,5 +1,6 @@
 import { Callout } from '@zohelo/design';
 import { localeOf, useLocale, type Locale } from '../i18n';
+import { pageMeta } from '../seo';
 import { pages } from '../site.config';
 
 const page = pages.find((p) => p.path === '/portfolio')!;
@@ -31,7 +32,7 @@ const dict: Record<Locale, { heading: string; status: string; intro: string[]; t
 
 export function meta({ location }: { location: { pathname: string } }) {
   const locale = localeOf(location.pathname);
-  return [{ title: `${page.title[locale]} · zohelo` }, { name: 'description', content: page.description[locale] }];
+  return pageMeta({ path: page.path, locale, title: page.title[locale], description: page.description[locale] });
 }
 
 export default function Portfolio() {
