@@ -9,6 +9,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./visuals": {
+      "types": "./dist/visuals/index.d.ts",
+      "import": "./dist/visuals/index.js"
     }
   },
   "peerDependencies": {
@@ -16,5 +20,10 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "vega": "6.4.0",
+    "vega-embed": "7.3.0",
+    "vega-lite": "6.5.0"
   }
 }
