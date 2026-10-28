@@ -44,7 +44,7 @@ jobs:
         # wrangler from the lockfile (devDependency), never a floating bunx download.
         run: |
           set -euo pipefail
-          bun run wrangler pages deploy dist --project-name zohelo --branch "$BRANCH" --commit-dirty=true | tee /tmp/deploy.log
+          bun run wrangler pages deploy build/client --project-name zohelo --branch "$BRANCH" --commit-dirty=true | tee /tmp/deploy.log
           url=$(grep -Eo 'https://[a-z0-9.-]+\.pages\.dev' /tmp/deploy.log | tail -1)
           echo "DEPLOY_URL=$url" >> "$GITHUB_ENV"
           echo "::notice title=deployed::$url"
@@ -57,7 +57,7 @@ jobs:
             [ "$code" = 200 ] && break
             sleep 10
           done
-          if [ "$code" != 200 ] || ! grep -q 'id="root"' /tmp/page.html; then echo "::error title=site::HTTP $code"; exit 1; fi
+          if [ "$code" != 200 ] || ! grep -q 'Research' /tmp/page.html; then echo "::error title=site::HTTP $code"; exit 1; fi
           echo "::notice title=site::page 200"
           if [ "$BRANCH" = main ]; then
             live=$(curl -s -o /dev/null -w '%{http_code}' https://zohelo.com/ || true)

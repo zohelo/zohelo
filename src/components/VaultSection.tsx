@@ -1,6 +1,6 @@
 import React from 'react';
 import { FileSpreadsheet, Layers, BarChart, FileText, Download, Eye, Table2 } from 'lucide-react';
-import { vaultDatasets } from '../data/datasetsData';
+import { vaultDatasets } from '../content/datasetsData';
 import { DatasetItem } from '../types';
 import { IllustrativeBadge } from './IllustrativeBadge';
 

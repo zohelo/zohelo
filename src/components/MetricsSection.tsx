@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { declarativeMetrics } from '../data/metricsData';
+import { declarativeMetrics } from '../content/metricsData';
 import { IllustrativeBadge } from './IllustrativeBadge';
 
 interface SparklineResult {
