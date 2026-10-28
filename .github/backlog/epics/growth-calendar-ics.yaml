@@ -72,8 +72,7 @@ deliverables:
   done_when:
   - webcal://zohelo.com/calendar.ics link on home and each indicator page, PL/EN labels
   todo:
-  - Place SubscribeCalendar (Task subscribe) in the home what-changed block and the indicator page sidebar once /calendar.ics
-    is served.
+  - Place SubscribeCalendar in the indicator page sidebar (/indicators/:kpi, Task kpi-route) once that page exists.
   tasks:
   - key: com/growth/calendar-ics/links/subscribe
     type: Task
@@ -106,3 +105,29 @@ deliverables:
     out_of_scope:
     - Serving /calendar.ics and public/_headers (Deliverable feed)
     - Placing the component on any page
+  - key: com/growth/calendar-ics/links/home-subscribe
+    type: Task
+    title: Add the calendar subscribe links to the home what-changed block
+    effort: S
+    state: open
+    contract: false
+    depends_on:
+    - com/growth/what-changed/page/home-changes
+    - com/growth/calendar-ics/feed/copy
+    context: SubscribeCalendar (src/components/SubscribeCalendar.tsx) renders the webcal:// and .ics links; the build serves
+      /calendar.ics after Task copy. The home what-changed block is src/growth/HomeChanges.tsx (Task home-changes).
+    files:
+    - edit: src/growth/HomeChanges.tsx
+    - edit: tests/homeChanges.test.tsx
+    steps:
+    - 'HomeChanges.tsx: after the <p> that holds the ''All changes'' link, render <div className="mt-2"><SubscribeCalendar
+      locale={locale} /></div> (import from ''../components/SubscribeCalendar'').'
+    - 'tests/homeChanges.test.tsx: pl markup contains ''webcal://zohelo.com/calendar.ics'' and ''Subskrybuj kalendarz publikacji'';
+      en contains ''Subscribe to the release calendar''.'
+    acceptance:
+    - build/client/index.html contains webcal://zohelo.com/calendar.ics
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/homeChanges.test.tsx
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - the indicator page sidebar link (todo of this Deliverable)
