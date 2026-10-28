@@ -17,6 +17,7 @@ const pages = (suffix: string) => [
   route('sources', 'routes/sources.tsx', { id: `sources${suffix}` }),
   route('changes', 'routes/changes.tsx', { id: `changes${suffix}` }),
   route('indicators', 'routes/indicators.tsx', { id: `indicators${suffix}` }),
+  route('indicators/:kpi', 'routes/indicator.tsx', { id: `indicator${suffix}` }),
   route('regions', 'routes/regions.tsx', { id: `regions${suffix}` }),
 ];
 
