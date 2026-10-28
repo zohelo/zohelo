@@ -61,6 +61,8 @@ export type LatestValue = {
   geography_level: string;
   period: string;
   value: number;
+  // unit of this value; absent in files written before zohelo-data#2148
+  unit_key?: string;
   previous_period?: string;
   previous_value?: number;
   flags: string[];

@@ -19,6 +19,7 @@ const pages = (suffix: string) => [
   route('indicators', 'routes/indicators.tsx', { id: `indicators${suffix}` }),
   route('indicators/:kpi', 'routes/indicator.tsx', { id: `indicator${suffix}` }),
   route('regions', 'routes/regions.tsx', { id: `regions${suffix}` }),
+  route('regions/:teryt', 'routes/region.tsx', { id: `region${suffix}` }),
 ];
 
 export default [

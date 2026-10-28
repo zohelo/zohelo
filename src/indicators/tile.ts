@@ -21,10 +21,10 @@ export type LatestTile = {
  */
 export function latestTile(kpi: CatalogKpi, latest: KpiLatest, units: Unit[], locale: Locale): LatestTile {
   const label = locale === 'pl' ? kpi.name_pl : kpi.name_en;
-  const unit = units.find((u) => u.unit_key === kpi.unit_key)?.symbol ?? kpi.unit_key;
+  const symbolOf = (unitKey: string) => units.find((u) => u.unit_key === unitKey)?.symbol ?? unitKey;
   const rows = latest.values.filter((v) => v.geography_key === 'PL');
   if (rows.length === 0) {
-    return { label, value: null, unit, delta: null, period: kpi.last_period, sourceKey: null, checkedAt: null, provisional: false };
+    return { label, value: null, unit: symbolOf(kpi.unit_key), delta: null, period: kpi.last_period, sourceKey: null, checkedAt: null, provisional: false };
   }
 
   const present = new Set(rows.map((r) => r.source_key));
@@ -37,7 +37,7 @@ export function latestTile(kpi: CatalogKpi, latest: KpiLatest, units: Unit[], lo
   return {
     label,
     value: row.value,
-    unit,
+    unit: symbolOf(row.unit_key ?? kpi.unit_key),
     delta: row.previous_value !== undefined && row.previous_value !== null ? row.value - row.previous_value : null,
     period: row.period,
     sourceKey: row.source_key,
