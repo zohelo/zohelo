@@ -1,0 +1,4 @@
+Synthetic fixture set of the published layer (zohelo-data docs/published.md), for PR checks and tests.
+Values, dates, licences and links here are not real. scripts/fetch-published.ts copies this directory
+when the lakehouse read key is absent; this file makes the site show the sample-data banner on every page.
+Never create this file in 06_published/v1.

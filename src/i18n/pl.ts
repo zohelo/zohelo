@@ -35,6 +35,10 @@ export const pl = {
     pl: 'PL',
     en: 'EN',
   },
+  sample: {
+    banner:
+      'Dane przykładowe: ta wersja strony jest zbudowana z wartości syntetycznych, nie z danych źródeł. Liczby, daty i licencje nie są prawdziwe.',
+  },
 } as const;
 
 type Widen<T> = { [K in keyof T]: T[K] extends string ? string : Widen<T[K]> };

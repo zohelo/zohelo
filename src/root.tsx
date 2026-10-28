@@ -1,11 +1,28 @@
 import '@zohelo/design/fonts.css';
 import './index.css';
 import type { ReactNode } from 'react';
+import { SampleDataBanner } from './components/SampleDataBanner';
 import { useLocale } from './i18n';
-import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteError } from 'react-router';
+import { isFixtureLayer, publishedDir } from './published';
+import {
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useRouteError,
+  useRouteLoaderData,
+} from 'react-router';
+
+// Runs at build only (ssr: false): a build from fixtures/published marks every page as sample data.
+export async function loader() {
+  return { sample: isFixtureLayer(publishedDir()) };
+}
 
 export function Layout({ children }: { children: ReactNode }) {
   const locale = useLocale();
+  const sample = useRouteLoaderData<typeof loader>('root')?.sample ?? false;
   return (
     <html lang={locale} data-theme="light">
       <head>
@@ -15,6 +32,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <Links />
       </head>
       <body className="bg-[#F8FAFC] text-[#24292E] font-sans antialiased selection:bg-[#3B8B94]/20 selection:text-[#18484F]">
+        {sample && <SampleDataBanner locale={locale} />}
         {children}
         <ScrollRestoration />
         <Scripts />

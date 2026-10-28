@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import { fetchPublished } from '../scripts/fetch-published';
-import { NO_LATEST, readCatalog, requiredLatest } from '../src/published';
+import { isFixtureLayer, NO_LATEST, readCatalog, requiredLatest } from '../src/published';
 
 const dirs: string[] = [];
 function tempOut(): string {
@@ -17,10 +17,11 @@ afterEach(() => {
 });
 
 describe('fetchPublished without credentials', () => {
-  test('copies the eight fixture files', async () => {
+  test('copies the fixture files and the fixture marker', async () => {
     const out = tempOut();
     const written = await fetchPublished(out, {}, { require: false });
     expect(written.map((p) => relative(out, p)).sort()).toEqual([
+      'FIXTURE.txt',
       'catalog/catalog.json',
       'feed/changes.json',
       'geo/voivodeship.geojson',
@@ -31,12 +32,13 @@ describe('fetchPublished without credentials', () => {
       'manifest.json',
     ]);
     expect(existsSync(join(out, 'catalog', 'catalog.json'))).toBe(true);
+    expect(isFixtureLayer(out)).toBe(true);
   });
 
   test('a partial key counts as missing', async () => {
     const out = tempOut();
     const written = await fetchPublished(out, { STORAGE_ENDPOINT_URL: 'https://example.invalid' }, { require: false });
-    expect(written).toHaveLength(8);
+    expect(written).toHaveLength(9);
   });
 
   test('with require it rejects', async () => {
