@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev": "react-router dev --port 3000 --host 0.0.0.0",
-    "build": "bun run --cwd packages/design build && bun scripts/fetch-published.ts && react-router build && bun scripts/not-found.ts && bun scripts/sitemap.ts && bun scripts/rss.ts",
+    "build": "bun run --cwd packages/design build && bun scripts/fetch-published.ts && react-router build && bun scripts/not-found.ts && bun scripts/sitemap.ts && bun scripts/rss.ts && bun scripts/calendar.ts",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "bun run --cwd packages/design build && react-router typegen && tsc --noEmit"
