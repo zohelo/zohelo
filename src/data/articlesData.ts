@@ -39,7 +39,7 @@ export const articlesList: ArticleItem[] = [
     fullContent: [
       'This empirical paper assesses the microeconomic impact of digital modernization across small and medium enterprises (SMEs) in Poland between 2020 and 2024. Utilizing panel regressions on a sample of 1,200 manufacturing and service firms, we identify a statistically significant 18.4% productivity premium for firms integrating unified data warehousing and automated ERP pipelines.',
       'Regional disparities remain prominent: enterprises located in Lower Silesia (Wrocław), Greater Poland (Poznań), and Mazovia demonstrate an average digital maturity index of 76/100, whereas eastern voivodeships average 52/100.',
-      'Crucially, our findings indicate that government co-financing programs paired with lightweight "Everything-as-Code" architectures yield higher ROI compared to monolithic proprietary enterprise suites, directly lowering operating IT overhead by 65%.'
+      'Crucially, our findings indicate that government co-financing programs paired with lightweight, code-defined architectures yield higher ROI compared to monolithic proprietary enterprise suites, directly lowering operating IT overhead by 65%.'
     ],
     keyDataPoints: [
       { label: 'Total Sample Size', value: '1,200 Firms', context: 'Stratified across all 16 regions' },
@@ -85,12 +85,12 @@ export const articlesList: ArticleItem[] = [
     fullContent: [
       'Public administration entities in Poland generate vast troves of structured data—spanning the GUS Local Data Bank (BDL), Public Information Bulletins (BIP), and regional treasury audits—yet less than 5% of these assets are actively utilized for evidence-based policymaking.',
       'In this operational case study, we demonstrate how a zero-maintenance "BI-as-Code" pipeline combining DuckDB, dbt Core, and Parquet on cloud object storage enabled a medium-sized municipality to predict property tax revenues with 98.4% accuracy.',
-      'By decoupling analytical metric definitions into MetricFlow YAML schemas, municipal analysts gained the ability to query complex demographic aging ratios in milliseconds without requiring dedicated on-premise database servers.'
+      'By decoupling analytical metric definitions into declarative YAML files, municipal analysts gained the ability to query complex demographic aging ratios in milliseconds without requiring dedicated on-premise database servers.'
     ],
     keyDataPoints: [
       { label: 'Forecast Accuracy', value: '98.4%', context: 'Municipal revenue projection model' },
       { label: 'Query Latency', value: '<42ms', context: 'DuckDB columnar scan on 5M rows' },
-      { label: 'Infrastructure Cost', value: '$0.00/mo', context: 'GCP Always-Free Tier compliance' }
+      { label: 'Infrastructure Cost', value: '$0.00/mo', context: 'Free-tier cloud services' }
     ]
   }
 ];

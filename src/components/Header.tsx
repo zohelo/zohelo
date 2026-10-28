@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
-import { Search, Database, FileCode2, Menu, X, Sparkles } from 'lucide-react';
+import { Search, Database, Menu, X } from 'lucide-react';
 
 interface HeaderProps {
   onOpenSearch: () => void;
-  onOpenEacModal: () => void;
   activeSection: string;
   onNavigate: (sectionId: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenSearch,
-  onOpenEacModal,
   onNavigate
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -76,16 +74,6 @@ export const Header: React.FC<HeaderProps> = ({
                 ⌘K
               </kbd>
             </button>
-
-            {/* Jarvis / EaC Blueprint Trigger */}
-            <button
-              onClick={onOpenEacModal}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#3B8B94]/10 text-[#2C6E76] hover:bg-[#3B8B94] hover:text-white text-xs font-semibold tracking-wide transition-all cursor-pointer border border-[#3B8B94]/20"
-              title="Inspect Everything-as-Code (EaC) and MetricFlow YAML Architecture"
-            >
-              <FileCode2 className="w-3.5 h-3.5" />
-              <span>EaC / MetricFlow</span>
-            </button>
           </div>
 
           {/* Mobile Menu Trigger */}
@@ -122,18 +110,6 @@ export const Header: React.FC<HeaderProps> = ({
                 {item.label}
               </button>
             ))}
-          </div>
-          <div className="flex flex-col space-y-2 pt-1">
-            <button
-              onClick={() => {
-                onOpenEacModal();
-                setMobileMenuOpen(false);
-              }}
-              className="flex items-center justify-center space-x-2 w-full py-2.5 px-4 rounded-lg bg-[#3B8B94] text-white text-xs font-semibold shadow-sm"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>View Jarvis EaC & MetricFlow Blueprint</span>
-            </button>
           </div>
         </div>
       )}
