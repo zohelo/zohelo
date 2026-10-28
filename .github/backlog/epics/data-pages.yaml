@@ -29,13 +29,86 @@ deliverables:
   - Downloads served from the site build (copied published extracts) with licence and citation per file
   todo:
   - Copy selected published extracts into build/client/downloads at build (size cap 200 kB per file, else link to
-    bi); citation text template 'zohelo (2026), <KPI>, source <source dataset>, accessed <date>'.
+    bi); show citation() (Task citation) with each file.
+  tasks:
+  - key: com/site/data-pages/data/citation
+    type: Task
+    title: Add the citation text for downloads
+    effort: S
+    state: open
+    contract: false
+    context: 'Every download on /data comes with a citation (Deliverable done_when), template ''zohelo (<year>), <KPI>,
+      source <source dataset>, accessed <date>''. This Task adds only the pure function, in Polish and English; the
+      downloads and the page come later.'
+    files:
+    - create: src/dataPages/citation.ts
+    - create: tests/citation.test.ts
+    steps:
+    - 'Export type CitationInput = { kpiName: string; sourceName: string; datasetCode?: string; accessed: string }
+      (accessed: ISO date or timestamp) and function citation(input: CitationInput, locale: ''pl'' | ''en''): string.'
+    - 'year = accessed.slice(0, 4); date = accessed.slice(0, 10); source = datasetCode ? `${sourceName} (${datasetCode})`
+      : sourceName.'
+    - 'pl: `zohelo (${year}), ${kpiName}, źródło ${source}, dostęp ${date}`; en: `zohelo (${year}), ${kpiName}, source
+      ${source}, accessed ${date}`. No trailing full stop.'
+    - 'tests/citation.test.ts (bun:test): en { kpiName: ''Unemployment rate (LFS)'', sourceName: ''Eurostat'', datasetCode:
+      ''une_rt_a'', accessed: ''2026-10-28T09:00:00Z'' } gives ''zohelo (2026), Unemployment rate (LFS), source Eurostat
+      (une_rt_a), accessed 2026-10-28''; pl with kpiName ''Stopa bezrobocia (BAEL)'' gives ''zohelo (2026), Stopa bezrobocia
+      (BAEL), źródło Eurostat (une_rt_a), dostęp 2026-10-28''; without datasetCode the source has no parentheses.'
+    acceptance:
+    - citation is pure and every rule above is tested
+    verify:
+    - run: bun run lint && bun test tests/citation.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - Copying extracts into build/client/downloads and the /data route (todo above)
 - key: com/site/data-pages/sources
   title: /sources page
   done_when:
   - 'One row per onboarded source: name, provider, family, licence, last loaded, KPIs fed'
   todo:
-  - Route /sources from catalog dim_source + dim_licence + freshness; link each KPI to its indicator page.
+  - Route /sources from sourceRows() (Task model) plus last-load freshness from catalog/freshness.parquet; each KPI
+    links to its indicator page.
+  tasks:
+  - key: com/site/data-pages/sources/model
+    type: Task
+    title: Add the /sources page model from the catalog
+    effort: S
+    state: open
+    contract: false
+    context: '/sources lists every onboarded source with its licence, last load and the KPIs it feeds (Deliverable
+      done_when). catalog/catalog.json (type Catalog in src/published.ts; zohelo-data docs/published.md) holds sources,
+      licences and KPIs with source_keys and loaded_at. This Task adds only the pure function; the route and freshness
+      from catalog/freshness.parquet come later.'
+    files:
+    - create: src/dataPages/sources.ts
+    - create: tests/sources.test.ts
+    steps:
+    - 'Export type SourceRow = { source_key: string; name: string; register_id: string; licence: { name: string; url:
+      string; attribution: string; commercial_ok: boolean } | null; kpis: { kpi_key: string; name: string; href: string
+      }[]; last_loaded: string | null } and function sourceRows(catalog: Catalog, locale: Locale): SourceRow[]. Import
+      type Catalog from ''../published''; Locale and localizedPath from ''../i18n''.'
+    - 'One row per catalog.sources entry: name = name_pl/name_en; licence = the catalog.licences entry with its licence_key
+      (attribution = attribution_text), null when missing.'
+    - 'kpis = catalog KPIs with status ''published'' whose source_keys include the source: name by locale, href =
+      localizedPath(`/indicators/${kpi_key}`, locale), sorted by name with a.name.localeCompare(b.name, locale). last_loaded =
+      the greatest loaded_at of those KPIs (string compare), null when there are none.'
+    - Sort rows by name with a.name.localeCompare(b.name, locale).
+    - 'tests/sources.test.ts (bun:test, readCatalog(''fixtures/published'')): pl order Bank Światowy – WDI, Eurostat,
+      GUS – Bank Danych Lokalnych, Narodowy Bank Polski; en order Eurostat, National Bank of Poland, Statistics Poland
+      – Local Data Bank, World Bank – WDI; gus_bdl feeds only population; nbp feeds fx_rate with href ''/en/indicators/fx_rate''
+      in en; eurostat has 4 KPIs and licence name ''Creative Commons Attribution 4.0''; a copy with an unknown licence_key
+      gives licence null; a source no KPI uses gives kpis [] and last_loaded null.'
+    acceptance:
+    - sourceRows is pure and does not mutate the catalog
+    - Every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/sources.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The /sources route and freshness.parquet
+    - Registered sources that are not in the catalog
+    depends_on:
+    - com/site/indicators/data/readers
 - key: com/site/data-pages/vault-removal
   title: Vault removed
   depends_on:

@@ -34,4 +34,37 @@ deliverables:
   done_when:
   - webcal://zohelo.com/calendar.ics link on home and each indicator page, PL/EN labels
   todo:
-  - Add a SubscribeCalendar link component; place it in the home what-changed block and the indicator page sidebar.
+  - Place SubscribeCalendar (Task subscribe) in the home what-changed block and the indicator page sidebar once /calendar.ics
+    is served.
+  tasks:
+  - key: com/growth/calendar-ics/links/subscribe
+    type: Task
+    title: Add the SubscribeCalendar link component
+    effort: S
+    state: open
+    contract: false
+    context: 'zohelo.com will serve /calendar.ics, the release calendar (Deliverable feed). Readers subscribe with a
+      webcal:// link or download the file. This Task adds only the component with both links; it is placed on pages
+      once the feed is served (todo above). site.url in src/site.config.ts is ''https://zohelo.com''.'
+    files:
+    - create: src/components/SubscribeCalendar.tsx
+    - create: tests/subscribeCalendar.test.tsx
+    steps:
+    - 'export function calendarLinks(): { webcal: string; https: string } = { webcal: site.url.replace(/^https:/, ''webcal:'')
+      + ''/calendar.ics'', https: site.url + ''/calendar.ics'' } (import site from ''../site.config'').'
+    - 'export function SubscribeCalendar({ locale }: { locale: ''pl'' | ''en'' }) renders <p className="font-ui text-[length:var(--z-size-sm)]
+      text-text-muted"> with <a href={webcal} className="text-text underline"> ''Subskrybuj kalendarz publikacji''
+      (pl) / ''Subscribe to the release calendar'' (en), the text '' · '', and <a href={https} download className="underline">
+      ''Pobierz plik .ics'' (pl) / ''Download the .ics file'' (en). No state or effects.'
+    - 'tests/subscribeCalendar.test.tsx (bun:test, renderToStaticMarkup from react-dom/server): calendarLinks() equals
+      { webcal: ''webcal://zohelo.com/calendar.ics'', https: ''https://zohelo.com/calendar.ics'' }; the pl markup contains
+      both hrefs and ''Subskrybuj kalendarz publikacji''; the en markup contains ''Subscribe to the release calendar''
+      and ''Download the .ics file''.'
+    acceptance:
+    - Every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/subscribeCalendar.test.tsx
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - Serving /calendar.ics and public/_headers (Deliverable feed)
+    - Placing the component on any page

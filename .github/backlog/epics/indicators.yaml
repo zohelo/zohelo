@@ -92,8 +92,9 @@ deliverables:
   - 'Route /indicators: one section per indicatorGroups() group (Task groups), a KpiTile per KPI from latestTile()
     (Task latest-tile); needs .published/ at build.'
   - 'Route /indicators/:kpi: KpiTile, line Chart (series), regional DataTable when kpi_dimension has geography,
-    definition, SourceFooter, licence, CSV download link to the published extract, Dataset JSON-LD from datasetJsonLd()
-    (Task dataset-jsonld); prerender list from site.config indicators.'
+    definition, SourceFooter and licence from kpiSources()/footerProps() (Task kpi-sources), CSV download link to
+    the published extract, Dataset JSON-LD from datasetJsonLd() (Task dataset-jsonld); prerender list from site.config
+    indicators.'
   tasks:
   - key: com/site/indicators/pages/groups
     type: Task
@@ -212,6 +213,47 @@ deliverables:
     depends_on:
     - com/site/indicators/data/readers
     - com/site/site-v1/seo/meta
+  - key: com/site/indicators/pages/kpi-sources
+    type: Task
+    title: List a KPI's sources with their licences for the source footer
+    effort: S
+    state: open
+    contract: false
+    context: 'Every indicator page shows its sources and licence under the numbers (Epic done_when). latestTile()
+      (Task latest-tile) gives the value; this Task adds the pure functions that resolve a KPI''s source_keys in catalog/catalog.json
+      (type Catalog in src/published.ts) into names and licences, and shape them for SourceFooter from @zohelo/design
+      (props sources: { name; code?; url? }[], licence?: string).'
+    files:
+    - create: src/indicators/sources.ts
+    - create: tests/kpiSources.test.ts
+    steps:
+    - 'Export type KpiSource = { source_key: string; name: string; register_id: string; licence: { name: string; url:
+      string; attribution: string } | null } and function kpiSources(catalog: Catalog, kpiKey: string, locale: Locale):
+      KpiSource[] (`import type` from ''../published''; Locale from ''../i18n''). Unknown kpiKey throws Error(`KPI ${kpiKey}
+      is not in the catalog`).'
+    - 'One entry per key of the KPI''s source_keys that has a catalog.sources entry, in source_keys order (others
+      skipped): name = name_pl/name_en; licence = the catalog.licences entry with the source''s licence_key (attribution
+      = attribution_text), null when missing.'
+    - 'export function footerProps(sources: KpiSource[]): { sources: { name: string }[]; licence?: string }: sources
+      mapped to { name }; licence = the distinct licence names in order joined by '' · ''; the licence key is left
+      out when no source has a licence.'
+    - 'tests/kpiSources.test.ts (bun:test, readCatalog(''fixtures/published'')): unemployment_rate in pl gives names
+      [''Eurostat'', ''Bank Światowy – WDI''], both with licence name ''Creative Commons Attribution 4.0'', and footerProps
+      licence ''Creative Commons Attribution 4.0'' (once); population in en gives [''Eurostat'', ''World Bank – WDI'',
+      ''Statistics Poland – Local Data Bank''] and licence ''Creative Commons Attribution 4.0 · GUS terms of use (illustrative)'';
+      an unknown source_key is skipped; with licences [] every licence is null and footerProps has no licence key;
+      ''nope'' throws /not in the catalog/.'
+    acceptance:
+    - Both functions are pure and do not mutate the catalog
+    - Every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/kpiSources.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - Rendering SourceFooter on a page; latestTile() and datasetJsonLd()
+    - Dataset codes (not in catalog.json v1)
+    depends_on:
+    - com/site/indicators/data/readers
 - key: com/site/indicators/home
   title: Today strip and real metrics on home
   depends_on:
