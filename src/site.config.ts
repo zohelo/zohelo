@@ -44,3 +44,10 @@ export const pages: Page[] = [
 export function prerenderPaths(): string[] {
   return pages.flatMap((p) => [p.path, p.path === '/' ? '/en' : `/en${p.path}`]);
 }
+
+/**
+ * The not-found page, pre-rendered once per language and moved to 404.html and en/404.html after the
+ * build (scripts/not-found.ts). Cloudflare Pages serves the nearest 404.html with HTTP 404 for every
+ * unknown URL; without it Pages treats the site as a single-page app and answers 200 with the home page.
+ */
+export const notFoundPaths = ['/404', '/en/404'];
