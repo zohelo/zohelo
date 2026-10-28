@@ -165,25 +165,29 @@ deliverables:
     effort: S
     state: open
     contract: true
-    context: zohelo-data's repo_check rejects 'uses:' lines without a full commit SHA; zohelo has no such rule,
-      so a future edit could reintroduce a floating tag (A-04).
+    context: 'zohelo-data''s repo_check rejects ''uses:'' lines without a full commit SHA; zohelo has no such rule,
+      so a future edit could reintroduce a floating tag (A-04). zohelo-bi solved it with ops/check-pins.sh (merged
+      28 Oct, zohelo-bi #107): it reads only YAML `uses:` keys, so it does not match its own step (the inline grep
+      of the first version of this Task did, design question 28 Oct). zohelo uses the same script.'
     files:
+    - create: scripts/check-pins.sh
     - edit: .github/workflows/check.yml
     steps:
-    - 'Add a first step to the check job, named ''Actions pinned by SHA'', before checkout''s following steps:'
-    - 'run: | (bash) set -euo pipefail; bad=$(grep -rhoE ''uses:[[:space:]]*[^[:space:]#]+'' .github/workflows |
-      sed -E ''s/uses:[[:space:]]*//'' | grep -v ''^\./'' | grep -vE ''@[0-9a-f]{40}$'' || true); if [ -n "$bad"
-      ]; then echo "::error title=unpinned action::$bad"; exit 1; fi'
-    - The step needs the checkout, so place it right after actions/checkout.
+    - 'Copy zohelo-bi''s script byte for byte: `gh api repos/zohelo/zohelo-bi/contents/ops/check-pins.sh -H "Accept:
+      application/vnd.github.raw" > scripts/check-pins.sh`, then `chmod +x scripts/check-pins.sh` and `git update-index
+      --chmod=+x scripts/check-pins.sh`.'
+    - 'check.yml: add a step `- name: Actions pinned` with `run: scripts/check-pins.sh` directly after the first
+      actions/checkout step.'
     acceptance:
-    - check fails when any workflow uses an action by tag or branch
-    - check passes on main as it is today (all actions pinned)
+    - scripts/check-pins.sh is identical to zohelo-bi ops/check-pins.sh
+    - 'check fails when a workflow uses an action by tag or branch (try `uses: actions/checkout@v7` locally, then
+      revert)'
+    - check passes on main as it is today
     verify:
+    - run: scripts/check-pins.sh
+      expect: pins ok (<n> uses)
     - workflow: Check on this PR
-      expect: green; step "Actions pinned by SHA" ran
-    - run: grep -rhoE 'uses:[[:space:]]*[^[:space:]#]+' .github/workflows | sed -E 's/uses:[[:space:]]*//' | grep
-        -v '^\./' | grep -vcE '@[0-9a-f]{40}$'
-      expect: '0'
+      expect: green; step "Actions pinned" ran
     out_of_scope:
     - Changing which actions are used
 - key: com/platform/hardening/scaffold
