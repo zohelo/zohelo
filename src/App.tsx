@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { PulseSection } from './components/PulseSection';
-import { MetricsSection } from './components/MetricsSection';
 import { CompassSection } from './components/CompassSection';
 import { VaultSection } from './components/VaultSection';
 import { ProductsSection } from './components/ProductsSection';
@@ -12,8 +11,10 @@ import { DatasetPreviewModal } from './components/DatasetPreviewModal';
 import { CommandPalette } from './components/CommandPalette';
 import { VoivodeshipData, DatasetItem, ProductItem } from './types';
 import { CheckCircle2 } from 'lucide-react';
+import type { Locale } from './i18n';
+import { TodayStrip, type TodayTile } from './indicators/TodayStrip';
 
-export default function App() {
+export default function App({ tiles, locale }: { tiles: TodayTile[]; locale: Locale }) {
   const [activeSection, setActiveSection] = useState('top');
   
   // Modals state
@@ -73,8 +74,7 @@ export default function App() {
           }}
         />
 
-        {/* 3. The Metrics: KPIs (GDP, Unemployment, Inflation) */}
-        <MetricsSection />
+        <TodayStrip tiles={tiles} locale={locale} />
 
         {/* 4. The Compass: Polish Regional Map + Public Finance Trends 2024-2025 */}
         <CompassSection
