@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { tokens } from '../../packages/design/src/generated/tokens';
 import { SampleChart } from '../components/SampleChart.client';
 import { localeOf, useLocale } from '../i18n';
+import { pageMeta } from '../seo';
 import { pages } from '../site.config';
 
 // A visual test page of the design system: every token and every component with sample props.
@@ -12,10 +13,7 @@ const page = pages.find((p) => p.path === '/design')!;
 
 export function meta({ location }: { location: { pathname: string } }) {
   const locale = localeOf(location.pathname);
-  return [
-    { title: `${page.title[locale]} · zohelo` },
-    { name: 'description', content: page.description[locale] },
-  ];
+  return pageMeta({ path: page.path, locale, title: page.title[locale], description: page.description[locale] });
 }
 
 type Mode = 'light' | 'dark';
