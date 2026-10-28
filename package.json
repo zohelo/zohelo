@@ -16,11 +16,15 @@
   "dependencies": {
     "@react-router/node": "7.18.5",
     "@zohelo/design": "workspace:*",
+    "gray-matter": "^4.0.3",
+    "isbot": "^5",
     "lucide-react": "^0.577.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router": "7.18.5",
-    "isbot": "^5"
+    "remark": "^15.0.1",
+    "remark-html": "^16.0.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@react-router/dev": "7.18.5",
