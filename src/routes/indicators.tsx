@@ -50,7 +50,7 @@ export default function Indicators() {
                 label={tile.label}
                 value={tile.value}
                 unit={tile.unit}
-                delta={tile.delta}
+                delta={tile.delta ?? undefined}
                 period={tile.period}
                 locale={locale}
                 href={href}
