@@ -90,6 +90,17 @@ export function publishedDir(): string {
   return process.env.PUBLISHED_DIR ?? '.published';
 }
 
+/**
+ * Published KPIs that have no kpi/<kpi_key>/latest.json by contract. Mirrors SKIP in zohelo-data
+ * warehouse/publish.py (docs/published.md, decision D26); keep the two lists equal.
+ */
+export const NO_LATEST: readonly string[] = ['fx_rate'];
+
+/** The kpi_keys whose latest.json the build must have: published KPIs not in NO_LATEST. Pure. */
+export function requiredLatest(catalog: Catalog): string[] {
+  return catalog.kpis.filter((k) => k.status === 'published' && !NO_LATEST.includes(k.kpi_key)).map((k) => k.kpi_key);
+}
+
 function readJson(path: string): unknown {
   if (!existsSync(path)) throw new Error(`published file missing: ${path}`);
   return JSON.parse(readFileSync(path, 'utf8'));
