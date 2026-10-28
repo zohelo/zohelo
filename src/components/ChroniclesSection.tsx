@@ -42,7 +42,7 @@ export const ChroniclesSection: React.FC<ChroniclesSectionProps> = ({ onOpenArti
             </p>
           </div>
           <div className="text-xs text-[#3B8B94] font-medium hidden sm:block">
-            Peer-Reviewed Open Reports
+            Sample articles
           </div>
         </div>
 

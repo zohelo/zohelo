@@ -47,7 +47,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) 
             <div className="flex flex-wrap items-center gap-4 mt-4 pt-3 border-t border-slate-100 text-xs text-slate-500">
               <div className="flex items-center space-x-1.5 font-semibold text-slate-700">
                 <User className="w-3.5 h-3.5 text-[#3B8B94]" />
-                <span>{article.author} ({article.authorRole})</span>
+                <span>{article.authorRole ? `${article.author} (${article.authorRole})` : article.author}</span>
               </div>
               <div className="flex items-center space-x-1 font-mono-code">
                 <Calendar className="w-3.5 h-3.5 text-slate-400" />

@@ -89,7 +89,7 @@ export interface ArticleItem {
   readTime: string;
   publishDate: string;
   author: string;
-  authorRole: string;
+  authorRole?: string;
   tags: string[];
   fullContent: string[];
   keyDataPoints: { label: string; value: string; context: string }[];
