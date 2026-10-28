@@ -15,6 +15,7 @@ const pages = (suffix: string) => [
   ...studyRoute(suffix),
   route('design', 'routes/design.tsx', { id: `design${suffix}` }),
   route('changes', 'routes/changes.tsx', { id: `changes${suffix}` }),
+  route('indicators', 'routes/indicators.tsx', { id: `indicators${suffix}` }),
 ];
 
 export default [

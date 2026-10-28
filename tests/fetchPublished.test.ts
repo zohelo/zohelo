@@ -17,13 +17,16 @@ afterEach(() => {
 });
 
 describe('fetchPublished without credentials', () => {
-  test('copies the five fixture files', async () => {
+  test('copies the eight fixture files', async () => {
     const out = tempOut();
     const written = await fetchPublished(out, {}, { require: false });
     expect(written.map((p) => relative(out, p)).sort()).toEqual([
       'catalog/catalog.json',
       'feed/changes.json',
       'geo/voivodeship.geojson',
+      'kpi/gdp_current_prices/latest.json',
+      'kpi/inflation/latest.json',
+      'kpi/population/latest.json',
       'kpi/unemployment_rate/latest.json',
       'manifest.json',
     ]);
@@ -33,7 +36,7 @@ describe('fetchPublished without credentials', () => {
   test('a partial key counts as missing', async () => {
     const out = tempOut();
     const written = await fetchPublished(out, { STORAGE_ENDPOINT_URL: 'https://example.invalid' }, { require: false });
-    expect(written).toHaveLength(5);
+    expect(written).toHaveLength(8);
   });
 
   test('with require it rejects', async () => {
