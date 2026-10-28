@@ -81,6 +81,10 @@ export type ChangeItem = {
 
 export type Changes = { generated_at: string; items: ChangeItem[] };
 
+export type GeoProperties = { geography_key: string; name_pl: string; name_en: string; level: string; parent_key?: string };
+
+export type GeoCollection = { type: 'FeatureCollection'; features: { properties: GeoProperties }[] };
+
 function readJson(path: string): unknown {
   if (!existsSync(path)) throw new Error(`published file missing: ${path}`);
   return JSON.parse(readFileSync(path, 'utf8'));
@@ -108,5 +112,12 @@ export function readChanges(dir: string): Changes {
   const path = join(dir, 'feed', 'changes.json');
   const data = readJson(path) as Changes;
   if (!Array.isArray(data?.items)) throw invalid(path);
+  return data;
+}
+
+export function readGeo(dir: string, level: string): GeoCollection {
+  const path = join(dir, 'geo', `${level}.geojson`);
+  const data = readJson(path) as GeoCollection;
+  if (!Array.isArray(data?.features)) throw invalid(path);
   return data;
 }
