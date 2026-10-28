@@ -1,6 +1,6 @@
 # zohelo-journal — discovery brief
 
-Status: draft, Product Owner, 28 Oct 2026. Discovery Epic `com/portfolio/journal`. No Developer time until the owner
+Status: complete, Product Owner, 28 Oct 2026; owner decision zohelo#268. Discovery Epic `com/portfolio/journal`. No Developer time until the owner
 approves (docs/team.md in zohelo-data, decision O13).
 
 ## Who it is for
