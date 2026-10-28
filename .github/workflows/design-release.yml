@@ -1,0 +1,56 @@
+name: Design release
+
+# Cuts a release of @zohelo/design (decision D3): builds packages/design, packs it and attaches
+# zohelo-design-<version>.tgz to the GitHub Release design-v<version>. Manual, main only; the
+# input must equal the version in packages/design/package.json.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release, e.g. 1.0.0 (must equal packages/design/package.json)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: design-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Main only
+        run: |
+          if [ "$GITHUB_REF" != refs/heads/main ]; then echo '::error::run on main'; exit 1; fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6  # v2.2.0
+        with:
+          bun-version: 1.4.2
+      - name: Install
+        run: bun install --frozen-lockfile
+      - name: Version matches package.json
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          actual="$(jq -r .version packages/design/package.json)"
+          if [ "$actual" != "$VERSION" ]; then
+            echo "::error::input version $VERSION does not match packages/design/package.json version $actual"
+            exit 1
+          fi
+      - name: Build and pack
+        working-directory: packages/design
+        run: bun run build && bun pm pack
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: >-
+          gh release create "design-v$VERSION" "packages/design/zohelo-design-$VERSION.tgz"
+          --title "design v$VERSION" --notes-file packages/design/CHANGELOG.md --target main
