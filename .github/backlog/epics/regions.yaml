@@ -280,8 +280,8 @@ deliverables:
   done_when:
   - /regions/<teryt> for all 16 TERYT codes with KPIs vs Poland and rank
   todo:
-  - Neighbours list from geometry adjacency computed at build; sitemap entries for /regions/<teryt>; links from the
-    /regions map and ranking table to the profiles.
+  - Neighbours list from geometry adjacency computed at build; links from the /regions map (a click on a region) to
+    the profiles.
   tasks:
   - key: com/site/regions/profiles/model
     type: Task
@@ -363,6 +363,76 @@ deliverables:
     notes:
     - The fixture values come from zohelo-data .github/backlog/assets/latest-fixtures.md (zohelo-data#2196). If the population
       fixture has no TERC:12 and TERC:14 rows, comment here and stop.
+  - key: com/site/regions/profiles/sitemap
+    type: Task
+    title: List the indicator and voivodeship pages in the sitemap
+    effort: S
+    state: open
+    contract: false
+    context: 'scripts/sitemap.ts writes build/client/sitemap.xml after the build from `pages` in src/site.config.ts
+      only, so the pre-rendered /indicators/<kpi_key> pages (one per published KPI, react-router.config.ts) and the 16
+      /regions/<teryt> profiles (VOIVODESHIP_TERYT, src/regions/profile.ts) are missing from it. The sitemap script
+      runs with bun after fetch-published, so it can read the catalog; src/site.config.ts must not import
+      src/published.ts (node:fs would reach the client bundle).'
+    files:
+    - edit: scripts/sitemap.ts
+    steps:
+    - 'Import publishedDir and readCatalog from ''../src/published'' and VOIVODESHIP_TERYT from ''../src/regions/profile''.'
+    - 'Build paths: [...pages.map((p) => p.path), ...readCatalog(publishedDir()).kpis.filter((k) => k.status === ''published'').map((k)
+      => `/indicators/${k.kpi_key}`), ...VOIVODESHIP_TERYT.map((t) => `/regions/${t}`)].'
+    - 'entries = paths.flatMap((path) => …) with the same <url> block as today (loc plus the pl, en and x-default
+      alternates), using path instead of page.path. Update the header comment: pages from site.config.ts, every
+      published KPI and every voivodeship profile.'
+    acceptance:
+    - sitemap.xml lists every page of site.config.ts, every published KPI page and the 16 profiles, each in pl and en
+      with the hreflang alternates
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun run build && grep -c '<loc>' build/client/sitemap.xml && grep
+        -c '<loc>https://zohelo.com/en/indicators/unemployment_rate/</loc>' build/client/sitemap.xml && grep -c '<loc>https://zohelo.com/regions/12/</loc>'
+        build/client/sitemap.xml
+      expect: 'the first count is 2 × (pages in site.config.ts + 5 published fixture KPIs + 16), 56 with today''s 7 pages; then
+        1 and 1'
+    out_of_scope:
+    - Changing src/site.config.ts, react-router.config.ts or robots.txt
+    - lastmod dates
+    depends_on:
+    - com/site/regions/profiles/profile-route
+  - key: com/site/regions/profiles/ranking-links
+    type: Task
+    title: Link the voivodeships in the ranking table to their profiles
+    effort: S
+    state: open
+    contract: false
+    context: 'RankingTable (src/regions/RankingTable.tsx) shows the voivodeship ranking on /regions and on every
+      /indicators/<kpi_key> page; the region names are plain text, so readers cannot reach the /regions/<teryt> profiles
+      from them. DataTable (packages/design/src/components/DataTable.tsx) passes only the cell value to a column''s
+      format, so a cell cannot read another field of its row. terytOf() and regionPath() are in src/regions/profile.ts.'
+    files:
+    - edit: packages/design/src/components/DataTable.tsx
+    - edit: packages/design/CHANGELOG.md
+    - edit: src/regions/RankingTable.tsx
+    - edit: tests/rankingTable.test.tsx
+    steps:
+    - 'DataTable.tsx: DataTableColumn.format becomes `format?: (value: T[keyof T], row: T) => ReactNode` and the cell
+      calls `c.format(row[c.key], row)`. Nothing else changes (sorting still uses row[c.key]).'
+    - 'CHANGELOG.md, under ''## Unreleased'', add the line: - `DataTable` — a column''s `format` also receives the row.'
+    - 'RankingTable.tsx: RankingRow gets `href: string | null`; rankingRows sets href = regionPath(teryt, locale) when
+      terytOf(r.geography_key) gives a code, else null (import both from ''./profile'').'
+    - 'The region column gets format: (v, row) => row.href ? <a href={row.href} className="text-brand-teal underline">{String(v)}</a>
+      : String(v).'
+    - 'tests/rankingTable.test.tsx: the three rankingRows expectations gain href (''/regions/12'' in pl, ''/en/regions/12''
+      in en, null for TERC:99); new test: the pl markup contains href="/regions/12" and the en markup href="/en/regions/12".'
+    acceptance:
+    - Every rule above is covered by a test; sorting by region still sorts by name
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/rankingTable.test.tsx && bun run build && grep -c 'href="/regions/12"'
+        build/client/regions/index.html
+      expect: exit 0; 0 fail; grep prints at least 1
+    out_of_scope:
+    - Links from the map (MapChoropleth) and the neighbours list
+    - A new @zohelo/design release
+    depends_on:
+    - com/site/regions/profiles/profile-route
 - key: com/site/regions/home
   title: Regional spotlight on home
   depends_on:
