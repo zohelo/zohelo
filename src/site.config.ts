@@ -2,6 +2,8 @@
 // this file, so adding a page to `pages` is the only step needed to pre-render it (in Polish at
 // its path and in English under /en).
 
+import { VOIVODESHIP_TERYT } from './regions/profile';
+
 export type Localized = { pl: string; en: string };
 export type Page = { path: string; title: Localized; description: Localized };
 
@@ -75,6 +77,11 @@ export const pages: Page[] = [
 /** Every pre-rendered path: each page in Polish and in English. */
 export function prerenderPaths(): string[] {
   return pages.flatMap((p) => [p.path, p.path === '/' ? '/en' : `/en${p.path}`]);
+}
+
+/** Every voivodeship profile page (/regions/<teryt>) in Polish and in English. */
+export function regionPaths(): string[] {
+  return VOIVODESHIP_TERYT.flatMap((t) => [`/regions/${t}`, `/en/regions/${t}`]);
 }
 
 /**
