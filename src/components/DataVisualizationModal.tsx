@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, MapPin, Download, Filter, TrendingUp, Users, DollarSign, Building2, BarChart3, ChevronRight, ArrowUpDown } from 'lucide-react';
-import { polandVoivodeships } from '../data/polandRegions';
+import { polandVoivodeships } from '../content/polandRegions';
 import { VoivodeshipData } from '../types';
 
 interface DataVisualizationModalProps {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BarChart2, FileText, Megaphone, Network, BookOpen, Clock, ArrowUpRight } from 'lucide-react';
-import { articlesList } from '../data/articlesData';
+import { articlesList } from '../content/articlesData';
 import { ArticleItem } from '../types';
 import { IllustrativeBadge } from './IllustrativeBadge';
 
