@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, FileText, Download, TrendingUp, Cpu, X, ArrowRight, CornerDownLeft } from 'lucide-react';
-import { pulseIndicators } from '../data/pulseData';
-import { polandVoivodeships } from '../data/polandRegions';
-import { articlesList } from '../data/articlesData';
-import { vaultDatasets } from '../data/datasetsData';
-import { productsList } from '../data/productsData';
+import { pulseIndicators } from '../content/pulseData';
+import { polandVoivodeships } from '../content/polandRegions';
+import { articlesList } from '../content/articlesData';
+import { vaultDatasets } from '../content/datasetsData';
+import { productsList } from '../content/productsData';
 import { VoivodeshipData, ArticleItem, DatasetItem } from '../types';
 
 interface CommandPaletteProps {
