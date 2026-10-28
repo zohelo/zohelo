@@ -68,3 +68,5 @@ $2.40 a month; reads and egress are free. Pages, Workers, Access (up to 50 users
 | data.zohelo.com | CNAME rutkala.github.io (GitHub Pages, switched off) |
 
 The old targets no longer exist; a rollback now means redeploying, not repointing.
+
+Last verified: 2026-10-28

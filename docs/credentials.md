@@ -49,3 +49,5 @@ Maintenance` and `[R2 SQL Studio]` (created and used by Cloudflare itself).
 
 Run **Check credentials** in zohelo-bi (Actions → Check credentials → Run workflow). It tries
 each variable and secret against its service and prints only lengths and status codes.
+
+Last verified: 2026-10-28
