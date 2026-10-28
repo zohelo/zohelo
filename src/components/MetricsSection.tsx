@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { declarativeMetrics } from '../data/metricsData';
+import { IllustrativeBadge } from './IllustrativeBadge';
 
 interface SparklineResult {
   linePath: string;
@@ -47,9 +48,12 @@ export const MetricsSection: React.FC = () => {
         {/* Section Title */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500">
-              The Metrics
-            </h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500">
+                The Metrics
+              </h2>
+              <IllustrativeBadge />
+            </div>
             <span className="text-[11px] font-medium text-slate-400">
               • Key indicators (GUS)
             </span>

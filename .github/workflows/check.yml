@@ -25,6 +25,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           persist-credentials: false
+      - name: Actions pinned
+        run: scripts/check-pins.sh
       - name: Lint workflows
         run: |
           # shellcheck disable=SC2016 # the -format template is for actionlint, not the shell
