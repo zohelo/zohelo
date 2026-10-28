@@ -4,6 +4,7 @@ import { index, prefix, route, type RouteConfig } from '@react-router/dev/routes
 const pages = (suffix: string) => [
   index('routes/home.tsx', { id: `home${suffix}` }),
   route('portfolio', 'routes/portfolio.tsx', { id: `portfolio${suffix}` }),
+  route('design', 'routes/design.tsx', { id: `design${suffix}` }),
 ];
 
 export default [

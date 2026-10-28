@@ -30,6 +30,14 @@ export const pages: Page[] = [
       en: 'A portfolio of dashboards on demo enterprise data — in preparation.',
     },
   },
+  {
+    path: '/design',
+    title: { pl: 'System projektowy', en: 'Design system' },
+    description: {
+      pl: 'Tokeny i komponenty systemu projektowego zohelo: kolory, typografia, odstępy i komponenty.',
+      en: 'Tokens and components of the zohelo design system: colours, typography, spacing and components.',
+    },
+  },
 ];
 
 /** Every pre-rendered path: each page in Polish and in English. */
