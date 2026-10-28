@@ -39,6 +39,14 @@ export const pages: Page[] = [
     },
   },
   {
+    path: '/sources',
+    title: { pl: 'Źródła danych', en: 'Data sources' },
+    description: {
+      pl: 'Źródła danych zohelo: dostawca, licencja, ostatnie ładowanie i zasilane wskaźniki.',
+      en: 'zohelo data sources: provider, licence, last load and the indicators they feed.',
+    },
+  },
+  {
     path: '/changes',
     title: { pl: 'Co się zmieniło', en: 'What changed' },
     description: {
