@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { productsList } from '../content/productsData';
+import { localizedPath, useLocale, useT } from '../i18n';
 import { ProductItem, ProductStatus } from '../types';
 
 interface ProductsSectionProps {
@@ -21,6 +22,8 @@ const statusClass: Record<ProductStatus, string> = {
 };
 
 export const ProductsSection: React.FC<ProductsSectionProps> = () => {
+  const t = useT();
+  const locale = useLocale();
   return (
     <section id="products" className="w-full pt-4 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -28,10 +31,10 @@ export const ProductsSection: React.FC<ProductsSectionProps> = () => {
         {/* Section Header */}
         <div className="mb-4">
           <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500">
-            Produkty
+            {t.products.heading}
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            Części zohelo i etap, na którym jest każda z nich
+            {t.products.subtitle}
           </p>
         </div>
 
@@ -57,7 +60,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = () => {
             return (
               <li key={product.id}>
                 {product.href ? (
-                  <a href={product.href} className="zohelo-card p-6 block h-full hover:border-[#3B8B94]">
+                  <a href={localizedPath(product.href, locale)} className="zohelo-card p-6 block h-full hover:border-[#3B8B94]">
                     {body}
                   </a>
                 ) : (
