@@ -337,6 +337,37 @@ deliverables:
     - com/site/indicators/pages/kpi-sources
     - com/site/indicators/pages/dataset-jsonld
     - com/site/regions/map/ranking-table
+  - key: com/site/indicators/pages/value-unit
+    type: Task
+    title: Show each latest value in its own unit (latestTile)
+    effort: S
+    state: open
+    contract: false
+    context: 'zohelo-data now writes a unit_key on every latest.json value (docs/published.md, Bug zohelo-data#2148), because
+      one KPI''s sources can publish in different units: gdp_current_prices has Eurostat in million EUR and the World Bank
+      in US$. latestTile() (src/indicators/tile.ts) always shows the KPI''s unit, so a tile can show a EUR value labelled
+      ''mln''.'
+    files:
+    - edit: src/published.ts
+    - edit: src/indicators/tile.ts
+    - edit: tests/indicatorTile.test.ts
+    steps:
+    - 'published.ts LatestValue: add the optional field `unit_key?: string` after value, with the comment ''// unit of
+      this value; absent in files written before zohelo-data#2148''.'
+    - 'tile.ts latestTile(): replace the single unit lookup with symbolOf(unitKey) = units.find((u) => u.unit_key === unitKey)?.symbol
+      ?? unitKey. With no PL row: unit = symbolOf(kpi.unit_key), as today. With the chosen row: unit = symbolOf(row.unit_key
+      ?? kpi.unit_key).'
+    - 'tests/indicatorTile.test.ts, three new cases with inline data: a row with unit_key ''mln_eur'' and units containing
+      { unit_key: ''mln_eur'', symbol: ''mln EUR'' } gives unit ''mln EUR''; a row without unit_key gives the KPI unit''s
+      symbol; a row with unit_key ''usd'' that is not in units gives ''usd''. Keep the existing cases unchanged.'
+    acceptance:
+    - every rule above is covered by a test; the existing tile tests pass unchanged
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/indicatorTile.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - fixture files
+    - TodayStrip and the routes (they use latestTile and need no change)
 - key: com/site/indicators/home
   title: Today strip and real metrics on home
   depends_on:
@@ -344,9 +375,10 @@ deliverables:
   done_when:
   - Home today strip and the metrics/pulse sections read published values; Illustrative badges removed there
   todo:
-  - Replace MetricsSection with TodayStrip (Task today-strip) fed by latestTile() for the 6 KPIs; replace PulseSection
-    with a rates block (NBP EUR/PLN, USD/PLN, CHF/PLN, reference rate) from published KPIs (published v1 skips fx_rate
-    in latest.json, zohelo-data docs/published.md); delete src/content/pulseData.ts and metricsData.ts.
+  - Replace PulseSection with a rates block (NBP EUR/PLN, USD/PLN, CHF/PLN with table number and date, reference rate;
+    no WIBOR; Domain expert finance proposal 1 on zohelo-data#2074) from published KPIs. fx_rate has no latest.json
+    under D26, so the block needs a series.parquet reader. Delete src/content/pulseData.ts. The today strip grows from
+    HOME_KPIS to the six KPIs of the Epic's done_when as they are published.
   tasks:
   - key: com/site/indicators/home/today-strip
     type: Task
@@ -389,3 +421,43 @@ deliverables:
     depends_on:
     - com/design/design-v1/components/basics
     - com/site/site-v1/i18n/routing
+  - key: com/site/indicators/home/home-strip
+    type: Task
+    title: Show the today strip on home instead of MetricsSection
+    effort: M
+    state: open
+    contract: false
+    depends_on:
+    - com/site/indicators/pages/index-route
+    context: 'Home (src/routes/home.tsx → src/App.tsx) still shows MetricsSection with invented numbers from src/content/metricsData.ts.
+      TodayStrip and latestTile() exist; the loader pattern (build time only, ssr: false) is that of src/routes/indicators.tsx.
+      index-route adds the fixture latest.json files the test reads; NO_LATEST comes from Bug #267.'
+    files:
+    - create: src/indicators/home.ts
+    - edit: src/routes/home.tsx
+    - edit: src/App.tsx
+    - delete: src/components/MetricsSection.tsx
+    - delete: src/content/metricsData.ts
+    - create: tests/homeTiles.test.ts
+    steps:
+    - src/indicators/home.ts and tests/homeTiles.test.ts exactly as .github/backlog/assets/home-regions.md, section 'homeTiles'.
+    - 'routes/home.tsx: export async function loader({ request }: { request: Request }): locale = localeOf(new URL(request.url).pathname),
+      dir = publishedDir(), catalog = readCatalog(dir); return { tiles: homeTiles(catalog, (k) => readKpiLatest(dir, k),
+      locale) }. Home renders <App tiles={tiles} locale={locale} /> from useLoaderData<typeof loader>().'
+    - 'App.tsx: App({ tiles, locale }: { tiles: TodayTile[]; locale: Locale }); replace <MetricsSection /> and its comment
+      with <TodayStrip tiles={tiles} locale={locale} />; remove the MetricsSection import.'
+    - Delete MetricsSection.tsx and content/metricsData.ts; `grep -rn 'metricsData\|MetricsSection' src` then prints nothing.
+    acceptance:
+    - build/client/index.html contains 'Dziś w danych' and href="/indicators/unemployment_rate"; build/client/en/index.html
+      contains 'Today in data'
+    - no file in src imports metricsData or MetricsSection
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/homeTiles.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -c 'Dziś w danych' build/client/index.html
+      expect: '1'
+    out_of_scope:
+    - PulseSection and the rates block
+    - the other home sections
+    notes:
+    - 'If NO_LATEST is not on main yet, stack on the PR of Bug #267 (zohelo#272) as docs/team.md step 4 says.'

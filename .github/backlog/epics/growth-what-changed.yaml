@@ -110,8 +110,6 @@ deliverables:
   - com/growth/what-changed/build-data
   done_when:
   - Home shows the 10 latest changes; /changes shows 30 days; rss.xml generated at build
-  todo:
-  - Home block with the 10 latest changes (ChangesList limit 10) once the home page is rebuilt from published data.
   tasks:
   - key: com/growth/what-changed/page/changes-route
     type: Task
@@ -280,6 +278,46 @@ deliverables:
     - Serving or linking the feed
     depends_on:
     - data/published/published-v1/contract/schemas
+  - key: com/growth/what-changed/page/home-changes
+    type: Task
+    title: Show the latest 10 changes on home
+    effort: S
+    state: open
+    contract: false
+    depends_on:
+    - com/site/indicators/home/home-strip
+    - com/growth/what-changed/page/changes-route
+    context: ChangesList (src/growth/ChangesList.tsx) already takes a limit, and /changes (src/routes/changes.tsx) lists
+      the whole feed. Home gets a short block under the today strip. The home loader (src/routes/home.tsx, Task home-strip)
+      is extended; a missing feed is normal, exactly as in routes/changes.tsx.
+    files:
+    - create: src/growth/HomeChanges.tsx
+    - edit: src/routes/home.tsx
+    - edit: src/App.tsx
+    - create: tests/homeChanges.test.tsx
+    steps:
+    - 'HomeChanges.tsx: export function HomeChanges({ items, sources, locale }: { items: ChangeItem[]; sources: Source[];
+      locale: Locale }) renders <section aria-labelledby="what-changed" className="mx-auto max-w-6xl px-4 py-8"> with <h2
+      id="what-changed" className="mb-4 font-display text-[length:var(--z-size-xl)] text-text"> ''Co się zmieniło'' (pl)
+      / ''What changed'' (en), <ChangesList items sources locale limit={10} /> and <p className="mt-4"><a className="text-brand-teal
+      underline" href={localizedPath(''/changes'', locale)}> ''Wszystkie zmiany'' / ''All changes''.'
+    - 'home loader: also return items (readChanges(dir).items; when the error message starts with ''published file missing''
+      use [], any other error throws, as in routes/changes.tsx) and sources = catalog.sources. App takes items and sources
+      props and renders <HomeChanges items sources locale /> right after <TodayStrip />.'
+    - 'tests/homeChanges.test.tsx (bun:test, renderToStaticMarkup): 12 inline items give 10 <li>; pl markup has ''Co się
+      zmieniło'' and href="/changes"; en has ''What changed'' and href="/en/changes"; items [] show ChangesList''s empty
+      text.'
+    acceptance:
+    - build/client/index.html contains 'Co się zmieniło' and the 2 fixture feed items
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/homeChanges.test.tsx
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -c 'Co się zmieniło' build/client/index.html
+      expect: '1'
+    out_of_scope:
+    - the /changes page
+    - RSS
+    - the calendar link (Task home-subscribe)
 - key: com/growth/what-changed/trigger
   title: Rebuild after each publish
   repo: zohelo-data
