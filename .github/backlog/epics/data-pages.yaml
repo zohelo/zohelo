@@ -66,8 +66,8 @@ deliverables:
   done_when:
   - 'One row per onboarded source: name, provider, family, licence, last loaded, KPIs fed'
   todo:
-  - Route /sources from sourceRows() (Task model) plus last-load freshness from catalog/freshness.parquet; each KPI
-    links to its indicator page.
+  - Last-load freshness from catalog/freshness.parquet and KPI links on /sources once /indicators/:kpi exists
+    (com/site/indicators/pages/kpi-route).
   tasks:
   - key: com/site/data-pages/sources/model
     type: Task
@@ -109,6 +109,44 @@ deliverables:
     - Registered sources that are not in the catalog
     depends_on:
     - com/site/indicators/data/readers
+  - key: com/site/data-pages/sources/sources-page
+    type: Task
+    title: Add the /sources page from the published catalogue
+    effort: S
+    state: open
+    contract: false
+    depends_on: [com/site/data-pages/sources/model, com/growth/what-changed/build-data/fetch-script]
+    context: 'With sourceRows (src/dataPages/sources.ts, Task model) and publishedDir() (src/published.ts, Task
+      fetch-script) the site can pre-render /sources and /en/sources. Pages are registered in src/routes.ts
+      (pages(suffix)) and listed in src/site.config.ts pages (prerender and sitemap read it). The site is static (ssr
+      false), so the route loader runs at build time. src/routes/portfolio.tsx shows the page pattern (dict per locale,
+      meta from site.config, useLocale).'
+    files:
+    - create: src/routes/sources.tsx
+    - edit: src/routes.ts
+    - edit: src/site.config.ts
+    steps:
+    - 'site.config.ts pages: add {path: "/sources", title: {pl: "Źródła danych", en: "Data sources"}, description: {pl:
+      "Źródła danych zohelo: dostawca, licencja, ostatnie ładowanie i zasilane wskaźniki.", en: "zohelo data sources:
+      provider, licence, last load and the indicators they feed."}}.'
+    - 'routes.ts: in pages(suffix) add route("sources", "routes/sources.tsx", {id: `sources${suffix}`}).'
+    - 'sources.tsx: export async function loader({ request }) with locale = localeOf(new URL(request.url).pathname); return
+      { rows: sourceRows(readCatalog(publishedDir()), locale) }; meta like portfolio.tsx.'
+    - 'The component renders an h1 with the page title and a table with columns (pl / en) Źródło / Source, Rejestr /
+      Register, Licencja / Licence (a link to licence.url with licence.name, or – when licence is null), Ostatnie
+      ładowanie / Last loaded (the first 10 characters of last_loaded, or –), Wskaźniki / Indicators (KPI names joined
+      with ", ", no links yet).'
+    - Tailwind token classes as in portfolio.tsx; no new CSS file.
+    acceptance:
+    - bun run build pre-renders build/client/sources/index.html and build/client/en/sources/index.html
+    - the built /en/sources page lists Eurostat, National Bank of Poland, Statistics Poland and World Bank with their
+      licences (fixture build)
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test && bun run build && grep -c "Eurostat" build/client/en/sources/index.html
+      expect: all pass; grep prints at least 1
+    out_of_scope:
+    - KPI links and freshness.parquet (todo line); a navigation entry in the header
+    - Changing src/dataPages/sources.ts or scripts/fetch-published.ts
 - key: com/site/data-pages/vault-removal
   title: Vault removed
   depends_on:
