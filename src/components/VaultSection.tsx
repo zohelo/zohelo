@@ -2,15 +2,14 @@ import React from 'react';
 import { FileSpreadsheet, Layers, BarChart, FileText, Download, Eye, Table2 } from 'lucide-react';
 import { vaultDatasets } from '../data/datasetsData';
 import { DatasetItem } from '../types';
+import { IllustrativeBadge } from './IllustrativeBadge';
 
 interface VaultSectionProps {
   onPreviewDataset: (dataset: DatasetItem) => void;
-  onDownloadDataset: (dataset: DatasetItem) => void;
 }
 
 export const VaultSection: React.FC<VaultSectionProps> = ({
-  onPreviewDataset,
-  onDownloadDataset
+  onPreviewDataset
 }) => {
   const getFormatIcon = (format: string) => {
     switch (format) {
@@ -50,9 +49,12 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
         {/* Section Header matching Mockup: "THE VAULT" */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500">
-              The Vault
-            </h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500">
+                The Vault
+              </h2>
+              <IllustrativeBadge />
+            </div>
             <p className="text-xs text-slate-400 mt-0.5">
               Open Lakehouse Artifacts • 5TB Parquet Storage (The Cabinet)
             </p>
@@ -102,16 +104,14 @@ export const VaultSection: React.FC<VaultSectionProps> = ({
                   <Table2 className="w-3 h-3 text-slate-400 ml-1" />
                 </button>
 
-                {/* Download Circle Button */}
+                {/* No downloads until the data release */}
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDownloadDataset(dataset);
-                  }}
-                  className="w-8 h-8 rounded-full bg-[#EBF5F6] hover:bg-[#3B8B94] text-[#2C6E76] hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-2xs group/btn"
-                  title={`Download ${dataset.title} (${dataset.format})`}
+                  type="button"
+                  disabled
+                  className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 text-[11px] font-semibold cursor-not-allowed"
                 >
-                  <Download className="w-4 h-4 transition-transform group-hover/btn:translate-y-0.5" />
+                  <Download className="w-3.5 h-3.5" aria-hidden="true" />
+                  <span>Available with the data release</span>
                 </button>
               </div>
 
