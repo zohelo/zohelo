@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { LayoutDashboard, Check, ExternalLink, Sparkles, Building2, TrendingUp, Home, Cpu } from 'lucide-react';
 import { productsList } from '../data/productsData';
 import { ProductItem } from '../types';
+import { IllustrativeBadge } from './IllustrativeBadge';
 
 interface ProductsSectionProps {
   onSelectProduct: (product: ProductItem) => void;
@@ -28,9 +29,12 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({ onSelectProduc
         {/* Section Header */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500">
-              The Products
-            </h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-xs font-bold tracking-wider uppercase text-slate-500">
+                The Products
+              </h2>
+              <IllustrativeBadge />
+            </div>
             <p className="text-xs text-slate-400 mt-0.5">
               Commercial-Grade Analytics Suites & Pre-configured Lakehouse Systems
             </p>
@@ -57,7 +61,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = ({ onSelectProduc
                       ? 'bg-[#EBF5F6] text-[#2C6E76] border border-[#3B8B94]/30'
                       : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                   }`}>
-                    {product.tier}
+                    Concept
                   </span>
                 </div>
 

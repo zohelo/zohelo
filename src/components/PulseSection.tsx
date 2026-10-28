@@ -25,6 +25,7 @@ import {
   pulseIndicators
 } from '../data/pulseData';
 import { MarketIndicator, QuoteSnapshot, StockAssetInfo } from '../types';
+import { IllustrativeBadge } from './IllustrativeBadge';
 
 interface PulseSectionProps {
   onSelectIndicator?: (indicator: MarketIndicator) => void;
@@ -217,10 +218,7 @@ export const PulseSection: React.FC<PulseSectionProps> = ({ onSelectIndicator })
             </div>
             
             <div className="flex items-center space-x-1.5">
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 font-mono">
-                <AlertCircle className="w-2.5 h-2.5 mr-1 text-amber-600" />
-                ILLUSTRATIVE VALUES
-              </span>
+              <IllustrativeBadge />
               <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono text-slate-500 bg-white border border-slate-200 shadow-2xs">
                 100+ GLOBAL ASSETS
               </span>

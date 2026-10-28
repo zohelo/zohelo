@@ -15,14 +15,12 @@
   },
   "dependencies": {
     "@zohelo/design": "workspace:*",
-    "canvas-confetti": "^1.9.4",
     "lucide-react": "^0.577.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.14",
-    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^22.20.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
