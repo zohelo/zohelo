@@ -5,7 +5,7 @@
 import { S3Client } from 'bun';
 import { cpSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
-import { publishedDir, readCatalog } from '../src/published';
+import { NO_LATEST, publishedDir, readCatalog, requiredLatest } from '../src/published';
 
 type Env = Record<string, string | undefined>;
 
@@ -62,10 +62,14 @@ export async function fetchPublished(out: string, env: Env, opts: { require: boo
 
   await required('catalog/catalog.json');
   const catalog = readCatalog(out);
-  for (const kpi of catalog.kpis.filter((k) => k.status === 'published')) {
-    await required(`kpi/${kpi.kpi_key}/latest.json`);
+  for (const key of requiredLatest(catalog)) {
+    await required(`kpi/${key}/latest.json`);
   }
-  for (const path of optional) {
+  // Published KPIs without latest.json by contract (NO_LATEST): fetched when present, never required.
+  const extra = catalog.kpis
+    .filter((k) => k.status === 'published' && NO_LATEST.includes(k.kpi_key))
+    .map((k) => `kpi/${k.kpi_key}/latest.json`);
+  for (const path of [...extra, ...optional]) {
     if (!(await download(path))) console.log(`fetch-published: ${prefix}${path} missing, skipped`);
   }
   readCatalog(out);
