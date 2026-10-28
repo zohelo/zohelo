@@ -4,7 +4,6 @@ import type { Dict } from './pl';
 export const en: Dict = {
   nav: {
     badge: 'DATA LAKEHOUSE',
-    research: 'Research',
     dashboards: 'Dashboards',
     products: 'Products',
     vault: 'The Vault',
@@ -21,7 +20,6 @@ export const en: Dict = {
     pulse: 'The Pulse (Live Indicators)',
     metrics: 'The Metrics (KPIs)',
     compass: 'The Compass (16 Voivodeships)',
-    chronicles: 'The Chronicles (Research)',
     vault: 'The Vault (Parquet Lakehouse)',
     foundedBy: 'Founded by',
     founder: 'Radosław Utkała',
