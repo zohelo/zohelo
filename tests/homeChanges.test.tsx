@@ -25,12 +25,15 @@ describe('HomeChanges', () => {
     const html = renderToStaticMarkup(<HomeChanges items={items} sources={sources} locale="pl" />);
     expect(html).toContain('Co się zmieniło');
     expect(html).toContain('href="/changes"');
+    expect(html).toContain('webcal://zohelo.com/calendar.ics');
+    expect(html).toContain('Subskrybuj kalendarz publikacji');
   });
 
   test('English heading and link', () => {
     const html = renderToStaticMarkup(<HomeChanges items={items} sources={sources} locale="en" />);
     expect(html).toContain('What changed');
     expect(html).toContain('href="/en/changes"');
+    expect(html).toContain('Subscribe to the release calendar');
   });
 
   test('no items show the empty text', () => {
