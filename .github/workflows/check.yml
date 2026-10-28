@@ -26,7 +26,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Lint workflows
-        run: bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash) 1.7.7 && ./actionlint -format '{{range $err := .}}::error file={{$err.Filepath}},line={{$err.Line}},col={{$err.Column}}::{{$err.Message}}{{println}}{{end}}'
+        run: |
+          # shellcheck disable=SC2016 # the -format template is for actionlint, not the shell
+          bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash) 1.7.7 && ./actionlint -format '{{range $err := .}}::error file={{$err.Filepath}},line={{$err.Line}},col={{$err.Column}}::{{$err.Message}}{{println}}{{end}}'
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6  # v2.2.0
         with:
           bun-version: 1.4.2
