@@ -38,7 +38,49 @@ deliverables:
   - Home shows the 10 latest changes; /changes shows 30 days; rss.xml generated at build
   todo:
   - Route /changes reading .published/feed/changes.json; home block component; scripts/rss.ts writing build/client/rss.xml
-    and en/rss.xml.
+    and en/rss.xml with renderRss() from Task rss-writer.
+  tasks:
+  - key: com/growth/what-changed/page/rss-writer
+    type: Task
+    title: Add a pure RSS 2.0 writer for the what-changed feed
+    effort: S
+    state: open
+    contract: false
+    context: 'The site will publish /rss.xml (Polish) and /en/rss.xml (English) from feed/changes.json of the
+      published layer (zohelo-data docs/published.md). This Task adds only the pure function that turns feed
+      items into RSS 2.0 XML; the build script and routes come later. Item input is a structural subset of
+      changes.json items declared in the file itself, so it does not wait for src/published.ts.'
+    files:
+    - create: src/growth/rss.ts
+    - create: tests/rss.test.ts
+    steps:
+    - 'Export type FeedItem = { at: string; source_key: string; dataset_key: string; kpi_keys: string[]; title_pl:
+      string; title_en: string } and function renderRss(items: FeedItem[], locale: ''pl'' | ''en'', builtAt:
+      string): string. Import site from ''../site.config''; base = site.url for pl, `${site.url}/en` for en.'
+    - 'Escape every text and attribute value with a local escapeXml (& < > " '' to &amp; &lt; &gt; &quot; &apos;).
+      Dates are new Date(x).toUTCString().'
+    - 'Output, lines joined with ''\n'': `<?xml version="1.0" encoding="UTF-8"?>`, <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">,
+      <channel> with title (pl ''zohelo — co się zmieniło'', en ''zohelo — what changed''), link ${base}/changes,
+      description site.description[locale], language pl or en, lastBuildDate from builtAt, <atom:link href="${base}/rss.xml"
+      rel="self" type="application/rss+xml"/>, then the items, </channel></rss>.'
+    - 'Items: sorted by at descending (equal at keep input order), at most 50. Each <item>: title = title_pl or
+      title_en; link = ${base}/indicators/${kpi_keys[0]}, or ${base}/changes when kpi_keys is empty; <guid isPermaLink="false">${source_key}:${dataset_key}:${at}</guid>;
+      pubDate from at.'
+    - 'tests/rss.test.ts (bun:test, items from zohelo-data warehouse/published/fixtures/feed/changes.json written
+      inline): pl output contains ''<link>https://zohelo.com/indicators/unemployment_rate</link>'' and the Polish
+      title; en output links under https://zohelo.com/en/; a title ''A & B <C>'' is escaped; newer at comes first;
+      60 items give 50 <item> elements; empty kpi_keys links to /changes.'
+    acceptance:
+    - renderRss is pure (no file, network or clock access) and returns well-formed RSS 2.0
+    - Every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/rss.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - scripts/rss.ts, the /changes route and the home block (todo above)
+    - Serving or linking the feed
+    depends_on:
+    - data/published/published-v1/contract/schemas
 - key: com/growth/what-changed/trigger
   title: Rebuild after each publish
   repo: zohelo-data

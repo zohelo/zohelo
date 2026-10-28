@@ -9,7 +9,7 @@ why: Daily habit needs one new, finishable thing each weekday. A chart of the la
 outcome: Every weekday the home page shows one chart of the KPI that moved most since its previous value, with a
   templated takeaway headline, source footer and link to its indicator page.
 in_scope:
-- Selection rule (largest absolute z-score of the latest change among published KPIs)
+- Selection rule (largest absolute relative change of the latest value among published KPIs)
 - Templated PL/EN headline, chart from @zohelo/design visuals
 out_of_scope:
 - An archive of past charts (decided 27 Oct by the architect; revisit with the newsletter, Phase 2)
@@ -21,14 +21,57 @@ depends_on:
 - data/published/published-v1
 - com/design/design-v1
 - com/site/indicators
+decisions:
+- 'architect 28 Oct: v1 ranks KPIs by the relative change between value and previous_value of kpi/<key>/latest.json
+  (country PL, non-provisional); a z-score needs series.parquet history and is revisited after the indicator pages'
 deliverables:
 - key: com/growth/chart-of-day/rule
   title: Selection rule and headline template
   done_when:
   - A pure function picks the KPI and renders the headline; unit-tested on fixtures
-  todo:
-  - 'src/growth/chartOfDay.ts: input published kpi latest.json files, output {kpi_key, headline_pl, headline_en};
-    tie-break by kpi_key; skip KPIs flagged provisional; bun test with fixtures.'
+  tasks:
+  - key: com/growth/chart-of-day/rule/select
+    type: Task
+    title: Add the chart-of-the-day selection rule and headlines
+    effort: M
+    state: open
+    contract: false
+    context: 'Pure function only (the home block is a later Task), using the rule decided in this Epic. Its input
+      type is a structural subset of kpi/<kpi_key>/latest.json (zohelo-data docs/published.md) declared in the
+      file, so it does not wait for src/published.ts.'
+    files:
+    - create: src/growth/chartOfDay.ts
+    - create: tests/chartOfDay.test.ts
+    steps:
+    - 'Export types: LatestFile = { kpi_key: string; values: { source_key: string; geography_key: string; period:
+      string; value: number; previous_value?: number; flags: string[] }[] }; KpiNames
+      = Record<string, { name_pl: string; name_en: string }>; ChartOfDay = { kpi_key, source_key, period, headline_pl,
+      headline_en: string; change_pct: number }.'
+    - 'export function chartOfDay(files: LatestFile[], names: KpiNames): ChartOfDay | null. Per file keep rows
+      with geography_key ''PL'', previous_value defined and not 0, and flags without ''p''; skip the file when
+      names has no entry or no row is left. Take the row with the greatest period (string compare), ties by
+      source_key ascending.'
+    - 'change_pct = (value - previous_value) / Math.abs(previous_value) * 100. Winner: greatest Math.abs(change_pct),
+      ties by kpi_key ascending. No candidate returns null.'
+    - 'Headlines with formatNumber(x, locale) from @zohelo/design: up → `${name_pl}: wzrost
+      z ${prev} do ${val} (${period})` and `${name_en}: up from ${prev} to ${val} (${period})`; down → ''spadek
+      z … do …'' and ''down from … to …''; change_pct 0 → `${name_pl}: bez zmian, ${val} (${period})` and `${name_en}:
+      unchanged at ${val} (${period})`.'
+    - 'tests/chartOfDay.test.ts (bun:test, inline data): unemployment_rate PL eurostat 2025 3.2 prev 2.9 vs inflation
+      2026-09 2.8 prev 2.9 picks unemployment_rate with headline_pl ''Stopa bezrobocia (BAEL): wzrost z 2,9 do
+      3,2 (2025)'' and headline_en ''Unemployment rate (LFS): up from 2.9 to 3.2 (2025)''; inflation alone gives
+      ''Inflacja (ceny konsumpcyjne): spadek z 2,9 do 2,8 (2026-09)''; flags [''p''] on unemployment picks inflation;
+      two KPIs with equal change pick the lower kpi_key; value equal to previous_value gives ''Stopa bezrobocia (BAEL): bez zmian, 3,2 (2025)''; a 2024 world_bank_wdi row loses to the 2025 eurostat row;
+      only TERC:12 rows or previous_value 0 give null.'
+    acceptance:
+    - chartOfDay is pure; every rule above has a test
+    verify:
+    - run: bun run lint && bun test tests/chartOfDay.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The home block, file reading, units in headlines
+    depends_on:
+    - data/published/published-v1/contract/schemas
 - key: com/growth/chart-of-day/page
   title: Home block
   depends_on:

@@ -28,7 +28,48 @@ deliverables:
   - /regions renders a choropleth (sequential teal ramp) and a ranking table for a KPI selector
   todo:
   - MapChoropleth via Vega-Lite geoshape from geo/voivodeship.geojson; KPI selector limited to KPIs with geography
-    level voivodeship; ranking DataTable.
+    level voivodeship; ranking DataTable fed by rankRegions() from Task ranking.
+  tasks:
+  - key: com/site/regions/map/ranking
+    type: Task
+    title: Add the voivodeship ranking function
+    effort: S
+    state: open
+    contract: false
+    context: 'The /regions ranking table and the profiles (rank 1–16 and the value for Poland) both need one ranking
+      of the 16 voivodeships for a KPI, computed at build from kpi/<kpi_key>/latest.json (zohelo-data docs/published.md:
+      one value per source × geography, levels country and voivodeship). This Task adds only the pure function.
+      Input is a structural subset of latest.json declared in the file itself, so it does not wait for src/published.ts.'
+    files:
+    - create: src/regions/ranking.ts
+    - create: tests/ranking.test.ts
+    steps:
+    - 'Export type RegionalLatest = { kpi_key: string; values: { source_key: string; geography_key: string; geography_level:
+      string; period: string; value: number; flags: string[] }[] }, type RankedRegion = { geography_key: string;
+      value: number; rank: number; provisional: boolean }, type RegionRanking = { kpi_key, source_key, period: string;
+      national: number | null; regions: RankedRegion[] }.'
+    - 'export function rankRegions(file: RegionalLatest, sourceKey?: string): RegionRanking | null. Rows = values
+      with geography_level ''voivodeship''. Source = sourceKey, else the source with the most rows (ties by source_key
+      ascending). No row for the source returns null.'
+    - Keep the source's rows whose period equals the greatest period among them (string compare).
+    - 'Sort by value descending, ties by geography_key ascending. rank = 1 + number of kept rows with a strictly
+      greater value (1, 2, 2, 4). provisional = flags includes ''p''.'
+    - national = value of the row with geography_key 'PL', the same source and the same period, else null.
+    - 'tests/ranking.test.ts (bun:test, inline data): three regions 5, 7, 7 rank 1, 1, 3 in order TERC:02, TERC:12
+      (both 7) then the 5; national from the PL row; a region with an older period is left out; the source with
+      more rows wins without sourceKey and sourceKey overrides it; flags [''p''] gives provisional true; no voivodeship
+      rows give null.'
+    acceptance:
+    - rankRegions is pure and does not mutate its input
+    - Every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/ranking.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The map, the KPI selector, the DataTable and routes
+    - Sort direction for KPIs where lower is better (the page decides colours)
+    depends_on:
+    - data/published/published-v1/contract/schemas
 - key: com/site/regions/profiles
   title: Voivodeship profiles
   depends_on:

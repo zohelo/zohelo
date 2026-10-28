@@ -36,10 +36,52 @@ deliverables:
   done_when:
   - Build fails clearly when published files are missing; local dev works from a committed fixture
   todo:
-  - scripts/fetch-published.ts (shared with com/growth/what-changed/build-data) + fixtures/published/ with 3 KPIs
-    for local dev and the PR check (check.yml has no credentials).
-  - src/published.ts typed readers for catalog.json and latest.json (types from the published-layer contract in
-    zohelo-data docs).
+  - scripts/fetch-published.ts (shared with com/growth/what-changed/build-data) writing .published/ for the build;
+    ready once gold.publish writes 06_published/v1. The PR check keeps reading fixtures/published/ (no credentials).
+  tasks:
+  - key: com/site/indicators/data/readers
+    type: Task
+    title: Add published-layer fixtures and typed readers
+    effort: M
+    state: open
+    contract: false
+    context: 'The site reads 06_published/v1 files at build, never at runtime (contract: zohelo-data docs/published.md
+      and warehouse/published/). Nothing is in R2 yet, so the site works from copies of the contract fixtures.
+      Readers take the directory as an argument: the build later passes .published/, tests pass fixtures/published.'
+    files:
+    - create: fixtures/published/
+    - create: src/published.ts
+    - create: tests/published.test.ts
+    steps:
+    - 'Copy the five fixtures: `for p in catalog/catalog.json manifest.json kpi/unemployment_rate/latest.json
+      feed/changes.json geo/voivodeship.geojson; do mkdir -p fixtures/published/$(dirname $p); gh api "repos/zohelo/zohelo-data/contents/warehouse/published/fixtures/$p?ref=47bb8da1997995cfedd4b69ac6b7ccafc8a468b7"
+      -H "Accept: application/vnd.github.raw" > fixtures/published/$p; done`.'
+    - 'src/published.ts: export types with every field of docs/published.md (optional fields with ?): Catalog
+      (version: 1, generated_at, kpis: CatalogKpi[], domains: Domain[], units: Unit[], sources: Source[], licences:
+      Licence[]), CatalogKpi (dimensions: KpiDimension[]), Domain {domain_key, level, parent_key: string | null,
+      name_en, name_pl, csa_code, sort: number}, Unit {unit_key, symbol, name_en, name_pl, is_rate: boolean},
+      KpiLatest, LatestValue, Changes, ChangeItem.'
+    - 'Readers (node:fs readFileSync, node:path join): readCatalog(dir) → catalog/catalog.json, readKpiLatest(dir,
+      kpiKey) → kpi/<kpiKey>/latest.json, readChanges(dir) → feed/changes.json.'
+    - 'One private readJson(path): a missing file throws Error(`published file missing: ${path}`). Each reader then
+      throws Error(`published file invalid: ${path}`) unless: catalog version === 1 and kpis is an array; latest
+      kpi_key === kpiKey and values is an array; changes items is an array.'
+    - 'tests/published.test.ts (bun:test, dir ''fixtures/published''): catalog has 5 kpis and unemployment_rate
+      name_pl ''Stopa bezrobocia (BAEL)''; latest values[0].value is 3.2; changes has 2 items; readKpiLatest(dir,
+      ''nope'') and readCatalog(''fixtures'') throw /published file missing/.'
+    acceptance:
+    - The five fixtures are identical to zohelo-data's at the pinned commit
+    - Reader errors name the file path
+    verify:
+    - run: bun run lint && bun test tests/published.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run build
+      expect: exit 0
+    out_of_scope:
+    - scripts/fetch-published.ts and deploy.yml (todo above)
+    - Readers for manifest.json, series.parquet and geo files
+    depends_on:
+    - data/published/published-v1/contract/schemas
 - key: com/site/indicators/pages
   title: Index and KPI page template
   depends_on:

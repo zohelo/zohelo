@@ -114,6 +114,7 @@ deliverables:
   title: Pull-request gate on main
   done_when:
   - check.yml runs on every PR and rejects unpinned actions
+  - check.yml runs the unit tests (bun test)
   - Ruleset on main requires check
   tasks:
   - key: com/platform/hardening/pr-gate/check
@@ -190,6 +191,33 @@ deliverables:
       expect: green; step "Actions pinned" ran
     out_of_scope:
     - Changing which actions are used
+  - key: com/platform/hardening/pr-gate/unit-tests
+    type: Task
+    title: Run the unit tests in the PR check
+    effort: S
+    state: open
+    contract: true
+    context: 'The repo has bun:test files (packages/design/src/format.test.ts, packages/design/scripts/build-tokens.test.ts)
+      and the next Tasks add tests/*.test.ts, but check.yml runs only lint and build, so a failing test can merge.
+      `bun test` from the root finds every *.test.ts outside node_modules. Tests import @zohelo/design from packages/design/dist,
+      which the "Type check" step (bun run lint) builds, so the new step goes after it.'
+    files:
+    - edit: .github/workflows/check.yml
+    steps:
+    - 'check.yml: directly after the step `- name: Type check` (run: bun run lint) and before `- name: Build`,
+      add a step `- name: Unit tests` with `run: bun test`.'
+    - Change nothing else in the workflow.
+    acceptance:
+    - The Check workflow runs bun test on every PR and fails when a test fails
+    - The step order is Install, Type check, Unit tests, Build
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test
+      expect: exit 0; 0 fail
+    - workflow: Check on this PR
+      expect: green; step "Unit tests" ran
+    out_of_scope:
+    - Writing or changing tests
+    - Coverage reports
 - key: com/platform/hardening/scaffold
   title: Prototype scaffolding and Finnhub removed
   done_when:
