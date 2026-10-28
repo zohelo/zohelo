@@ -38,6 +38,14 @@ export const pages: Page[] = [
       en: 'Tokens and components of the zohelo design system: colours, typography, spacing and components.',
     },
   },
+  {
+    path: '/sources',
+    title: { pl: 'Źródła danych', en: 'Data sources' },
+    description: {
+      pl: 'Źródła danych zohelo: dostawca, licencja, ostatnie ładowanie i zasilane wskaźniki.',
+      en: 'zohelo data sources: provider, licence, last load and the indicators they feed.',
+    },
+  },
 ];
 
 /** Every pre-rendered path: each page in Polish and in English. */
