@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LayoutDashboard, Check, ExternalLink, Sparkles, Building2, TrendingUp, Home, Cpu } from 'lucide-react';
-import { productsList } from '../data/productsData';
+import { productsList } from '../content/productsData';
 import { ProductItem } from '../types';
 import { IllustrativeBadge } from './IllustrativeBadge';
 
