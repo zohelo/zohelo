@@ -1,18 +1,15 @@
 import React, { useState } from 'react';
 import { X, Table2, Code2, Download, Database, Play, Sparkles, CheckCircle2, FileText } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import { DatasetItem } from '../types';
 
 interface DatasetPreviewModalProps {
   dataset: DatasetItem | null;
   onClose: () => void;
-  onDownload: (dataset: DatasetItem) => void;
 }
 
 export const DatasetPreviewModal: React.FC<DatasetPreviewModalProps> = ({
   dataset,
-  onClose,
-  onDownload
+  onClose
 }) => {
   const [activeTab, setActiveTab] = useState<'preview' | 'schema' | 'duckdb'>('preview');
   const [customSql, setCustomSql] = useState<string>('');
@@ -47,11 +44,12 @@ export const DatasetPreviewModal: React.FC<DatasetPreviewModalProps> = ({
 
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => onDownload(dataset)}
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#3B8B94] hover:bg-[#2C6E76] text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
+              type="button"
+              disabled
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-500 text-xs font-semibold cursor-not-allowed"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>Download File</span>
+              <Download className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>Available with the data release</span>
             </button>
             <button
               onClick={onClose}
