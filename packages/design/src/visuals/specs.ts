@@ -87,3 +87,38 @@ export function barSpec(rows: object[], o: BarOptions): VisualizationSpec {
     },
   } as VisualizationSpec;
 }
+
+export type ChoroplethOptions = {
+  key: string;
+  value: string;
+  name: string;
+  valueTitle: string;
+  colors: [string, string];
+  noData: string;
+};
+
+/** A region map: geoshapes from a GeoJSON FeatureCollection, coloured by rows joined on `key`. */
+export function choroplethSpec(geojson: object, rows: object[], o: ChoroplethOptions): VisualizationSpec {
+  return {
+    ...base,
+    height: 420,
+    projection: { type: "mercator" },
+    data: { values: geojson, format: { type: "json", property: "features" } },
+    transform: [{ lookup: `properties.${o.key}`, from: { data: { values: rows }, key: o.key, fields: [o.value] } }],
+    mark: { type: "geoshape", stroke: o.noData, strokeWidth: 0.5 },
+    encoding: {
+      color: {
+        condition: { test: `!isValid(datum['${o.value}'])`, value: o.noData },
+        field: o.value,
+        type: "quantitative",
+        title: o.valueTitle,
+        scale: { range: o.colors },
+        legend: { orient: "bottom", direction: "horizontal" },
+      },
+      tooltip: [
+        { field: `properties.${o.name}`, type: "nominal", title: "Region" },
+        { field: o.value, type: "quantitative", title: o.valueTitle, format: ",.4~f" },
+      ],
+    },
+  } as VisualizationSpec;
+}

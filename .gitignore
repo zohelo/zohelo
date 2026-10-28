@@ -8,3 +8,4 @@ coverage/
 !.env.example
 packages/design/dist/
 .react-router/
+.published/
