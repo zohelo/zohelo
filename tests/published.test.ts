@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { readCatalog, readChanges, readKpiLatest } from '../src/published';
+import { readCatalog, readChanges, readGeo, readKpiLatest } from '../src/published';
 
 const dir = 'fixtures/published';
 
@@ -16,6 +16,12 @@ describe('published readers', () => {
 
   test('changes has 2 items', () => {
     expect(readChanges(dir).items).toHaveLength(2);
+  });
+
+  test('voivodeship geo has 1 feature named Małopolskie', () => {
+    const geo = readGeo(dir, 'voivodeship');
+    expect(geo.features).toHaveLength(1);
+    expect(geo.features[0].properties.name_pl).toBe('Małopolskie');
   });
 
   test('missing files throw an error naming the path', () => {
