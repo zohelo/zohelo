@@ -19,7 +19,7 @@ export const site = {
 export const pages: Page[] = [
   {
     path: '/',
-    title: { pl: 'zohelo — Polska w danych', en: 'zohelo — Poland in data' },
+    title: { pl: 'Polska w danych', en: 'Poland in data' },
     description,
   },
   {
