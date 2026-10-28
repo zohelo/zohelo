@@ -79,8 +79,8 @@ deliverables:
   done_when:
   - Home shows today's chart with headline, Chart, SourceFooter and a link to /indicators/<kpi_key>
   todo:
-  - Place ChartOfDayBlock (Task block) on home, fed by chartOfDay() at build from .published/, with a line Chart child
-    from a .client module rendered after hydration (decision D25) once series.parquet has a reader.
+  - Give the home ChartOfDayBlock a line Chart child from a .client module rendered after hydration (decision D25)
+    once kpi/<kpi_key>/series.parquet has a reader at build.
   tasks:
   - key: com/growth/chart-of-day/page/block
     type: Task
@@ -124,3 +124,44 @@ deliverables:
     - com/growth/chart-of-day/rule/select
     - com/design/design-v1/components/basics
     - com/design/design-v1/components/table
+  - key: com/growth/chart-of-day/page/home-block
+    type: Task
+    title: Show the chart of the day on the home page
+    effort: S
+    state: open
+    contract: false
+    context: 'chartOfDay() (src/growth/chartOfDay.ts) picks the national KPI with the largest relative change from the
+      latest.json files; ChartOfDayBlock (src/growth/ChartOfDayBlock.tsx) renders it with headline, change, SourceFooter
+      and a link to the indicator page. Neither is on the home page yet. The home loader (src/routes/home.tsx) already
+      reads the catalog and latest.json files at build (ssr false) and passes its data to App (src/App.tsx). The
+      chart child comes later (todo).'
+    files:
+    - edit: src/routes/home.tsx
+    - edit: src/App.tsx
+    - create: tests/homeChartOfDay.test.ts
+    steps:
+    - 'home.tsx: export type HomeChartOfDay = { pick: ChartOfDay; sourceName: string; date: string } and function homeChartOfDay(dir:
+      string, catalog: Catalog, locale: Locale): HomeChartOfDay | null. files = requiredLatest(catalog).map((k) => readKpiLatest(dir,
+      k)); names = Object.fromEntries(catalog.kpis.map((k) => [k.kpi_key, { name_pl: k.name_pl, name_en: k.name_en }]));
+      pick = chartOfDay(files, names); null when pick is null. sourceName = name_pl/name_en of the catalog source with
+      pick.source_key, else pick.source_key; date = generated_at.slice(0, 10) of the file whose kpi_key is pick.kpi_key.'
+    - 'The loader returns chartOfDay: homeChartOfDay(dir, catalog, locale) and Home passes it to App.'
+    - 'App.tsx: new prop chartOfDay: HomeChartOfDay | null (import type from ''./routes/home''). Right after <HomeSpotlight
+      …/> render, when not null, <section aria-label={locale === ''pl'' ? ''Wykres dnia'' : ''Chart of the day''} className="mx-auto
+      max-w-6xl px-4 py-8"><ChartOfDayBlock pick={…} sourceName={…} date={…} locale={locale} /></section>, with no
+      children.'
+    - 'tests/homeChartOfDay.test.ts (bun:test, dir ''fixtures/published''): the pl result has pick.kpi_key equal to
+      chartOfDay() over the same files, a non-empty sourceName and a date matching /^\d{4}-\d{2}-\d{2}$/; the en sourceName
+      is the source''s name_en; a catalog copy with kpis [] gives null.'
+    acceptance:
+    - build/client/index.html contains 'Wykres dnia' and build/client/en/index.html 'Chart of the day'
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/homeChartOfDay.test.ts && bun run build && grep -c 'Wykres
+        dnia' build/client/index.html
+      expect: exit 0; 0 fail; grep prints at least 1
+    out_of_scope:
+    - The line chart child and a series.parquet reader (todo)
+    - Changing chartOfDay() or ChartOfDayBlock
+    - Removing PulseSection or any other legacy section
+    depends_on:
+    - com/growth/chart-of-day/page/block

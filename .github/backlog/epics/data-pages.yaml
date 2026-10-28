@@ -66,8 +66,7 @@ deliverables:
   done_when:
   - 'One row per onboarded source: name, provider, family, licence, last loaded, KPIs fed'
   todo:
-  - Last-load freshness from catalog/freshness.parquet and KPI links on /sources once /indicators/:kpi exists
-    (com/site/indicators/pages/kpi-route).
+  - Last-load freshness from catalog/freshness.parquet on /sources (needs a Parquet reader at build).
   tasks:
   - key: com/site/data-pages/sources/model
     type: Task
@@ -147,6 +146,32 @@ deliverables:
     out_of_scope:
     - KPI links and freshness.parquet (todo line); a navigation entry in the header
     - Changing src/dataPages/sources.ts or scripts/fetch-published.ts
+  - key: com/site/data-pages/sources/kpi-links
+    type: Task
+    title: Link the indicators on /sources to their pages
+    effort: S
+    state: open
+    contract: false
+    context: 'The Indicators column of /sources (src/routes/sources.tsx) joins the KPI names as plain text, although
+      sourceRows() (src/dataPages/sources.ts) already gives each KPI an href to its /indicators/<kpi_key> page in the
+      page language, and those pages are pre-rendered.'
+    files:
+    - edit: src/routes/sources.tsx
+    steps:
+    - 'Replace `{row.kpis.map((k) => k.name).join('', '')}` with the KPIs as links: for each k (index i) a React Fragment
+      keyed by k.kpi_key holding '', '' when i > 0 and <a href={k.href} className="text-brand-teal underline">{k.name}</a>
+      (import Fragment from ''react'').'
+    - When row.kpis is empty the cell shows '–'.
+    acceptance:
+    - Each KPI on /sources and /en/sources links to its indicator page in the same language
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test && bun run build && grep -c 'href="/en/indicators/unemployment_rate"'
+        build/client/en/sources/index.html && grep -c 'href="/indicators/population"' build/client/sources/index.html
+      expect: tests pass; each grep prints at least 1
+    out_of_scope:
+    - Changing src/dataPages/sources.ts; freshness.parquet
+    depends_on:
+    - com/site/data-pages/sources/sources-page
 - key: com/site/data-pages/vault-removal
   title: Vault removed
   depends_on:
