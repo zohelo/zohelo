@@ -28,7 +28,7 @@ deliverables:
   - /regions renders a choropleth (sequential teal ramp) and a ranking table for a KPI selector
   todo:
   - 'Route /regions: src/components/MapChoropleth.client.tsx rendering choroplethSpec() (Task choropleth-spec) after
-    hydration (decision D22); KPI selector limited to KPIs with geography level voivodeship; RankingTable (Task ranking-table).'
+    hydration (decision D25); KPI selector limited to KPIs with geography level voivodeship; RankingTable (Task ranking-table).'
   tasks:
   - key: com/site/regions/map/choropleth-spec
     type: Task
@@ -38,7 +38,7 @@ deliverables:
     contract: false
     context: 'The /regions map is a Vega-Lite geoshape of geo/voivodeship.geojson (Features with properties geography_key,
       name_pl, name_en) coloured by a KPI value. Spec builders (lineSpec, barSpec) live in packages/design/src/visuals/specs.ts.
-      This Task adds choroplethSpec; the client-only map component comes later (D22).'
+      This Task adds choroplethSpec; the client-only map component comes later (D25).'
     files:
     - edit: packages/design/src/visuals/specs.ts
     - edit: packages/design/src/visuals/index.ts

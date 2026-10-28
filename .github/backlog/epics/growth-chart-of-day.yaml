@@ -80,7 +80,7 @@ deliverables:
   - Home shows today's chart with headline, Chart, SourceFooter and a link to /indicators/<kpi_key>
   todo:
   - Place ChartOfDayBlock (Task block) on home, fed by chartOfDay() at build from .published/, with a line Chart child
-    from a .client module rendered after hydration (decision D22) once series.parquet has a reader.
+    from a .client module rendered after hydration (decision D25) once series.parquet has a reader.
   tasks:
   - key: com/growth/chart-of-day/page/block
     type: Task
@@ -91,7 +91,7 @@ deliverables:
     context: 'chartOfDay() (src/growth/chartOfDay.ts) picks the KPI with the largest change and returns { kpi_key,
       source_key, period, headline_pl, headline_en, change_pct }. The home block shows it with a chart, the source
       line and a link to the indicator page. Charts may only render after hydration from a .client module (decision
-      D22) and series data has no reader yet, so the block takes the chart as children. Card, SourceFooter and formatDelta
+      D25) and series data has no reader yet, so the block takes the chart as children. Card, SourceFooter and formatDelta
       come from @zohelo/design.'
     files:
     - create: src/growth/ChartOfDayBlock.tsx
