@@ -110,15 +110,14 @@ export interface DatasetItem {
   downloadUrl: string;
 }
 
+export type ProductStatus = 'concept' | 'building' | 'live';
+
 export interface ProductItem {
   id: string;
   name: string;
-  tagline: string;
-  description: string;
-  category: 'Enterprise BI' | 'Municipal' | 'Macro Analysis' | 'Real Estate';
-  tier: 'Free Open Tier' | 'Commercial Edition' | 'Custom Advisory' | 'Enterprise BI';
-  features: string[];
-  previewMetrics: { label: string; val: string }[];
+  oneLine: string;
+  status: ProductStatus;
+  href?: string;
 }
 
 export interface ConsultantProfile {

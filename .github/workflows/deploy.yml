@@ -57,7 +57,7 @@ jobs:
             [ "$code" = 200 ] && break
             sleep 10
           done
-          grep -q 'Research' /tmp/page.html && [ "$code" = 200 ] || { echo "::error title=site::HTTP $code"; exit 1; }
+          if [ "$code" != 200 ] || ! grep -q 'Research' /tmp/page.html; then echo "::error title=site::HTTP $code"; exit 1; fi
           echo "::notice title=site::page 200"
           if [ "$BRANCH" = main ]; then
             live=$(curl -s -o /dev/null -w '%{http_code}' https://zohelo.com/ || true)

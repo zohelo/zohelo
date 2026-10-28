@@ -47,6 +47,7 @@ jobs:
             exit 0
           fi
           open=$(gh api "repos/$REPO/pulls?state=open&per_page=100" --paginate --jq '.[].head.ref')
+          # shellcheck disable=SC2016 # jq reads $ENV.REPO
           merged=$(gh api "repos/$REPO/pulls?state=closed&per_page=100" --paginate \
             --jq '.[] | select(.merged_at != null and .head.repo.full_name == $ENV.REPO) | "\(.head.ref) \(.head.sha)"')
           count=0
