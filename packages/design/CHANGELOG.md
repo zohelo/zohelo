@@ -1,3 +1,7 @@
+## Unreleased
+
+- `./visuals` — `choroplethSpec` for region maps.
+
 ## 1.0.0
 
 First release of `@zohelo/design`. Exports:
