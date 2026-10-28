@@ -1,7 +1,8 @@
 // Turns tokens.json (W3C DTCG) into dist/tokens.css (CSS variables, light and dark),
-// dist/theme.css (Tailwind 4 @theme) and src/generated/tokens.ts (typed values).
+// dist/theme.css (Tailwind 4 @theme) and src/generated/tokens.ts (typed values), and copies
+// src/fonts.css to dist/fonts.css.
 // Run from anywhere: paths resolve from this file.
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -98,5 +99,6 @@ if (import.meta.main) {
   writeFileSync(join(root, 'dist/tokens.css'), tokensCss(flat));
   writeFileSync(join(root, 'dist/theme.css'), themeCss(flat));
   writeFileSync(join(root, 'src/generated/tokens.ts'), tokensTs(flat));
+  copyFileSync(join(root, 'src/fonts.css'), join(root, 'dist/fonts.css'));
   console.log(`tokens: ${flat.length} written to dist/tokens.css, dist/theme.css, src/generated/tokens.ts`);
 }

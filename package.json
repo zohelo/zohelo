@@ -14,9 +14,6 @@
     "lint": "bun run --cwd packages/design build && tsc --noEmit"
   },
   "dependencies": {
-    "@fontsource/jetbrains-mono": "5.3.0",
-    "@fontsource/newsreader": "5.3.0",
-    "@fontsource/plus-jakarta-sans": "5.3.0",
     "@zohelo/design": "workspace:*",
     "canvas-confetti": "^1.9.4",
     "lucide-react": "^0.577.0",
