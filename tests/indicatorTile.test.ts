@@ -78,6 +78,19 @@ describe('latestTile', () => {
     });
   });
 
+  test('a row with its own unit_key shows that unit', () => {
+    const units = [...catalog.units, { unit_key: 'mln_eur', symbol: 'mln EUR', name_en: 'million EUR', name_pl: 'mln EUR', is_rate: false }];
+    expect(latestTile(kpi, file([row({ unit_key: 'mln_eur' })]), units, 'pl').unit).toBe('mln EUR');
+  });
+
+  test('a row without unit_key shows the KPI unit', () => {
+    expect(latestTile(kpi, file([row({})]), catalog.units, 'pl').unit).toBe('%');
+  });
+
+  test('a unit_key missing from units is shown as the key', () => {
+    expect(latestTile(kpi, file([row({ unit_key: 'usd' })]), catalog.units, 'pl').unit).toBe('usd');
+  });
+
   test('pure', () => {
     const before = JSON.stringify(latest);
     latestTile(kpi, latest, catalog.units, 'pl');
