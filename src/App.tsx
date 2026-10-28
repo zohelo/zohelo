@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { PulseSection } from './components/PulseSection';
-import { CompassSection } from './components/CompassSection';
 import { VaultSection } from './components/VaultSection';
 import { ProductsSection } from './components/ProductsSection';
 import { HeroConsultingSection } from './components/HeroConsultingSection';
@@ -15,16 +14,19 @@ import type { Locale } from './i18n';
 import { TodayStrip, type TodayTile } from './indicators/TodayStrip';
 import { HomeChanges } from './growth/HomeChanges';
 import type { ChangeItem, Source } from './published';
+import { HomeSpotlight, type SpotlightData } from './regions/HomeSpotlight';
 
 export default function App({
   tiles,
   items,
   sources,
+  spotlight,
   locale,
 }: {
   tiles: TodayTile[];
   items: ChangeItem[];
   sources: Source[];
+  spotlight: SpotlightData | null;
   locale: Locale;
 }) {
   const [activeSection, setActiveSection] = useState('top');
@@ -53,11 +55,6 @@ export default function App({
     if (elem) {
       elem.scrollIntoView({ behavior: 'smooth' });
     }
-  };
-
-  const handleOpenExploreVisualization = (selectedRegion?: VoivodeshipData) => {
-    setExploreRegion(selectedRegion);
-    setIsExploreModalOpen(true);
   };
 
   const handleSelectProduct = (product: ProductItem) => {
@@ -89,10 +86,7 @@ export default function App({
         <TodayStrip tiles={tiles} locale={locale} />
         <HomeChanges items={items} sources={sources} locale={locale} />
 
-        {/* 4. The Compass: Polish Regional Map + Public Finance Trends 2024-2025 */}
-        <CompassSection
-          onOpenExploreVisualization={handleOpenExploreVisualization}
-        />
+        <HomeSpotlight data={spotlight} locale={locale} />
 
         {/* 6. The Vault / The Datasets: CSV, Parquet, Power BI, PDF Lakehouse Assets */}
         <VaultSection
