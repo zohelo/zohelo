@@ -73,9 +73,19 @@ No advertising networks: they cost page weight and trust, and they would need an
   hand-written stories built on today's fixtures and live sources.
 - **Usage cost.** Daily drafting sessions use the same Claude usage limit that stopped three Developer runs on
   28 Oct. Write one story per major release, not one per change.
-- **Legal (not legal advice).** Polish press law may treat a periodic online publication as press (registration
-  of the title, a named editor-in-chief). Source terms need attribution: GUS DBW under D23; NBP terms are still
-  open (see the NBP licence question). This needs the owner's or a lawyer's check before launch.
+- **Press law (not legal advice).** A website that publishes periodically under a stable title to inform the
+  public may count as press (Prawo prasowe art. 7; Polish courts have applied this to online publications). A press
+  title is registered at the regional court and needs a named editor-in-chief, who is legally responsible for the
+  content; publishing an unregistered press title risks a fine. Non-periodic "notes" carry fewer obligations but a
+  weaker brand. → owner decision 3. This needs the owner's or a lawyer's check before launch.
+- **EU AI Act art. 50(4)** (transparency duties apply from 2 Aug 2026): AI-generated text published to inform the
+  public on matters of public interest must be disclosed as AI-generated, unless it has had human review or
+  editorial control and a person holds editorial responsibility. Either every story is reviewed by a named person
+  before publication, or it carries a visible AI label. → owner decision 2.
+- **Review load.** Human review of one note per significant release is roughly 15–25 notes a month. If the owner
+  cannot review that, the cadence drops or the AI-label route is taken.
+- **Source terms.** Attribution as each source requires: GUS DBW under D23; NBP terms are still open (see the NBP
+  licence question).
 - **Owner's job.** Commentary under the owner's name could touch his employment or consulting contract (the same
   concern as zohelo-consulting).
 
@@ -83,7 +93,9 @@ No advertising networks: they cost page weight and trust, and they would need an
 
 1. Approve zohelo-journal as a product: its own repo `zohelo-journal` with its own Developer, or a section of the
    zohelo repo built by Developer 4. The Architect's view is recorded below.
-2. Byline and disclosure: "zohelo" as editorial team, or the owner's name; the wording of the AI-assistance note.
+2. Byline and disclosure: "zohelo" as editorial team, or the owner's name; and the AI route: every story reviewed by
+   a named person before publication (no AI label needed under art. 50(4)), or published with a visible
+   "written with AI from official data" label and reviewed after publication.
    Also whether the journal takes the "Brief i kalendarz" card or gets a new card.
 3. The press-law question: register the title or not, and who is named as editor.
 4. Language: PL first with EN later (proposed), or both from v0.
