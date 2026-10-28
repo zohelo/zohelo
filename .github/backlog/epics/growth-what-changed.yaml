@@ -37,8 +37,9 @@ deliverables:
   done_when:
   - Home shows the 10 latest changes; /changes shows 30 days; rss.xml generated at build
   todo:
-  - Route /changes reading .published/feed/changes.json; home block component; scripts/rss.ts writing build/client/rss.xml
-    and en/rss.xml with renderRss() from Task rss-writer.
+  - Route /changes and the home block from recentChanges()/latestChanges() and ChangesList (Tasks changes-model,
+    changes-list), reading feed/changes.json from publishedDir() and left out of the build when it is null; scripts/rss.ts
+    writing build/client/rss.xml and en/rss.xml with renderRss() from Task rss-writer.
   tasks:
   - key: com/growth/what-changed/page/rss-writer
     type: Task
@@ -81,6 +82,78 @@ deliverables:
     - Serving or linking the feed
     depends_on:
     - data/published/published-v1/contract/schemas
+  - key: com/growth/what-changed/page/changes-model
+    type: Task
+    title: Add the what-changed list rules (30 days, latest 10, links)
+    effort: S
+    state: open
+    contract: false
+    context: 'The /changes page shows the changes of the last 30 days and the home block the 10 latest (Deliverable
+      done_when), from feed/changes.json (type Changes in src/published.ts; zohelo-data docs/published.md). Each entry
+      links to the indicator page of its first KPI, the same rule src/growth/rss.ts uses. This Task adds only the
+      pure functions; routes come later.'
+    files:
+    - create: src/growth/changes.ts
+    - create: tests/changes.test.ts
+    steps:
+    - 'Export type ChangeEntry = { at: string; date: string; title: string; href: string; source_key: string }. Import
+      types Changes, ChangeItem from ''../published''; Locale and localizedPath from ''../i18n''.'
+    - 'export function changeEntry(item: ChangeItem, locale: Locale): ChangeEntry. date = at.slice(0, 10); title =
+      title_pl/title_en; href = localizedPath(`/indicators/${kpi_keys[0]}`, locale), or localizedPath(''/changes'',
+      locale) when kpi_keys is empty.'
+    - 'A private sortItems(items) returns a copy sorted by at descending (Array.prototype.sort is stable, so equal
+      at keep input order).'
+    - 'export function recentChanges(changes: Changes, now: string, locale: Locale, days = 30): ChangeEntry[] = sorted
+      items with Date.parse(at) >= Date.parse(now) - days * 86400000, mapped with changeEntry.'
+    - 'export function latestChanges(changes: Changes, locale: Locale, count = 10): ChangeEntry[] = the first count
+      sorted items, mapped with changeEntry.'
+    - 'tests/changes.test.ts (bun:test, inline items): an item 31 days before now is dropped and one 29 days before
+      kept; newer first, equal at keep input order; 12 items give 10 from latestChanges; pl href ''/indicators/unemployment_rate'',
+      en ''/en/indicators/unemployment_rate''; empty kpi_keys gives ''/changes'' (pl) and ''/en/changes'' (en); date
+      is ''2026-01-01'' for at ''2026-01-01T00:00:00Z''; the input items array keeps its order.'
+    acceptance:
+    - The functions are pure and do not mutate their input
+    - Every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/changes.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The /changes route, the home block and scripts/rss.ts
+    - Changing src/growth/rss.ts
+    depends_on:
+    - com/site/indicators/data/readers
+  - key: com/growth/what-changed/page/changes-list
+    type: Task
+    title: Add the ChangesList component
+    effort: S
+    state: open
+    contract: false
+    context: 'The home block and /changes render the same list (date, linked title), newest first. The entries are
+      computed elsewhere (todo above); this Task adds only the presentational component, styled with the token classes
+      already used in src/routes/portfolio.tsx and packages/design (text-text, text-text-muted, font-ui, z-figures,
+      border-border). The site forces the light theme (decision D21).'
+    files:
+    - create: src/components/ChangesList.tsx
+    - create: tests/changesList.test.tsx
+    steps:
+    - 'Export type ChangesListItem = { at: string; date: string; title: string; href: string } and function ChangesList({
+      items, locale }: { items: ChangesListItem[]; locale: ''pl'' | ''en'' }). No state, effects or data loading.'
+    - 'Empty items: render <p className="font-ui text-text-muted"> with ''Brak zmian w ostatnich 30 dniach.'' (pl)
+      or ''No changes in the last 30 days.'' (en).'
+    - 'Otherwise <ol className="divide-y divide-border"> with one <li className="flex gap-4 py-3"> per item, in the
+      given order: <time dateTime={at} className="z-figures shrink-0 text-text-muted">{date}</time>, then <a href={href}
+      className="text-text underline-offset-2 hover:underline">{title}</a>. key = `${at}-${href}-${index}`.'
+    - 'tests/changesList.test.tsx (bun:test, renderToStaticMarkup from react-dom/server): two items render two <li>
+      in the given order with dateTime, date, title and href; a title ''A <b>'' is escaped (''A &lt;b&gt;''); empty
+      items render the Polish and the English message.'
+    acceptance:
+    - Every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/changesList.test.tsx
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - Computing the entries (Task changes-model), routes and the home page
+    - New tokens or components in packages/design
 - key: com/growth/what-changed/trigger
   title: Rebuild after each publish
   repo: zohelo-data

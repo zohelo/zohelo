@@ -27,8 +27,9 @@ deliverables:
   done_when:
   - /regions renders a choropleth (sequential teal ramp) and a ranking table for a KPI selector
   todo:
-  - MapChoropleth via Vega-Lite geoshape from geo/voivodeship.geojson; KPI selector limited to KPIs with geography
-    level voivodeship; ranking DataTable fed by rankRegions() from Task ranking.
+  - Route /regions (left out of the build when publishedDir() is null) with a client-only map (Chart + choroplethSpec,
+    Task choropleth-spec) and RegionRankingTable (Task region-table); KPI selector limited to KPIs with geography
+    level voivodeship.
   tasks:
   - key: com/site/regions/map/ranking
     type: Task
@@ -70,6 +71,92 @@ deliverables:
     - Sort direction for KPIs where lower is better (the page decides colours)
     depends_on:
     - data/published/published-v1/contract/schemas
+  - key: com/site/regions/map/choropleth-spec
+    type: Task
+    title: Add a choropleth Vega-Lite spec builder to the design package
+    effort: S
+    state: open
+    contract: false
+    context: '/regions shows a choropleth of the voivodeships in a teal ramp (Deliverable done_when). Charts are
+      Vega-Lite specs from pure functions in packages/design/src/visuals/ (specs.ts, rendered by Chart.tsx); the map
+      spec gets its own file so it does not collide with lane-3 Tasks editing specs.ts. Geometry: geo/voivodeship.geojson
+      (FeatureCollection; properties.geography_key, name_pl, name_en).'
+    files:
+    - create: packages/design/src/visuals/map.ts
+    - create: packages/design/src/visuals/map.test.ts
+    - edit: packages/design/src/visuals/index.ts
+    - edit: packages/design/CHANGELOG.md
+    steps:
+    - 'map.ts (double quotes, like specs.ts): import type { VisualizationSpec } from "vega-embed"; export type ChoroplethOptions
+      = { key: string; value: string; valueTitle: string; nameProperty: string; stroke: string; scheme?: string }
+      and function choroplethSpec(geo: object, rows: object[], o: ChoroplethOptions): VisualizationSpec.'
+    - 'Return { $schema: "https://vega.github.io/schema/vega-lite/v6.json", width: "container", height: 360, autosize:
+      { type: "fit", contains: "padding" }, background: "transparent", data: { values: geo, format: { type: "json",
+      property: "features" } }, transform: [{ lookup: "properties.geography_key", from: { data: { values: rows },
+      key: o.key, fields: [o.value] } }], projection: { type: "mercator" }, mark: { type: "geoshape", stroke: o.stroke,
+      strokeWidth: 0.5 }, encoding }.'
+    - 'encoding = { color: { field: o.value, type: "quantitative", title: o.valueTitle, scale: { scheme: o.scheme ??
+      "teals" }, legend: { orient: "bottom" } }, tooltip: [{ field: `properties.${o.nameProperty}`, type: "nominal",
+      title: "Region" }, { field: o.value, type: "quantitative", title: o.valueTitle, format: ",.4~f" }] }.'
+    - 'index.ts: add export { choroplethSpec, type ChoroplethOptions } from "./map";. CHANGELOG.md: add `choroplethSpec`
+      to the `./visuals` line under 1.0.0.'
+    - 'map.test.ts (bun:test, inline FeatureCollection of TERC:12 and TERC:30): data.values is geo, data.format.property
+      ''features''; lookup uses o.key and [o.value]; scheme ''teals'' by default, else the given one; first tooltip
+      field ''properties.name_pl'' for nameProperty ''name_pl''; inputs not mutated.'
+    acceptance:
+    - choroplethSpec is pure and every rule above is tested
+    verify:
+    - run: bun run lint && bun test packages/design/src/visuals/map.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - A map component, the KPI selector, the /regions route; tokens, specs.ts, Chart.tsx
+    depends_on:
+    - com/design/design-v1/visuals/move
+  - key: com/site/regions/map/region-table
+    type: Task
+    title: Add readGeo and the voivodeship ranking table
+    effort: M
+    state: open
+    contract: false
+    context: 'rankRegions() in src/regions/ranking.ts ranks voivodeships by geography_key, but the page shows names.
+      Names are in geo/voivodeship.geojson (properties geography_key, name_pl, name_en, level, parent_key; zohelo-data
+      docs/published.md), which src/published.ts cannot read yet. This Task adds the reader, a pure row builder and
+      a table on DataTable from @zohelo/design.'
+    files:
+    - edit: src/published.ts
+    - create: src/regions/table.ts
+    - create: src/components/RegionRankingTable.tsx
+    - create: tests/regionTable.test.tsx
+    steps:
+    - 'src/published.ts: export types GeoFeature = { type: ''Feature''; properties: { geography_key: string; name_pl:
+      string; name_en: string; level: string; parent_key?: string }; geometry: unknown } and GeoCollection = { type:
+      ''FeatureCollection''; features: GeoFeature[] }; export function readGeo(dir: string, level: string): GeoCollection
+      reading geo/<level>.geojson with readJson; throw invalid(path) unless type is ''FeatureCollection'' and features
+      an array.'
+    - 'src/regions/table.ts: export type RegionRow = { rank: number; name: string; value: number; provisional: boolean
+      } and function regionRows(ranking: RegionRanking, geo: GeoCollection, locale: ''pl'' | ''en''): RegionRow[] in
+      ranking.regions order; name = the feature''s name_pl/name_en for the geography_key, else the geography_key.'
+    - 'src/components/RegionRankingTable.tsx: RegionRankingTable({ rows, locale, caption, unit }) renders DataTable
+      (not sortable) with columns rank (''Miejsce''/''Rank'', right), name (''Województwo''/''Voivodeship''), value
+      (`Wartość (${unit})`/`Value (${unit})`, right, format: (v) => formatNumber(v as number, locale)) and provisional
+      (''Status''; ''wstępne''/''provisional'' when true, else empty).'
+    - 'tests/regionTable.test.tsx (bun:test): readGeo(''fixtures/published'', ''voivodeship'') has 1 feature named
+      ''Małopolskie''; level ''gmina'' throws /published file missing/; regionRows for TERC:12 (rank 1) and TERC:30
+      (rank 2) gives ''Małopolskie'' (pl), ''Lesser Poland'' (en) and ''TERC:30''; renderToStaticMarkup shows ''Województwo''
+      and ''2,6'' in pl and ''provisional'' in en.'
+    acceptance:
+    - Existing readers and tests are unchanged and pass
+    - Every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The map, the KPI selector and the /regions route
+    - Changing rankRegions()
+    depends_on:
+    - com/site/regions/map/ranking
+    - com/site/indicators/data/readers
+    - com/design/design-v1/components/table
 - key: com/site/regions/profiles
   title: Voivodeship profiles
   depends_on:

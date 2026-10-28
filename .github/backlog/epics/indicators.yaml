@@ -30,6 +30,9 @@ depends_on:
 decisions:
 - 'owner 27 Oct no. 3: markets section uses public rates (NBP/ECB), no stock quotes'
 - 'plan §3.5: zohelo.com never calls the lakehouse at runtime; it fetches published files at build'
+- 'architect 28 Oct: until scripts/fetch-published.ts and gold.publish exist, build code finds the published files
+  with publishedDir() (src/publishedDir.ts, env PUBLISHED_DIR); unset means data pages and files are left out of
+  the build, so production never shows fixture numbers; tests read fixtures/published'
 deliverables:
 - key: com/site/indicators/data
   title: Published data available at build
@@ -37,7 +40,8 @@ deliverables:
   - Build fails clearly when published files are missing; local dev works from a committed fixture
   todo:
   - scripts/fetch-published.ts (shared with com/growth/what-changed/build-data) writing .published/ for the build;
-    ready once gold.publish writes 06_published/v1. The PR check keeps reading fixtures/published/ (no credentials).
+    deploy.yml then sets PUBLISHED_DIR=.published (read by publishedDir(), Task published-dir); ready once gold.publish
+    writes 06_published/v1. The PR check keeps reading fixtures/published/ (no credentials).
   tasks:
   - key: com/site/indicators/data/readers
     type: Task
@@ -82,6 +86,43 @@ deliverables:
     - Readers for manifest.json, series.parquet and geo files
     depends_on:
     - data/published/published-v1/contract/schemas
+  - key: com/site/indicators/data/published-dir
+    type: Task
+    title: Add publishedDir() to locate the published files at build
+    effort: S
+    state: open
+    contract: false
+    context: 'The readers in src/published.ts take a directory, but nothing tells the build which directory holds
+      the published layer: scripts/fetch-published.ts (todo above) does not exist yet and 06_published/v1 is not in
+      R2. Decision (Epic decisions, architect 28 Oct): build code calls publishedDir(); when PUBLISHED_DIR is unset
+      it returns null and data pages and files are left out of the build, so production never shows fixture numbers.
+      PUBLISHED_DIR=fixtures/published turns them on locally and in later Tasks'' verify.'
+    files:
+    - create: src/publishedDir.ts
+    - create: tests/publishedDir.test.ts
+    - edit: .gitignore
+    steps:
+    - 'src/publishedDir.ts: a two-line header comment (what it does; the Epic decision). export function publishedDir(env:
+      Record<string, string | undefined> = process.env): string | null.'
+    - 'dir = (env.PUBLISHED_DIR ?? '''').trim(). Empty → return null. When existsSync(join(dir, ''catalog'', ''catalog.json''))
+      is false, throw Error(`PUBLISHED_DIR=${dir} has no catalog/catalog.json`); otherwise return dir. Imports: existsSync
+      from node:fs, join from node:path.'
+    - Add the line `.published/` to .gitignore, directly after `.react-router/`.
+    - 'tests/publishedDir.test.ts (bun:test): {} → null; { PUBLISHED_DIR: '''' } → null; { PUBLISHED_DIR: ''  '' }
+      → null; { PUBLISHED_DIR: ''fixtures/published'' } → ''fixtures/published''; { PUBLISHED_DIR: ''fixtures'' }
+      throws /has no catalog\/catalog.json/.'
+    acceptance:
+    - publishedDir reads only its env argument (process.env only as the default) and the file system
+    - .gitignore ignores .published/
+    - Every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/publishedDir.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - scripts/fetch-published.ts and deploy.yml (todo above)
+    - Calling publishedDir() from routes, react-router.config.ts or scripts (later Tasks)
+    depends_on:
+    - com/site/indicators/data/readers
 - key: com/site/indicators/pages
   title: Index and KPI page template
   depends_on:
@@ -89,10 +130,135 @@ deliverables:
   done_when:
   - /indicators and /indicators/<kpi_key> pre-rendered for the 20 KPIs listed in site.config
   todo:
-  - 'Route /indicators: grouped by domain (dim_domain from catalog), KpiTile per KPI.'
-  - 'Route /indicators/:kpi: KpiTile, line Chart (series), regional DataTable when kpi_dimension has geography,
-    definition, SourceFooter, licence, CSV download link to the published extract, Dataset JSON-LD; prerender list
-    from site.config indicators.'
+  - 'Route /indicators from indicatorIndex() (Task index-model), one link per KPI, pre-rendered only when publishedDir()
+    is set.'
+  - 'Route /indicators/:kpi from kpiPageData() and datasetJsonLd() (Tasks kpi-model, jsonld): KpiTile, line Chart
+    (series), regional DataTable, definition, SourceFooter, licence, CSV download link to the published extract;
+    prerender list from site.config indicators when publishedDir() is set.'
+  tasks:
+  - key: com/site/indicators/pages/index-model
+    type: Task
+    title: Add the indicator index model grouped by domain
+    effort: S
+    state: open
+    contract: false
+    context: 'The /indicators page (todo above) lists the published KPIs grouped by top-level domain. This Task adds
+      only the pure function that turns catalog/catalog.json (type Catalog in src/published.ts; contract zohelo-data
+      docs/published.md) into the groups the page renders. Top-level domains are the catalog.domains entries with
+      level ''domain''; a KPI''s top-level domain is its domain_path[0].'
+    files:
+    - create: src/indicators/model.ts
+    - create: tests/indicatorIndex.test.ts
+    steps:
+    - 'Export type IndexKpi = { kpi_key: string; name: string; unit_symbol: string; last_period: string; href: string
+      }, type IndexGroup = { domain_key: string; name: string; kpis: IndexKpi[] } and function indicatorIndex(catalog:
+      Catalog, locale: Locale): IndexGroup[]. Import type Catalog from ''../published''; Locale and localizedPath from
+      ''../i18n''.'
+    - 'Keep KPIs with status ''published''. name = name_pl or name_en by locale; unit_symbol = symbol of the catalog
+      unit with the KPI''s unit_key ('''' when none); href = localizedPath(`/indicators/${kpi_key}`, locale).'
+    - 'Group by domain_path[0]. The group name is the matching level-''domain'' entry''s name_pl/name_en; groups are
+      ordered by that entry''s sort ascending, ties by domain_key. KPIs whose domain_path[0] has no level-''domain''
+      entry go to one last group { domain_key: ''other'', name: ''Inne'' (pl) / ''Other'' (en) }. Groups without
+      KPIs are left out.'
+    - Inside a group sort KPIs by name with a.name.localeCompare(b.name, locale).
+    - 'tests/indicatorIndex.test.ts (bun:test, readCatalog(''fixtures/published'')): pl group keys are [''economy'',
+      ''finance'', ''labour'', ''population'']; the economy group is named ''Gospodarka'' with kpi_keys [''inflation'',
+      ''gdp_current_prices''] in pl and [''gdp_current_prices'', ''inflation''] in en (name ''Economy''); unemployment_rate
+      has unit_symbol ''%'' and href ''/indicators/unemployment_rate'' (pl) and ''/en/indicators/unemployment_rate''
+      (en); a copy with one KPI in status ''draft'' drops it; a KPI with domain_path [''nowhere''] lands in the last
+      group ''other''; the catalog is not mutated.'
+    acceptance:
+    - indicatorIndex is pure and does not mutate the catalog
+    - Every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/indicatorIndex.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The /indicators route, KpiTile values and site.config.ts
+    - Groups below the top-level domain
+    depends_on:
+    - com/site/indicators/data/readers
+  - key: com/site/indicators/pages/kpi-model
+    type: Task
+    title: Add the KPI page model from the catalog and latest.json
+    effort: M
+    state: open
+    contract: false
+    context: 'Each /indicators/<kpi_key> page (todo above) shows the latest national value and change, the voivodeship
+      values and the sources with licences. This Task adds only the pure function combining catalog/catalog.json
+      and kpi/<kpi_key>/latest.json (types Catalog, KpiLatest in src/published.ts; zohelo-data docs/published.md).'
+    files:
+    - create: src/indicators/kpiPage.ts
+    - create: tests/kpiPage.test.ts
+    steps:
+    - 'Export type KpiPageData with string fields kpi_key, name, unit_symbol, unit_name, first_period, last_period;
+      national: { source_key, period: string; value: number; previous_period: string | null; previous_value, delta:
+      number | null } | null; regions: { geography_key, period: string; value: number; provisional: boolean }[];
+      sources: { source_key, name, register_id: string; licence_name, licence_url, attribution: string | null }[].'
+    - 'export function kpiPageData(catalog: Catalog, latest: KpiLatest, locale: Locale): KpiPageData (Locale from ''../i18n'').
+      Unknown latest.kpi_key throws Error(`KPI ${latest.kpi_key} is not in the catalog`). Names by locale; unit_symbol
+      and unit_name are empty strings when the unit is missing.'
+    - 'national = the geography_key ''PL'' row of the first source (in the KPI''s source_keys order) that has one,
+      else null; delta = value - previous_value, null when previous_value is absent.'
+    - 'regions = geography_level ''voivodeship'' rows of national.source_key (national null: of the first source with
+      such rows), sorted by geography_key; provisional = flags includes ''p''.'
+    - 'sources = source_keys with a catalog.sources entry, in order: name by locale, register_id, and name, url, attribution_text
+      of its licence (null when missing).'
+    - 'tests/kpiPage.test.ts (bun:test, fixtures/published): unemployment_rate pl has name ''Stopa bezrobocia (BAEL)'',
+      unit_symbol ''%'', national 3.2 from eurostat for ''2025'', delta toBeCloseTo(0.3); regions [TERC:12, 2.6, provisional];
+      sources eurostat, world_bank_wdi with licence_name ''Creative Commons Attribution 4.0''; en name ''Unemployment
+      rate (LFS)''. Inline: no PL row gives national null; no previous_value gives delta null; ''nope'' throws.'
+    acceptance:
+    - kpiPageData is pure and does not mutate its inputs
+    - Every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/kpiPage.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The /indicators/:kpi route, the chart (series.parquet) and the CSV download
+    - Region names; Dataset JSON-LD (Task jsonld)
+    depends_on:
+    - com/site/indicators/data/readers
+  - key: com/site/indicators/pages/jsonld
+    type: Task
+    title: Add Dataset JSON-LD for indicator pages
+    effort: S
+    state: open
+    contract: false
+    context: 'Google Dataset Search reads schema.org Dataset JSON-LD; the home page already writes WebSite JSON-LD
+      (src/routes/home.tsx). This Task adds only the pure builder from catalog/catalog.json (type Catalog in src/published.ts);
+      the route comes later.'
+    files:
+    - create: src/indicators/jsonLd.ts
+    - create: tests/jsonLd.test.ts
+    steps:
+    - 'export function datasetJsonLd(catalog: Catalog, kpiKey: string, locale: Locale): Record<string, unknown>. Imports:
+      absoluteUrl from ''../seo'', site from ''../site.config'', Locale from ''../i18n''. Throw Error(`KPI ${kpiKey}
+      is not in the catalog`) when the KPI is missing.'
+    - 'name = name_pl/name_en. Sources = the catalog.sources entries of the KPI''s source_keys, in that order, named
+      by locale. description pl: `${name}: dane ${first_period}–${last_period}, źródła: ${source names joined by '',
+      ''}.`; en: `${name}: data ${first_period}–${last_period}, sources: ${names}.` (en dash between the periods).'
+    - 'Return { ''@context'': ''https://schema.org'', ''@type'': ''Dataset'', name, description, url: absoluteUrl(`/indicators/${kpiKey}`,
+      locale), inLanguage: locale, temporalCoverage: `${first_period}/${last_period}`, spatialCoverage: { ''@type'':
+      ''Place'', name: ''Polska'' (pl) / ''Poland'' (en) }, dateModified: loaded_at, isAccessibleForFree: true, creator:
+      { ''@type'': ''Organization'', name: site.name, url: site.url }, license: url of the first source''s licence
+      (key left out when there is none), isBasedOn: sources.map((s) => ({ ''@type'': ''Dataset'', name: s.name })) }.'
+    - 'tests/jsonLd.test.ts (bun:test, readCatalog(''fixtures/published'')): unemployment_rate in pl has url ''https://zohelo.com/indicators/unemployment_rate'',
+      temporalCoverage ''2000/2025'', license ''https://creativecommons.org/licenses/by/4.0/'', isBasedOn names [''Eurostat'',
+      ''Bank Światowy – WDI''] and description ''Stopa bezrobocia (BAEL): dane 2000–2025, źródła: Eurostat, Bank Światowy
+      – WDI.''; en url is ''https://zohelo.com/en/indicators/unemployment_rate''; a catalog copy whose licences list
+      is empty has no license key; ''nope'' throws /not in the catalog/.'
+    acceptance:
+    - datasetJsonLd is pure and its result survives JSON.stringify unchanged
+    - Every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/jsonLd.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - Rendering the script tag and the /indicators/:kpi route
+    - Changing src/seo.ts or src/routes/home.tsx
+    depends_on:
+    - com/site/indicators/data/readers
 - key: com/site/indicators/home
   title: Today strip and real metrics on home
   depends_on:
