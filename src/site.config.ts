@@ -38,6 +38,38 @@ export const pages: Page[] = [
       en: 'Tokens and components of the zohelo design system: colours, typography, spacing and components.',
     },
   },
+  {
+    path: '/sources',
+    title: { pl: 'Źródła danych', en: 'Data sources' },
+    description: {
+      pl: 'Źródła danych zohelo: dostawca, licencja, ostatnie ładowanie i zasilane wskaźniki.',
+      en: 'zohelo data sources: provider, licence, last load and the indicators they feed.',
+    },
+  },
+  {
+    path: '/changes',
+    title: { pl: 'Co się zmieniło', en: 'What changed' },
+    description: {
+      pl: 'Najnowsze aktualizacje zbiorów danych i wskaźników, które się zmieniły.',
+      en: 'The latest dataset updates and the indicators they changed.',
+    },
+  },
+  {
+    path: '/indicators',
+    title: { pl: 'Wskaźniki', en: 'Indicators' },
+    description: {
+      pl: 'Najważniejsze wskaźniki o Polsce z najnowszą wartością, źródłem i datą.',
+      en: 'Headline indicators on Poland with the latest value, source and date.',
+    },
+  },
+  {
+    path: '/regions',
+    title: { pl: 'Regiony', en: 'Regions' },
+    description: {
+      pl: 'Porównanie 16 województw: mapa i ranking wybranego wskaźnika.',
+      en: 'The 16 voivodeships compared: a map and a ranking for one indicator.',
+    },
+  },
 ];
 
 /** Every pre-rendered path: each page in Polish and in English. */
