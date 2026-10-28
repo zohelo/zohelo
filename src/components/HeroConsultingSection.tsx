@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Send, CheckCircle2, User, Mail, Building, MessageSquare, Award, Clock, ArrowRight } from 'lucide-react';
-import { consultantProfile } from '../data/consultantData';
+import { consultantProfile } from '../content/consultantData';
 
 interface HeroConsultingSectionProps {
   onSubmitSuccess?: () => void;

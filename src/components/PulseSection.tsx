@@ -23,7 +23,7 @@ import {
   marketTabs,
   MarketTabKey,
   pulseIndicators
-} from '../data/pulseData';
+} from '../content/pulseData';
 import { MarketIndicator, QuoteSnapshot, StockAssetInfo } from '../types';
 import { IllustrativeBadge } from './IllustrativeBadge';
 

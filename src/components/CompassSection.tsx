@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, TrendingUp, BarChart3, Layers, ArrowRight, ShieldCheck, ChevronRight } from 'lucide-react';
-import { polandVoivodeships } from '../data/polandRegions';
-import { publicFinanceTrends, domainCategories } from '../data/financeTrends';
+import { polandVoivodeships } from '../content/polandRegions';
+import { publicFinanceTrends, domainCategories } from '../content/financeTrends';
 import { VoivodeshipData } from '../types';
 import { IllustrativeBadge } from './IllustrativeBadge';
 
