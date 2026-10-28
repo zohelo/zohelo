@@ -20,3 +20,8 @@ areas:
     purpose: >-
       How the site is built, checked, deployed and secured: workflows, dependencies, repository
       settings and the shared workflows used by all zohelo repos.
+  - key: com/portfolio
+    title: Portfolio · discovery
+    purpose: >-
+      New zohelo products before the owner approves them: one brief and one discovery Epic per
+      idea. Nothing here takes Developer time; an approved brief gets its own repo and Developer.

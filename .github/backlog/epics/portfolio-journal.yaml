@@ -1,0 +1,38 @@
+key: com/portfolio/journal
+area: com/portfolio
+title: zohelo-journal · discovery
+phase: 2
+priority: P2
+why: >-
+  zohelo already publishes official Polish statistics, but numbers alone do not bring readers back. A journal that
+  turns each release into a short, sourced story (what changed, why it matters, a chart) gives zohelo.com a reason
+  to visit and share, and replaces the illustrative articles on the home page with real ones.
+outcome: >-
+  The owner has decided, from docs/portfolio/zohelo-journal.md, whether zohelo-journal becomes a product with its
+  own repo and Developer, and with which first scope.
+in_scope:
+- The brief docs/portfolio/zohelo-journal.md
+- Consultation of the Domain expert (business value, data) and the Architect (feasibility, cost) on the brief
+- One owner:decision issue when the brief is complete
+out_of_scope:
+- Any product code, repo or scheduled task before the owner approves
+- Publishing anything outside the repos (social posts, mail, accounts)
+done_when:
+- The brief has the Domain expert's and the Architect's answers recorded in its "Consultation" section
+- An owner:decision issue for the brief is closed with the owner's answer
+deliverables:
+- key: com/portfolio/journal/brief
+  title: zohelo-journal brief complete
+  done_when:
+  - docs/portfolio/zohelo-journal.md has every section of docs/team.md (Product Owner step 5) and both consultations
+  todo:
+  - Domain expert review of the story types and the editorial rules (domains economy and labour first)
+  - Architect review of the build options, cost within free tiers and the reuse of feed/changes.json
+- key: com/portfolio/journal/decision
+  title: Owner decision on zohelo-journal
+  depends_on:
+  - com/portfolio/journal/brief
+  done_when:
+  - owner:decision issue answered; on approval, repo, backlog Epics and Developer row exist
+  todo:
+  - Open the owner:decision issue (assigned to rutkala) with the brief's "What the owner must decide" list
