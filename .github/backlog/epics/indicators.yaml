@@ -261,5 +261,48 @@ deliverables:
   done_when:
   - Home today strip and the metrics/pulse sections read published values; Illustrative badges removed there
   todo:
-  - Replace MetricsSection with the today strip (6 KpiTiles); replace PulseSection with a rates block (NBP EUR/PLN,
-    USD/PLN, CHF/PLN, reference rate) from published KPIs; delete src/content/pulseData.ts and metricsData.ts.
+  - Replace MetricsSection with TodayStrip (Task today-strip) fed by latestTile() for the 6 KPIs; replace PulseSection
+    with a rates block (NBP EUR/PLN, USD/PLN, CHF/PLN, reference rate) from published KPIs (published v1 skips fx_rate
+    in latest.json, zohelo-data docs/published.md); delete src/content/pulseData.ts and metricsData.ts.
+  tasks:
+  - key: com/site/indicators/home/today-strip
+    type: Task
+    title: Add the TodayStrip component for the home page
+    effort: S
+    state: open
+    contract: false
+    context: 'The home page will show six headline KPIs as KpiTile (@zohelo/design) in place of MetricsSection (Epic
+      done_when). latestTile() (Task latest-tile) will derive the values from latest.json; to stay independent of
+      it, the component declares the fields it needs. This Task adds only the component; choosing the six KPIs, feeding
+      it and replacing MetricsSection come later.'
+    files:
+    - create: src/indicators/TodayStrip.tsx
+    - create: tests/todayStrip.test.tsx
+    steps:
+    - 'export type TodayTile = { kpi_key: string; label: string; value: number | null; unit: string; delta: number
+      | null; period: string; provisional: boolean } and function TodayStrip({ tiles, locale }: { tiles: TodayTile[];
+      locale: Locale }) (KpiTile from ''@zohelo/design''; Locale and localizedPath from ''../i18n'').'
+    - 'No tiles: return null. Otherwise render <section aria-labelledby="today-strip" className="mx-auto max-w-6xl
+      px-4 py-8"> containing <h2 id="today-strip" className="mb-4 font-display text-[length:var(--z-size-xl)] text-text">
+      ''Dziś w danych'' (pl) / ''Today in data'' (en), then <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+      with one KpiTile per tile: the first 6 tiles, in input order.'
+    - 'KpiTile props: key = kpi_key, label, value, unit, delta, locale, href = localizedPath(`/indicators/${kpi_key}`,
+      locale), period = provisional ? `${period}, dane wstępne` (pl) or `${period}, provisional` (en) : period. No
+      goodDirection, no decimals.'
+    - 'tests/todayStrip.test.tsx (bun:test, renderToStaticMarkup from react-dom/server; tile = { kpi_key: ''unemployment_rate'',
+      label: ''Stopa bezrobocia (BAEL)'', value: 3.2, unit: ''%'', delta: 0.3, period: ''2025'', provisional: false
+      }): pl markup contains ''Dziś w danych'', href="/indicators/unemployment_rate", ''3,2'' and ''+0,3''; en contains
+      ''Today in data'', href="/en/indicators/unemployment_rate" and ''3.2''; with provisional true pl contains ''2025,
+      dane wstępne'' and en ''2025, provisional''; 7 tiles with kpi_key k1…k7 give 6 matches of ''href="/indicators/k'';
+      tiles [] render ''''.'
+    acceptance:
+    - Every rule above is covered by a test
+    verify:
+    - run: bun run lint && bun test tests/todayStrip.test.tsx
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - Replacing MetricsSection on home and choosing the six KPIs
+    - latestTile() and the rates block
+    depends_on:
+    - com/design/design-v1/components/basics
+    - com/site/site-v1/i18n/routing

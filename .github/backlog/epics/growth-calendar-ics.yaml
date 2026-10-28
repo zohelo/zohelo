@@ -24,9 +24,47 @@ deliverables:
   title: Calendar feed served
   done_when:
   - calendar.ics copied/generated into build/client at build; Content-Type text/calendar via public/_headers
-  todo:
-  - 'Copy .published/feed/calendar.ics to build/client/calendar.ics (or generate with a 40-line writer from release_calendar
-    rows); public/_headers sets Content-Type: text/calendar; charset=utf-8 for /calendar.ics.'
+  tasks:
+  - key: com/growth/calendar-ics/feed/copy
+    type: Task
+    title: Copy calendar.ics into the build and serve it as text/calendar
+    effort: S
+    state: open
+    contract: false
+    context: 'The published layer has feed/calendar.ics, one VEVENT per release (zohelo-data docs/published.md). The
+      build reads it from PUBLISHED_DIR (default .published/, missing until scripts/fetch-published.ts exists), like
+      scripts/rss.ts (Task rss-build). Vite copies public/ into build/client; Cloudflare Pages reads its _headers.'
+    files:
+    - create: scripts/calendar.ts
+    - create: public/_headers
+    - edit: package.json
+    steps:
+    - 'scripts/calendar.ts (same style as scripts/rss.ts; node:fs existsSync, readFileSync, copyFileSync; node:path
+      join): dir = process.env.PUBLISHED_DIR ?? ''.published''; src = join(dir, ''feed'', ''calendar.ics''); out = join(import.meta.dir,
+      ''..'', ''build'', ''client'').'
+    - 'When src does not exist: console.log(`calendar: ${dir}/feed/calendar.ics missing, no calendar written`) and
+      process.exit(0).'
+    - 'Otherwise text = readFileSync(src, ''utf8''); unless text.startsWith(''BEGIN:VCALENDAR'') throw new Error(`calendar:
+      ${src} is not an iCalendar file`). copyFileSync(src, join(out, ''calendar.ics'')) (exact bytes, no rewrite); events
+      = (text.match(/^BEGIN:VEVENT/gm) ?? []).length; console.log(`calendar: ${events} events written to build/client/calendar.ics`).'
+    - 'public/_headers, exactly two lines: ''/calendar.ics'' and ''  Content-Type: text/calendar; charset=utf-8''
+      (two leading spaces).'
+    - 'package.json, script build: append '' && bun scripts/calendar.ts'' after ''bun scripts/rss.ts''.'
+    acceptance:
+    - The build passes without .published/; a calendar is copied byte-identical; a non-iCalendar file fails
+    verify:
+    - run: bun run build 2>&1 | grep '^calendar:' && cat build/client/_headers
+      expect: 'calendar: .published/feed/calendar.ics missing, no calendar written; then the two _headers lines'
+    - run: d=$(mktemp -d) && mkdir -p $d/feed && printf 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//zohelo//test//EN\r\nBEGIN:VEVENT\r\nUID:t1\r\nDTSTAMP:20261028T000000Z\r\nDTSTART:20261101T080000Z\r\nSUMMARY:Test\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n'
+        > $d/feed/calendar.ics && PUBLISHED_DIR=$d bun scripts/calendar.ts && cmp $d/feed/calendar.ics build/client/calendar.ics
+        && printf 'hello' > $d/feed/calendar.ics && PUBLISHED_DIR=$d bun scripts/calendar.ts; echo "exit $?"
+      expect: 'calendar: 1 events written to build/client/calendar.ics; cmp silent; then an error naming .../feed/calendar.ics
+        and a non-zero exit'
+    out_of_scope:
+    - scripts/fetch-published.ts and deploy.yml
+    - Generating calendar.ics from rows; the subscribe links
+    depends_on:
+    - com/growth/what-changed/page/rss-build
 - key: com/growth/calendar-ics/links
   title: Subscribe links
   depends_on:
