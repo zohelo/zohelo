@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Send, CheckCircle2, User, Mail, Building, MessageSquare, Award, Clock, ArrowRight } from 'lucide-react';
-import confetti from 'canvas-confetti';
-import { consultantProfile } from '../data/consultantData';
+import { consultantProfile } from '../content/consultantData';
 
 interface HeroConsultingSectionProps {
   onSubmitSuccess?: () => void;
@@ -26,14 +25,6 @@ export const HeroConsultingSection: React.FC<HeroConsultingSectionProps> = ({ on
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
-
-      // Trigger confetti celebration
-      confetti({
-        particleCount: 80,
-        spread: 60,
-        origin: { y: 0.8 },
-        colors: ['#3B8B94', '#3A6FA4', '#10B981', '#F59E0B']
-      });
 
       if (onSubmitSuccess) onSubmitSuccess();
     }, 600);

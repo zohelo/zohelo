@@ -1,16 +1,4 @@
-import '@fontsource/plus-jakarta-sans/400.css';
-import '@fontsource/plus-jakarta-sans/500.css';
-import '@fontsource/plus-jakarta-sans/600.css';
-import '@fontsource/plus-jakarta-sans/700.css';
-import '@fontsource/plus-jakarta-sans/800.css';
-import '@fontsource/newsreader/400.css';
-import '@fontsource/newsreader/600.css';
-import '@fontsource/newsreader/700.css';
-import '@fontsource/newsreader/400-italic.css';
-import '@fontsource/newsreader/600-italic.css';
-import '@fontsource/jetbrains-mono/400.css';
-import '@fontsource/jetbrains-mono/500.css';
-import '@fontsource/jetbrains-mono/600.css';
+import '@zohelo/design/fonts.css';
 import './index.css';
 import type { ReactNode } from 'react';
 import { useLocale } from './i18n';
@@ -19,7 +7,7 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, 
 export function Layout({ children }: { children: ReactNode }) {
   const locale = useLocale();
   return (
-    <html lang={locale}>
+    <html lang={locale} data-theme="light">
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
