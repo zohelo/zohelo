@@ -69,3 +69,5 @@ flowchart LR
 - **One writer, many readers.** Write credentials exist only for zohelo-data; readers get read-only twins.
 - **No personal accounts in automation.** Automation acts as the organisation's GitHub App and
   organisation-owned Cloudflare tokens.
+
+Last verified: 2026-10-28

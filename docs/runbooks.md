@@ -6,10 +6,10 @@
 |---|---|
 | zohelo.com | Merge to `main` in zohelo/zohelo → workflow **Deploy zohelo.com**. A manual run on a branch deploys a preview. |
 | data.zohelo.com | Merge to `main` touching `portal/` in zohelo-data → **Deploy portal**. Manual run on a branch → preview `<branch>.zohelo-data.pages.dev`. |
-| bi.zohelo.com | Every push in zohelo-bi → **Deploy portal**; `main` is production, other branches are previews. |
+| bi.zohelo.com | Merge to `main` in zohelo-bi → **Deploy portal**; a manual run on a branch deploys a preview. |
 | Scheduler Worker | zohelo-data → Actions → **Ops · ad-hoc**, script `scheduler_trigger`, args `deploy` (also `status`, `pause`, `resume`). |
 
-Each deploy checks itself: the site answers, the API answers, sign-in is enforced.
+Each deploy checks itself. zohelo.com: the site answers. data and bi: sign-in is enforced; bi also runs a smoke test against the lakehouse before deploying.
 
 ## Rotate a credential
 
@@ -49,3 +49,5 @@ Extra firings are harmless: the scheduler only dispatches runs that are due.
 
 An old copy of the portal is cached on that device. Chrome → Settings → Site settings → zohelo.com
 → Delete data (and remove an installed portal app), then reload.
+
+Last verified: 2026-10-28

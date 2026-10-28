@@ -10,4 +10,6 @@ Each product repository documents its own internals; these pages cover what they
 | [credentials.md](credentials.md) | Every organisation variable and secret: name, meaning, who uses it, how to rotate it |
 | [runbooks.md](runbooks.md) | Step-by-step procedures: deploy, rotate, roll back, add a product, add a user |
 
-Owner: Radek. Last full review: 27 October 2026.
+Owner: Radek.
+
+Last verified: 2026-10-28
