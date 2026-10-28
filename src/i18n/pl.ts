@@ -2,7 +2,6 @@
 export const pl = {
   nav: {
     badge: 'DATA LAKEHOUSE',
-    research: 'Badania',
     dashboards: 'Dashboardy',
     products: 'Produkty',
     vault: 'Skarbiec',
@@ -19,7 +18,6 @@ export const pl = {
     pulse: 'Puls (wskaźniki na żywo)',
     metrics: 'Metryki (KPI)',
     compass: 'Kompas (16 województw)',
-    chronicles: 'Kroniki (badania)',
     vault: 'Skarbiec (lakehouse Parquet)',
     foundedBy: 'Założyciel:',
     founder: 'Radosław Utkała',

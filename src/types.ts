@@ -79,22 +79,6 @@ export interface FinanceTrendItem {
   growthYoY: string;
 }
 
-export interface ArticleItem {
-  id: string;
-  title: string;
-  subtitle: string;
-  summary: string;
-  iconType: 'chart' | 'paper' | 'megaphone' | 'network' | 'trending';
-  category: string;
-  readTime: string;
-  publishDate: string;
-  author: string;
-  authorRole?: string;
-  tags: string[];
-  fullContent: string[];
-  keyDataPoints: { label: string; value: string; context: string }[];
-}
-
 export interface DatasetItem {
   id: string;
   title: string;

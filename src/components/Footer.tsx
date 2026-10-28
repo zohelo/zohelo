@@ -50,11 +50,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('chronicles')} className="hover:text-white transition-colors">
-                  {t.footer.chronicles}
-                </button>
-              </li>
-              <li>
                 <button onClick={() => onNavigate('vault')} className="hover:text-white transition-colors">
                   {t.footer.vault}
                 </button>

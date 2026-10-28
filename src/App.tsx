@@ -3,16 +3,14 @@ import { Header } from './components/Header';
 import { PulseSection } from './components/PulseSection';
 import { MetricsSection } from './components/MetricsSection';
 import { CompassSection } from './components/CompassSection';
-import { ChroniclesSection } from './components/ChroniclesSection';
 import { VaultSection } from './components/VaultSection';
 import { ProductsSection } from './components/ProductsSection';
 import { HeroConsultingSection } from './components/HeroConsultingSection';
 import { Footer } from './components/Footer';
 import { DataVisualizationModal } from './components/DataVisualizationModal';
-import { ArticleModal } from './components/ArticleModal';
 import { DatasetPreviewModal } from './components/DatasetPreviewModal';
 import { CommandPalette } from './components/CommandPalette';
-import { VoivodeshipData, ArticleItem, DatasetItem, ProductItem } from './types';
+import { VoivodeshipData, DatasetItem, ProductItem } from './types';
 import { CheckCircle2 } from 'lucide-react';
 
 export default function App() {
@@ -21,7 +19,6 @@ export default function App() {
   // Modals state
   const [isExploreModalOpen, setIsExploreModalOpen] = useState(false);
   const [exploreRegion, setExploreRegion] = useState<VoivodeshipData | undefined>(undefined);
-  const [readArticle, setReadArticle] = useState<ArticleItem | null>(null);
   const [previewDataset, setPreviewDataset] = useState<DatasetItem | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   
@@ -84,11 +81,6 @@ export default function App() {
           onOpenExploreVisualization={handleOpenExploreVisualization}
         />
 
-        {/* 5. The Chronicles / The Articles: Data Journalism & Research Papers */}
-        <ChroniclesSection
-          onOpenArticle={(article) => setReadArticle(article)}
-        />
-
         {/* 6. The Vault / The Datasets: CSV, Parquet, Power BI, PDF Lakehouse Assets */}
         <VaultSection
           onPreviewDataset={(dataset) => setPreviewDataset(dataset)}
@@ -120,12 +112,6 @@ export default function App() {
         initialVoivodeship={exploreRegion}
       />
 
-      {/* 2. Full Article Reading Modal */}
-      <ArticleModal
-        article={readArticle}
-        onClose={() => setReadArticle(null)}
-      />
-
       {/* 3. Dataset Schema & DuckDB Query Modal */}
       <DatasetPreviewModal
         dataset={previewDataset}
@@ -140,7 +126,6 @@ export default function App() {
           setExploreRegion(r);
           setIsExploreModalOpen(true);
         }}
-        onSelectArticle={(a) => setReadArticle(a)}
         onSelectDataset={(d) => setPreviewDataset(d)}
         onNavigateSection={handleNavigate}
       />

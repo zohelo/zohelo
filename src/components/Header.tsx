@@ -19,7 +19,6 @@ export const Header: React.FC<HeaderProps> = ({
   const { pathname } = useLocation();
 
   const navItems = [
-    { label: t.nav.research, target: 'chronicles' },
     { label: t.nav.dashboards, target: 'compass' },
     { label: t.nav.products, target: 'products' },
     { label: t.nav.vault, target: 'vault' },

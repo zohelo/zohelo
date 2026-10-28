@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Search, MapPin, FileText, Download, TrendingUp, Cpu, X, ArrowRight, CornerDownLeft } from 'lucide-react';
+import { Search, MapPin, Download, TrendingUp, Cpu, X, ArrowRight, CornerDownLeft } from 'lucide-react';
 import { pulseIndicators } from '../content/pulseData';
 import { polandVoivodeships } from '../content/polandRegions';
-import { articlesList } from '../content/articlesData';
 import { vaultDatasets } from '../content/datasetsData';
 import { productsList } from '../content/productsData';
-import { VoivodeshipData, ArticleItem, DatasetItem } from '../types';
+import { VoivodeshipData, DatasetItem } from '../types';
 
 interface CommandPaletteProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectRegion: (region: VoivodeshipData) => void;
-  onSelectArticle: (article: ArticleItem) => void;
   onSelectDataset: (dataset: DatasetItem) => void;
   onNavigateSection: (sectionId: string) => void;
 }
@@ -20,7 +18,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   isOpen,
   onClose,
   onSelectRegion,
-  onSelectArticle,
   onSelectDataset,
   onNavigateSection
 }) => {
@@ -47,11 +44,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     r.capital.toLowerCase().includes(query.toLowerCase())
   ).slice(0, 3);
 
-  const filteredArticles = articlesList.filter(a =>
-    a.title.toLowerCase().includes(query.toLowerCase()) ||
-    a.summary.toLowerCase().includes(query.toLowerCase())
-  ).slice(0, 3);
-
   const filteredDatasets = vaultDatasets.filter(d =>
     d.title.toLowerCase().includes(query.toLowerCase()) ||
     d.format.toLowerCase().includes(query.toLowerCase())
@@ -67,7 +59,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           <input
             type="text"
             autoFocus
-            placeholder="Search indicators, 16 voivodeships, research chronicles, or datasets..."
+            placeholder="Search indicators, 16 voivodeships or datasets..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="flex-1 bg-transparent text-sm text-slate-800 placeholder-slate-400 focus:outline-none"
@@ -93,7 +85,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 { name: 'The Pulse', id: 'pulse' },
                 { name: 'The Metrics', id: 'metrics' },
                 { name: 'The Compass', id: 'compass' },
-                { name: 'The Chronicles', id: 'chronicles' },
                 { name: 'The Vault', id: 'vault' },
                 { name: 'The Products', id: 'products' },
                 { name: 'Consulting', id: 'consulting' },
@@ -135,33 +126,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                       <span className="text-slate-400 text-[11px]">Capital: {region.capital}</span>
                     </div>
                     <span className="font-mono-code font-bold text-slate-700">{region.gdpPerCapitaPln.toLocaleString()} PLN</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Chronicles / Research Results */}
-          {filteredArticles.length > 0 && (
-            <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5 px-2">
-                Research & Chronicles
-              </span>
-              <div className="space-y-1">
-                {filteredArticles.map((art) => (
-                  <div
-                    key={art.id}
-                    onClick={() => {
-                      onSelectArticle(art);
-                      onClose();
-                    }}
-                    className="p-2.5 rounded-lg hover:bg-slate-50 flex items-center justify-between cursor-pointer group"
-                  >
-                    <div className="flex items-center space-x-2.5">
-                      <FileText className="w-4 h-4 text-[#3A6FA4]" />
-                      <span className="font-bold text-slate-800 group-hover:text-[#3B8B94] truncate max-w-md">{art.title}</span>
-                    </div>
-                    <span className="text-slate-400 font-mono-code text-[11px]">{art.readTime}</span>
                   </div>
                 ))}
               </div>
