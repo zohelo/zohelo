@@ -46,6 +46,14 @@ export const pages: Page[] = [
       en: 'zohelo data sources: provider, licence, last load and the indicators they feed.',
     },
   },
+  {
+    path: '/changes',
+    title: { pl: 'Co się zmieniło', en: 'What changed' },
+    description: {
+      pl: 'Najnowsze aktualizacje zbiorów danych i wskaźników, które się zmieniły.',
+      en: 'The latest dataset updates and the indicators they changed.',
+    },
+  },
 ];
 
 /** Every pre-rendered path: each page in Polish and in English. */

@@ -3,6 +3,7 @@ import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import { fetchPublished } from '../scripts/fetch-published';
+import { NO_LATEST, readCatalog, requiredLatest } from '../src/published';
 
 const dirs: string[] = [];
 function tempOut(): string {
@@ -39,5 +40,21 @@ describe('fetchPublished without credentials', () => {
     const out = tempOut();
     await expect(fetchPublished(out, {}, { require: true })).rejects.toThrow(/credentials missing/);
     expect(existsSync(out)).toBe(false);
+  });
+});
+
+describe('requiredLatest', () => {
+  test('every published fixture KPI except fx_rate', () => {
+    const catalog = readCatalog('fixtures/published');
+    const published = catalog.kpis.filter((k) => k.status === 'published').map((k) => k.kpi_key);
+    expect(published).toContain('fx_rate');
+    expect(requiredLatest(catalog)).toEqual(published.filter((k) => k !== 'fx_rate'));
+    expect(NO_LATEST).toEqual(['fx_rate']);
+  });
+
+  test('draft KPIs are not required', () => {
+    const catalog = structuredClone(readCatalog('fixtures/published'));
+    catalog.kpis.find((k) => k.kpi_key === 'population')!.status = 'draft';
+    expect(requiredLatest(catalog)).not.toContain('population');
   });
 });
