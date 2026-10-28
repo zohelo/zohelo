@@ -39,6 +39,14 @@ export const pages: Page[] = [
     },
   },
   {
+    path: '/changes',
+    title: { pl: 'Co się zmieniło', en: 'What changed' },
+    description: {
+      pl: 'Najnowsze aktualizacje zbiorów danych i wskaźników, które się zmieniły.',
+      en: 'The latest dataset updates and the indicators they changed.',
+    },
+  },
+  {
     path: '/indicators',
     title: { pl: 'Wskaźniki', en: 'Indicators' },
     description: {
