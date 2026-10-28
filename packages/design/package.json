@@ -1,0 +1,20 @@
+{
+  "name": "@zohelo/design",
+  "version": "1.0.0",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "peerDependencies": {
+    "react": "^19"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  }
+}
