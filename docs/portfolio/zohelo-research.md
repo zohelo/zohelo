@@ -20,21 +20,30 @@ uses its own codes, units, territorial vintages and totals conventions. Nothing 
 1. **Harmonised panels.** One geography key (TERYT/NUTS), conformed axes (sex, age, currency) and one unit list
    across GUS BDL, GUS DBW, Eurostat, NBP and the World Bank. zohelo-data already builds these in Gold
    (dim_series, conformed dimensions, map_geography).
-2. **Citable vintages.** Iceberg snapshots mean a dataset can be frozen as "the panel as of 2026-11-01" and
-   cited. Official sources revise silently, so the snapshot is what makes the research reproducible.
-3. **Provenance.** Every value traces back to its Landing receipt (source file, SHA-256, download time). That is
-   rare and valued in replication packages.
+2. **Citable vintages.** Each release copies the panel files into an immutable `07_research/<dataset>/<vintage>/`
+   prefix and deposits them on Zenodo, so official sources' silent revisions no longer change what a paper cited.
+   (Iceberg snapshots cannot do this: the catalog keeps one snapshot per table and expires older ones after 1 h.)
+3. **Provenance.** Every value traces back to its Landing receipt (source file, SHA-256, download time); the receipt
+   stays after Archive retention removes the file. That is rare and valued in replication packages.
+4. **One column, one definition.** "Harmonised" means conformed keys and units, never GUS and Eurostat values
+   blended in one series: every panel row keeps `source_system` and `measure_key`.
 
 ## What it does
 
-- **Research datasets.** Curated panels published as Parquet and CSV with a codebook. Examples: voivodeship macro
-  panel 2000–2025, powiat labour market, regional prices, Poland vs EU-27 comparators. Each one is versioned,
-  carries a DOI from Zenodo (free) and a ready citation.
-- **Client libraries.** Thin Python and R packages that read the published layer
-  (`zohelo.panel("voivodeship-macro", vintage="2026-11")`). They read files only; there is no server cost.
-- **Methods notes.** Short notes per dataset: breaks in series, territorial reforms (1999, the 2002 and 2021
-  powiat changes), deflation, seasonal adjustment. Written with the Domain expert, they double as teaching
-  material.
+- **Research datasets.** Curated panels published as Parquet and CSV with a codebook in Polish and English. In
+  order of readiness (Domain expert, economy): (1) powiat labour & population, 380 powiats + 16 voivodeships ×
+  2002–, from GUS BDL KPIs we already load; (2) voivodeship / NUTS 2 macro (needs regional GDP and LFS-by-NUTS 2
+  KPIs); (3) Poland in the EU NUTS 2 comparison (Eurostat Bronze, no KPI yet); (4) gmina/powiat public finance
+  (not loaded). Each one is versioned, carries a DOI from Zenodo (free) and a ready citation.
+- **Client libraries.** Thin Python and R packages ("list datasets and vintages, download, cache, read", about 200
+  lines each) that read the vintage files from Zenodo's public URLs (`zohelo.panel("powiat-labour",
+  vintage="2026-11")`). They read files only, with no server cost and no credentials; R2 stays private (D7).
+- **Methods notes.** One per panel plus a shared geography note, reviewed by the Domain expert: territory (as-of vs
+  constant boundaries with a published concordance, city vs land powiats, PL91 + PL92 for Mazowieckie, changes
+  cited from TERYT change lists), breaks as a flag column (NSP 2011 and 2021, LFS 2021, ESA 2010, NACE Rev. 2),
+  coverage (powiat wages cover entities with more than 9 employees; registered vs LFS unemployment), denominators,
+  deflation, suppressed cells kept missing with a status column, and the source release dates in each vintage.
+  They double as teaching material.
 - **Analysis notebooks.** Worked examples (convergence of voivodeships, labour-market slack by powiat). They show
   the data in use and feed zohelo-journal stories.
 
@@ -42,8 +51,13 @@ uses its own codes, units, territorial vintages and totals conventions. Nothing 
 
 - Built only on `06_published/v1` (contract D5): `catalog.json`, `kpi/*/series.parquet`, `geo/<level>.geojson`.
   Research panels are new published artefacts written by `gold.publish`, so the single-writer rule holds.
-- Vintages: a release job copies the panel files to `research/<dataset>/<vintage>/` (R2 storage, within the free
-  tier for tens of MB per release) and deposits the same files on Zenodo.
+- Vintages: a write-once `research.release` activity (its own prefix `07_research/`, so `gold.publish` stays the
+  sole writer of `06_published/`) copies the panel files with a SHA-256 manifest and deposits them on Zenodo
+  (Architect consultation on zohelo#249). It fails if the vintage exists; errata get a new vintage. A panel is a
+  few MB, so even 10 panels × 4 vintages a year stay under 1 GB/year. The exact prefix and writer are settled by
+  the Architect when the Tasks are written.
+- Contract first: a panel is a new artefact type, so it gets a JSON Schema and a `catalog.json` entry in zohelo-data
+  before any reader is written (as D24).
 - Licences: each dataset inherits its sources' terms (the licence seed; D23 for GUS DBW). A dataset is published
   only when every source permits redistribution with attribution.
 
@@ -64,9 +78,9 @@ Modest and mostly indirect; all of it is an owner decision.
 
 | Step | Scope | Effort guess |
 |---|---|---|
-| v0 | One panel (voivodeship macro: GDP per capita, unemployment, population, wages) as Parquet/CSV + codebook from published-v1, one vintage, a Zenodo DOI, a `/research` page on zohelo.com | 1–2 weeks after `data/published/published-v1` |
-| v1 | Python package reading panels and vintages; three more panels; methods notes reviewed by the Domain expert | 3–4 weeks |
-| v2 | R package; notebooks; quarterly vintages on a schedule | after v1 has its first external users |
+| v0 | One panel (powiat labour & population: population, working-age share, registered unemployment, average gross wage, births, deaths, net migration, density) as Parquet/CSV + PL/EN codebook, `research.release`, one vintage, a Zenodo DOI (sandbox first), a `/research` page on zohelo.com; about 6–8 S/M Tasks | 1–2 weeks after `data/published/published-v1` |
+| v1 | Python package (about 3 Tasks); the voivodeship / NUTS 2 macro panel once regional GDP is loaded; methods notes reviewed by the Domain expert | 3–4 weeks |
+| v2 | R package via r-universe (about 3 Tasks); notebooks; quarterly vintages on a schedule | after v1 has its first external users |
 
 ## Risks
 
@@ -76,7 +90,10 @@ Modest and mostly indirect; all of it is an owner decision.
   expert reviews every methods note, the Quality Engineer cross-checks values against the sources, and errata
   come with a new vintage, never an overwrite.
 - **Licences (not legal advice).** Redistributing source data in bulk is stricter than showing it. The licence
-  register must say "redistribution allowed" for each source in a panel. The NBP terms question is still open.
+  register must say "redistribution allowed" for each source in a panel; the licence seed has no such field yet
+  (a `data/` Task for Developer 1 after approval). The NBP terms question is still open.
+- **Irreversible DOIs.** Zenodo files cannot be deleted after publishing, so the release job runs the Quality
+  Engineer's checks first and the first deposits are manual.
 - **Maintenance.** Packages and vintages create a promise to users. Keep the surface small: files plus thin
   readers, no API server.
 - **Adoption is slow.** Academic users arrive over terms, not weeks. Success in the first 6 months means
@@ -89,8 +106,12 @@ Modest and mostly indirect; all of it is an owner decision.
 2. Whether datasets carry the owner's name as author or "zohelo" as the creator on Zenodo (an account the owner
    must create).
 3. Whether to pursue grants or institutional partners at all, given the owner's employment.
+4. A Zenodo account and token (and later PyPI/r-universe accounts), and keeping research vintages forever (a new
+   retention rule).
 
 ## Consultation
 
-- Domain expert: pending (dataset choice, methods notes, how researchers use these panels).
-- Architect: pending (vintage storage, Zenodo deposit from Actions, packages within the free platform).
+- Domain expert (economy): approved with changes on zohelo#249 (v0 = powiat labour & population panel, since we
+  load no regional GDP; methods-note checklist; audience ranked; PL/EN codebook).
+- Architect: answered on zohelo#249 (vintages as write-once copies in `07_research/`, Zenodo deposit from the release
+  job, readers reading Zenodo files; cost negligible).

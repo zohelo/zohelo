@@ -5,8 +5,8 @@ phase: 2
 priority: P3
 why: >-
   Researchers who use Polish statistics stitch sources together one by one and cannot cite a stable version of what
-  they used. zohelo-data already harmonises the sources and keeps snapshots, so citable research panels could reach
-  an audience that values exactly that.
+  they used. zohelo-data already harmonises the sources and records provenance, so citable research panels (frozen
+  as write-once vintages) could reach an audience that values exactly that.
 outcome: >-
   The owner has decided, from docs/portfolio/zohelo-research.md, whether zohelo-research becomes a product and with
   which first scope.
