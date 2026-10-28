@@ -27,9 +27,93 @@ deliverables:
   done_when:
   - /regions renders a choropleth (sequential teal ramp) and a ranking table for a KPI selector
   todo:
-  - MapChoropleth via Vega-Lite geoshape from geo/voivodeship.geojson; KPI selector limited to KPIs with geography
-    level voivodeship; ranking DataTable fed by rankRegions() from Task ranking.
+  - 'Route /regions: src/components/MapChoropleth.client.tsx rendering choroplethSpec() (Task choropleth-spec) after
+    hydration (decision D22); KPI selector limited to KPIs with geography level voivodeship; RankingTable (Task ranking-table).'
   tasks:
+  - key: com/site/regions/map/choropleth-spec
+    type: Task
+    title: Add a voivodeship choropleth spec to the design visuals
+    effort: S
+    state: open
+    contract: false
+    context: 'The /regions map is a Vega-Lite geoshape of geo/voivodeship.geojson (Features with properties geography_key,
+      name_pl, name_en) coloured by a KPI value. Spec builders (lineSpec, barSpec) live in packages/design/src/visuals/specs.ts.
+      This Task adds choroplethSpec; the client-only map component comes later (D22).'
+    files:
+    - edit: packages/design/src/visuals/specs.ts
+    - edit: packages/design/src/visuals/index.ts
+    - edit: packages/design/CHANGELOG.md
+    - create: packages/design/src/visuals/specs.test.ts
+    steps:
+    - 'specs.ts: export type ChoroplethOptions = { key: string; value: string; name: string; valueTitle: string;
+      colors: [string, string]; noData: string } and function choroplethSpec(geojson: object, rows: object[], o:
+      ChoroplethOptions).'
+    - 'Return (cast as VisualizationSpec like barSpec) { ...base, height: 420, projection: { type: ''mercator'' }, data: { values: geojson, format: { type:
+      ''json'', property: ''features'' } }, transform: [{ lookup: `properties.${o.key}`, from: { data: { values:
+      rows }, key: o.key, fields: [o.value] } }], mark: { type: ''geoshape'', stroke: o.noData, strokeWidth: 0.5 },
+      encoding: { color: { condition: { test: `!isValid(datum[''${o.value}''])`, value: o.noData }, field: o.value,
+      type: ''quantitative'', title: o.valueTitle, scale: { range: o.colors }, legend: { orient: ''bottom'', direction:
+      ''horizontal'' } }, tooltip: [{ field: `properties.${o.name}`, type: ''nominal'', title: ''Region'' }, { field:
+      o.value, type: ''quantitative'', title: o.valueTitle, format: '',.4~f'' }] } }.'
+    - 'visuals/index.ts: add choroplethSpec and type ChoroplethOptions to the ./specs export line.'
+    - 'CHANGELOG.md: add ''## Unreleased'' above ''## 1.0.0'' with ''- `./visuals` — `choroplethSpec` for region maps.'''
+    - 'specs.test.ts (bun:test; geojson = fixtures/published/geo/voivodeship.geojson read with node:fs): mark.type
+      ''geoshape''; transform[0].lookup ''properties.geography_key'', from.key ''geography_key'', fields [''value''];
+      color.scale.range equals the colors passed; tooltip[0].field ''properties.name_pl''; inputs not mutated.'
+    acceptance:
+    - choroplethSpec is exported from @zohelo/design/visuals; the rules above are tested
+    verify:
+    - run: bun run lint && bun test packages/design/src/visuals/specs.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run --cwd packages/design build && grep -c choroplethSpec packages/design/dist/visuals/index.d.ts
+      expect: '1'
+    out_of_scope:
+    - The map component, the /regions route, token values and a new release
+    depends_on:
+    - com/design/design-v1/visuals/move
+  - key: com/site/regions/map/ranking-table
+    type: Task
+    title: Add the geo reader and the voivodeship ranking table
+    effort: M
+    state: open
+    contract: false
+    context: 'rankRegions() (src/regions/ranking.ts) ranks voivodeships by geography_key; the page needs names from
+      geo/voivodeship.geojson, which src/published.ts cannot read yet. This Task adds readGeo and a RankingTable component
+      for the later /regions route.'
+    files:
+    - edit: src/published.ts
+    - edit: tests/published.test.ts
+    - create: src/regions/RankingTable.tsx
+    - create: tests/rankingTable.test.tsx
+    steps:
+    - 'src/published.ts: export type GeoProperties = { geography_key: string; name_pl: string; name_en: string; level:
+      string; parent_key?: string } and GeoCollection = { type: ''FeatureCollection''; features: { properties: GeoProperties
+      }[] }; readGeo(dir, level) reads geo/<level>.geojson with readJson; throws invalid(path) unless features is
+      an array. tests/published.test.ts: readGeo(dir, ''voivodeship'') has 1 feature named ''Małopolskie''.'
+    - 'RankingTable.tsx: export type RankingRow = { rank: number; region: string; value: number; note: string } and
+      rankingRows(ranking: RegionRanking, geo: GeoCollection, locale: Locale): RankingRow[] — region = name_pl/name_en
+      of the feature with the same geography_key, else the key; note ''dane wstępne'' / ''provisional'' when provisional,
+      else ''''. Use `import type` for GeoCollection (published.ts imports node:fs).'
+    - 'export function RankingTable({ ranking, geo, unit, locale }): DataTable (sortable, caption ''Ranking województw''
+      / ''Voivodeship ranking'') with columns rank ''#'', region ''Województwo'' / ''Voivodeship'', value ''Wartość
+      (${unit})'' / ''Value (${unit})'' align right formatted with formatNumber(v, locale), note ''Uwagi'' / ''Notes''.
+      Under it, when ranking.national !== null, <p className="mt-2 font-ui text-text-muted">: `Polska: ${formatNumber(national,
+      ''pl'')} ${unit}` / `Poland: … ${unit}`.'
+    - 'tests/rankingTable.test.tsx (bun:test, renderToStaticMarkup; ranking = rankRegions(readKpiLatest(''fixtures/published'',
+      ''unemployment_rate''))!): rankingRows pl equals [{ rank: 1, region: ''Małopolskie'', value: 2.6, note: ''dane
+      wstępne'' }]; en region ''Lesser Poland'', note ''provisional''; unknown geography_key gives the key; pl markup
+      with unit ''%'' contains ''2,6'' and ''Polska: 3,2 %''; with national null no ''Polska:''.'
+    acceptance:
+    - Every rule above is covered by a test; existing published tests still pass
+    verify:
+    - run: bun run lint && bun test tests/published.test.ts tests/rankingTable.test.tsx
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The map, the KPI selector and the /regions route
+    depends_on:
+    - com/site/regions/map/ranking
+    - com/site/indicators/data/readers
+    - com/design/design-v1/components/table
   - key: com/site/regions/map/ranking
     type: Task
     title: Add the voivodeship ranking function
