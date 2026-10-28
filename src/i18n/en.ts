@@ -28,6 +28,10 @@ export const en: Dict = {
     sources: 'Data Sources: Central Statistical Office (GUS), NBP, RIO',
     credit: 'Tony Stark & Jarvis Model',
   },
+  products: {
+    heading: 'Products',
+    subtitle: 'The parts of zohelo and the stage each one is at',
+  },
   common: {
     brand: 'Zohelo',
     site: 'Zohelo.com',

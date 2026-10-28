@@ -26,6 +26,10 @@ export const pl = {
     sources: 'Źródła danych: Główny Urząd Statystyczny (GUS), NBP, RIO',
     credit: 'Tony Stark & Jarvis Model',
   },
+  products: {
+    heading: 'Produkty',
+    subtitle: 'Części zohelo i etap, na którym jest każda z nich',
+  },
   common: {
     brand: 'Zohelo',
     site: 'Zohelo.com',
