@@ -1,11 +1,13 @@
 import '@zohelo/design/fonts.css';
 import './index.css';
 import type { ReactNode } from 'react';
+import { useLocale } from './i18n';
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteError } from 'react-router';
 
 export function Layout({ children }: { children: ReactNode }) {
+  const locale = useLocale();
   return (
-    <html lang="pl" data-theme="light">
+    <html lang={locale} data-theme="light">
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />

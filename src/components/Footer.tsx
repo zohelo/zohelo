@@ -1,10 +1,12 @@
 import React from 'react';
+import { useT } from '../i18n';
 
 interface FooterProps {
   onNavigate: (sectionId: string) => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+  const t = useT();
   return (
     <footer className="w-full bg-[#1E252B] text-slate-300 border-t border-slate-800 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -14,47 +16,47 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           <div className="md:col-span-5 space-y-3">
             <div className="flex items-baseline space-x-2">
               <span className="font-serif-heading text-2xl font-bold text-white tracking-tight">
-                Zohelo
+                {t.common.brand}
               </span>
               <span className="text-[10px] font-mono-code font-semibold tracking-wider text-[#4EB0BA] bg-[#3B8B94]/20 px-2 py-0.5 rounded">
-                PROJECT OPEN REPORTING
+                {t.footer.badge}
               </span>
             </div>
 
             <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
-              Public data on Poland and the world, built on Cloudflare and GitHub.
+              {t.footer.about}
             </p>
           </div>
 
           {/* Nav Links (Cols 6-8) */}
           <div className="md:col-span-3 space-y-2.5">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-              Navigation Hub
+              {t.footer.navHeading}
             </h4>
             <ul className="space-y-1.5 text-slate-400">
               <li>
                 <button onClick={() => onNavigate('pulse')} className="hover:text-white transition-colors">
-                  The Pulse (Live Indicators)
+                  {t.footer.pulse}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('metrics')} className="hover:text-white transition-colors">
-                  The Metrics (KPIs)
+                  {t.footer.metrics}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('compass')} className="hover:text-white transition-colors">
-                  The Compass (16 Voivodeships)
+                  {t.footer.compass}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('chronicles')} className="hover:text-white transition-colors">
-                  The Chronicles (Research)
+                  {t.footer.chronicles}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('vault')} className="hover:text-white transition-colors">
-                  The Vault (Parquet Lakehouse)
+                  {t.footer.vault}
                 </button>
               </li>
             </ul>
@@ -65,12 +67,12 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         {/* Bottom Bar */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-3">
           <div>
-            © {new Date().getFullYear()} Zohelo.com • Founded by <strong className="text-slate-300">Radosław Utkała</strong>.
+            © {new Date().getFullYear()} {t.common.site} • {t.footer.foundedBy} <strong className="text-slate-300">{t.footer.founder}</strong>.
           </div>
           <div className="flex items-center space-x-4">
-            <span>Data Sources: Central Statistical Office (GUS), NBP, RIO</span>
+            <span>{t.footer.sources}</span>
             <span>•</span>
-            <span className="text-[#3B8B94]">Tony Stark & Jarvis Model</span>
+            <span className="text-[#3B8B94]">{t.footer.credit}</span>
           </div>
         </div>
       </div>
