@@ -9,7 +9,7 @@ describe('datasetJsonLd', () => {
   test('unemployment rate in Polish', () => {
     const ld = datasetJsonLd(kpi('unemployment_rate'), catalog, 'pl');
     expect(ld['@type']).toBe('Dataset');
-    expect(ld.url).toBe('https://zohelo.com/indicators/unemployment_rate');
+    expect(ld.url).toBe('https://zohelo.com/indicators/unemployment_rate/');
     expect(ld.identifier).toBe('unemployment_rate');
     expect(ld.temporalCoverage).toBe('2000/2025');
     expect((ld.isBasedOn as { name: string }[]).map((s) => s.name)).toEqual(['Eurostat', 'Bank Światowy – WDI']);
@@ -20,7 +20,7 @@ describe('datasetJsonLd', () => {
 
   test('English url and place', () => {
     const ld = datasetJsonLd(kpi('unemployment_rate'), catalog, 'en');
-    expect(ld.url).toBe('https://zohelo.com/en/indicators/unemployment_rate');
+    expect(ld.url).toBe('https://zohelo.com/en/indicators/unemployment_rate/');
     expect(ld.spatialCoverage).toEqual({ '@type': 'Place', name: 'Poland' });
     expect(String(ld.description)).toContain('data from 2000 to 2025');
   });

@@ -1,19 +1,16 @@
 // Writes build/client/sitemap.xml and robots.txt after the build: one <url> per page and language
-// (the pre-rendered paths from src/site.config.ts), each with its hreflang alternates.
+// (the pre-rendered paths from src/site.config.ts, at their trailing-slash URL), each with its hreflang alternates.
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { absoluteUrl } from '../src/seo';
 import { pages, site } from '../src/site.config';
 
 type Lang = 'pl' | 'en';
 const out = join(import.meta.dir, '..', 'build', 'client');
 
-function localized(path: string, lang: Lang): string {
-  if (lang === 'pl') return path;
-  return path === '/' ? '/en' : `/en${path}`;
-}
-
 const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const url = (path: string, lang: Lang) => escape(site.url + localized(path, lang));
+// The same URL as the pages' canonical and hreflang tags (src/seo.ts).
+const url = (path: string, lang: Lang) => escape(absoluteUrl(path, lang));
 
 const entries = pages.flatMap((page) =>
   (['pl', 'en'] as const).map((lang) =>

@@ -7,9 +7,14 @@ export type PageMetaInput = { path: string; locale: Locale; title: string; descr
 
 const ogLocale: Record<Locale, string> = { pl: 'pl_PL', en: 'en_GB' };
 
-/** The absolute address of a page in a language: https://zohelo.com + '/x' or '/en/x'. */
+/**
+ * The absolute address of a page in a language, with a trailing slash: https://zohelo.com + '/x/' or
+ * '/en/x/'. Every page is pre-rendered to <path>/index.html, and Cloudflare Pages answers such a page
+ * only at the slash URL (the bare one redirects), so canonical, hreflang and sitemap use that form.
+ */
 export function absoluteUrl(path: string, locale: Locale): string {
-  return site.url + localizedPath(path, locale);
+  const local = localizedPath(path, locale);
+  return site.url + (local.endsWith('/') ? local : `${local}/`);
 }
 
 /**
