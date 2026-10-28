@@ -1,7 +1,19 @@
 import { useLocation } from 'react-router';
+import { localeOf } from '../i18n';
+import { pageMeta } from '../seo';
 
-export function meta() {
-  return [{ title: '404 — zohelo' }, { name: 'robots', content: 'noindex' }];
+export function meta({ location }: { location: { pathname: string } }) {
+  const locale = localeOf(location.pathname);
+  const en = locale === 'en';
+  return [
+    ...pageMeta({
+      path: '/',
+      locale,
+      title: en ? 'Page not found' : 'Nie ma takiej strony',
+      description: en ? 'This address does not exist on zohelo.com.' : 'Ten adres nie istnieje w serwisie zohelo.com.',
+    }).filter((d) => !('rel' in d)),
+    { name: 'robots', content: 'noindex' },
+  ];
 }
 
 export default function NotFound() {
