@@ -13,8 +13,20 @@ import { VoivodeshipData, DatasetItem, ProductItem } from './types';
 import { CheckCircle2 } from 'lucide-react';
 import type { Locale } from './i18n';
 import { TodayStrip, type TodayTile } from './indicators/TodayStrip';
+import { HomeChanges } from './growth/HomeChanges';
+import type { ChangeItem, Source } from './published';
 
-export default function App({ tiles, locale }: { tiles: TodayTile[]; locale: Locale }) {
+export default function App({
+  tiles,
+  items,
+  sources,
+  locale,
+}: {
+  tiles: TodayTile[];
+  items: ChangeItem[];
+  sources: Source[];
+  locale: Locale;
+}) {
   const [activeSection, setActiveSection] = useState('top');
   
   // Modals state
@@ -75,6 +87,7 @@ export default function App({ tiles, locale }: { tiles: TodayTile[]; locale: Loc
         />
 
         <TodayStrip tiles={tiles} locale={locale} />
+        <HomeChanges items={items} sources={sources} locale={locale} />
 
         {/* 4. The Compass: Polish Regional Map + Public Finance Trends 2024-2025 */}
         <CompassSection
