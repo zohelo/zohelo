@@ -8,6 +8,17 @@ const dir = 'fixtures/published';
 const names = Object.fromEntries(readCatalog(dir).kpis.map((k) => [k.kpi_key, { name_pl: k.name_pl, name_en: k.name_en }]));
 const pick = chartOfDay([readKpiLatest(dir, 'unemployment_rate')], names)!;
 
+// Strips tags until nothing changes, so no nested remainder of a tag survives.
+const text = (html: string) => {
+  let t = html;
+  let prev: string;
+  do {
+    prev = t;
+    t = t.replace(/<[^>]*>/g, '');
+  } while (t !== prev);
+  return t;
+};
+
 const render = (locale: 'pl' | 'en', children?: React.ReactNode) =>
   renderToStaticMarkup(
     <ChartOfDayBlock pick={pick} sourceName="Eurostat" date="2026-01-01" locale={locale}>
@@ -23,7 +34,7 @@ describe('ChartOfDayBlock', () => {
     expect(html).toContain('+10,3 %');
     expect(html).toContain('href="/indicators/unemployment_rate"');
     expect(html).toContain('Zobacz wskaźnik');
-    expect(html.replace(/<[^>]+>/g, '')).toContain('Źródło: Eurostat, dane z 2026-01-01');
+    expect(text(html)).toContain('Źródło: Eurostat, dane z 2026-01-01');
   });
 
   test('English block', () => {
