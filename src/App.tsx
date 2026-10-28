@@ -13,7 +13,6 @@ import { ArticleModal } from './components/ArticleModal';
 import { DatasetPreviewModal } from './components/DatasetPreviewModal';
 import { CommandPalette } from './components/CommandPalette';
 import { VoivodeshipData, ArticleItem, DatasetItem, ProductItem } from './types';
-import confetti from 'canvas-confetti';
 import { CheckCircle2 } from 'lucide-react';
 
 export default function App() {
@@ -49,29 +48,6 @@ export default function App() {
   const handleOpenExploreVisualization = (selectedRegion?: VoivodeshipData) => {
     setExploreRegion(selectedRegion);
     setIsExploreModalOpen(true);
-  };
-
-  const handleDownloadDataset = (dataset: DatasetItem) => {
-    // Trigger confetti
-    confetti({
-      particleCount: 60,
-      spread: 50,
-      origin: { y: 0.7 },
-      colors: ['#3B8B94', '#3A6FA4', '#10B981']
-    });
-
-    // Generate downloadable mock file payload
-    const content = JSON.stringify(dataset.sampleData, null, 2);
-    const blob = new Blob([content], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${dataset.id}_export.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    showToast(`Downloaded ${dataset.title} (${dataset.format})`);
   };
 
   const handleSelectProduct = (product: ProductItem) => {
@@ -116,7 +92,6 @@ export default function App() {
         {/* 6. The Vault / The Datasets: CSV, Parquet, Power BI, PDF Lakehouse Assets */}
         <VaultSection
           onPreviewDataset={(dataset) => setPreviewDataset(dataset)}
-          onDownloadDataset={handleDownloadDataset}
         />
 
         {/* 7. The Products: Commercial Analytics Suites */}
@@ -155,7 +130,6 @@ export default function App() {
       <DatasetPreviewModal
         dataset={previewDataset}
         onClose={() => setPreviewDataset(null)}
-        onDownload={handleDownloadDataset}
       />
 
       {/* 4. Command Palette (⌘K) */}
