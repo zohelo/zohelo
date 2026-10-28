@@ -9,6 +9,7 @@ Each product repository documents its own internals; these pages cover what they
 | [infrastructure.md](infrastructure.md) | Hosting, domains, sign-in, setup-as-code, DNS, costs |
 | [credentials.md](credentials.md) | Every organisation variable and secret: name, meaning, who uses it, how to rotate it |
 | [runbooks.md](runbooks.md) | Step-by-step procedures: deploy, rotate, roll back, add a product, add a user |
+| [portfolio/](portfolio/) | Discovery briefs for proposed products (Product Owner; not approved until the owner decides) |
 
 Owner: Radek.
 

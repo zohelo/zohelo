@@ -20,3 +20,9 @@ areas:
     purpose: >-
       How the site is built, checked, deployed and secured: workflows, dependencies, repository
       settings and the shared workflows used by all zohelo repos.
+  - key: com/portfolio
+    title: Portfolio · discovery
+    purpose: >-
+      Proposed new zohelo products, each briefed in docs/portfolio/ before any build: who it serves, how it uses zohelo
+      data, how it could earn money, risks and the owner's decisions. Holds only discovery Epics; no Tasks until the
+      owner approves a brief.

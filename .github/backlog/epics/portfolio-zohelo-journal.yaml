@@ -1,0 +1,40 @@
+key: com/portfolio/zohelo-journal
+area: com/portfolio
+title: zohelo-journal · discovery
+phase: 2
+priority: P2
+why: >-
+  zohelo publishes official numbers but says nothing about them; readers come back for what a new release means,
+  especially for their region. A short, data-first note per GUS, NBP and Eurostat release, linked to the indicator
+  pages, gives zohelo daily content and return visits from the data it already has.
+outcome: >-
+  The owner has a brief (docs/portfolio/zohelo-journal.md) reviewed by the Domain expert and the Architect, and has
+  approved, changed or rejected the product.
+in_scope:
+- Brief, audience, formats, money options, first roadmap, risks
+- Domain expert and Architect consultation on the brief
+- Owner decisions on editor, press registration and the AI-review route
+out_of_scope:
+- Any Task or code before the owner approves the brief (decision O13)
+- Publishing or posting anything outside the repos (owner action)
+done_when:
+- docs/portfolio/zohelo-journal.md is on main with the Domain expert's and the Architect's answers reflected
+- An owner:decision issue for the brief is closed with the owner's answer
+decisions:
+- 'owner 28 Oct O13: new products go through discovery briefs first'
+deliverables:
+- key: com/portfolio/zohelo-journal/brief
+  title: Brief reviewed by Domain expert and Architect
+  done_when:
+  - The brief names the reviewed release formats, the KPIs of the first notes and the placement of the generator
+  todo:
+  - Domain expert (economy, labour, prices, population) reviews formats, first 10 release types and regional angle
+  - Architect answers placement (zohelo repo or new zohelo-journal repo), generator design and monthly cost
+- key: com/portfolio/zohelo-journal/decision
+  title: Owner decision on the brief
+  depends_on:
+  - com/portfolio/zohelo-journal/brief
+  done_when:
+  - The owner answered the three decisions in the brief
+  todo:
+  - Open an owner:decision issue for rutkala once fewer than 3 owner items are open (D8)
