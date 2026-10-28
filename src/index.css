@@ -1,39 +1,41 @@
-@import "tailwindcss";
+@import '@zohelo/design/tokens.css';
+@import 'tailwindcss';
+@import '@zohelo/design/theme.css';
 
 @layer base {
   :root {
-    --primary-teal: #3B8B94;
-    --primary-teal-dark: #2C6E76;
-    --primary-teal-light: #EBF5F6;
-    --secondary-azure: #3A6FA4;
-    --secondary-azure-dark: #2B5480;
+    --primary-teal: var(--z-color-brand-teal);
+    --primary-teal-dark: var(--z-color-brand-teal-strong);
+    --primary-teal-light: var(--z-color-brand-teal-soft);
+    --secondary-azure: var(--z-color-brand-azure);
+    --secondary-azure-dark: var(--z-color-focus);
     --secondary-azure-light: #EBF2F9;
-    --neutral-charcoal: #24292E;
-    --neutral-surface: #FFFFFF;
-    --neutral-bg: #F4F7F9;
+    --neutral-charcoal: var(--z-color-text);
+    --neutral-surface: var(--z-color-surface);
+    --neutral-bg: var(--z-color-bg);
   }
 
   body {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: #F3F6F8;
-    color: #24292E;
+    font-family: var(--z-font-ui);
+    background-color: var(--z-color-bg);
+    color: var(--z-color-text);
   }
 
   h1, h2, .font-serif-heading {
-    font-family: 'Newsreader', Georgia, Cambria, 'Times New Roman', serif;
+    font-family: var(--z-font-display);
   }
 
   .font-mono-code {
-    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: var(--z-font-mono);
   }
 }
 
 /* Custom crisp card shadow matching mockup */
 .zohelo-card {
-  background: #FFFFFF;
-  border-radius: 14px;
+  background: var(--z-color-surface);
+  border-radius: var(--z-radius-lg);
   border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+  box-shadow: var(--z-shadow-card);
   transition: all 0.2s ease-in-out;
 }
 
