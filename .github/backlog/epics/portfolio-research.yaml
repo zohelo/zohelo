@@ -1,0 +1,38 @@
+key: com/portfolio/research
+area: com/portfolio
+title: zohelo-research · discovery
+phase: 2
+priority: P3
+why: >-
+  Researchers who use Polish statistics stitch sources together one by one and cannot cite a stable version of what
+  they used. zohelo-data already harmonises the sources and keeps snapshots, so citable research panels could reach
+  an audience that values exactly that.
+outcome: >-
+  The owner has decided, from docs/portfolio/zohelo-research.md, whether zohelo-research becomes a product and with
+  which first scope.
+in_scope:
+- The brief docs/portfolio/zohelo-research.md
+- Consultation of the Domain expert (dataset value, methods) and the Architect (vintages, Zenodo, packages, cost)
+- One owner:decision issue when the brief is complete
+out_of_scope:
+- Any product code, repo, account or scheduled task before the owner approves
+- Grant applications or contacts with institutions (owner actions)
+done_when:
+- The brief has the Domain expert's and the Architect's answers recorded in its "Consultation" section
+- An owner:decision issue for the brief is closed with the owner's answer
+deliverables:
+- key: com/portfolio/research/brief
+  title: zohelo-research brief complete
+  done_when:
+  - docs/portfolio/zohelo-research.md has every section of docs/team.md (Product Owner step 5) and both consultations
+  todo:
+  - Domain expert review of the first panels, the methods notes and the research audience (domains economy and labour)
+  - Architect review of vintage storage, Zenodo deposit from Actions and the Python/R readers within the free platform
+- key: com/portfolio/research/decision
+  title: Owner decision on zohelo-research
+  depends_on:
+  - com/portfolio/research/brief
+  done_when:
+  - owner:decision issue answered; on approval, the chosen home, backlog Epics and Developer row exist
+  todo:
+  - Open the owner:decision issue (assigned to rutkala) with the brief's "What the owner must decide" list
