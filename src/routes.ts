@@ -1,7 +1,10 @@
 import { index, prefix, route, type RouteConfig } from '@react-router/dev/routes';
 
 // Page routes are defined once and registered twice: Polish at /, English under /en (ids '-en').
-const pages = (suffix: string) => [index('routes/home.tsx', { id: `home${suffix}` })];
+const pages = (suffix: string) => [
+  index('routes/home.tsx', { id: `home${suffix}` }),
+  route('portfolio', 'routes/portfolio.tsx', { id: `portfolio${suffix}` }),
+];
 
 export default [
   ...pages(''),

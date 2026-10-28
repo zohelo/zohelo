@@ -22,6 +22,14 @@ export const pages: Page[] = [
     title: { pl: 'zohelo — Polska w danych', en: 'zohelo — Poland in data' },
     description,
   },
+  {
+    path: '/portfolio',
+    title: { pl: 'Portfolio', en: 'Portfolio' },
+    description: {
+      pl: 'Portfolio dashboardów na demonstracyjnych danych przedsiębiorstwa — w przygotowaniu.',
+      en: 'A portfolio of dashboards on demo enterprise data — in preparation.',
+    },
+  },
 ];
 
 /** Every pre-rendered path: each page in Polish and in English. */
