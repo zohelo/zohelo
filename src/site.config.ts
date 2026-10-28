@@ -46,6 +46,14 @@ export const pages: Page[] = [
       en: 'Headline indicators on Poland with the latest value, source and date.',
     },
   },
+  {
+    path: '/regions',
+    title: { pl: 'Regiony', en: 'Regions' },
+    description: {
+      pl: 'Porównanie 16 województw: mapa i ranking wybranego wskaźnika.',
+      en: 'The 16 voivodeships compared: a map and a ranking for one indicator.',
+    },
+  },
 ];
 
 /** Every pre-rendered path: each page in Polish and in English. */

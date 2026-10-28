@@ -6,6 +6,7 @@ const pages = (suffix: string) => [
   route('portfolio', 'routes/portfolio.tsx', { id: `portfolio${suffix}` }),
   route('design', 'routes/design.tsx', { id: `design${suffix}` }),
   route('indicators', 'routes/indicators.tsx', { id: `indicators${suffix}` }),
+  route('regions', 'routes/regions.tsx', { id: `regions${suffix}` }),
 ];
 
 export default [
