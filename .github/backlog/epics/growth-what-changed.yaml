@@ -26,10 +26,84 @@ deliverables:
   title: Build-time fetch of the published layer
   done_when:
   - The deploy workflow downloads 06_published/v1 files needed by the site with the lakehouse read key before building
-  todo:
-  - Add scripts/fetch-published.ts (S3 GetObject with STORAGE_LAKEHOUSE_READ_ACCESS_KEY/SECRET_KEY, endpoint STORAGE_ENDPOINT_URL,
-    bucket STORAGE_LAKEHOUSE_BUCKET_NAME) writing to .published/; deploy.yml passes those env names; the build fails
-    if catalog.json is missing. Shared with the Indicators Epic — whichever starts first writes it.
+  tasks:
+  - key: com/growth/what-changed/build-data/fetch-script
+    type: Task
+    title: Fetch the published layer into .published/ before the build
+    effort: M
+    state: open
+    contract: false
+    context: 'scripts/rss.ts reads PUBLISHED_DIR (default .published/), but nothing fills .published/. Target: scripts/fetch-published.ts
+      downloads what the site needs from 06_published/v1/ (zohelo-data docs/published.md) with the lakehouse read
+      key, and copies fixtures/published/ when the key is absent, so PR checks need no credentials. Use Bun''s built-in
+      S3Client (no new dependency).'
+    files:
+    - create: scripts/fetch-published.ts
+    - edit: src/published.ts
+    - edit: package.json
+    - edit: .gitignore
+    - create: tests/fetchPublished.test.ts
+    steps:
+    - 'src/published.ts: export function publishedDir() returning process.env.PUBLISHED_DIR ?? ''.published''.'
+    - 'scripts/fetch-published.ts: export async function fetchPublished(out, env, opts: { require: boolean }): Promise<string[]>
+      (paths written). Credentials: STORAGE_LAKEHOUSE_READ_ACCESS_KEY, _SECRET_KEY, STORAGE_ENDPOINT_URL, STORAGE_LAKEHOUSE_BUCKET_NAME.'
+    - 'One missing: opts.require → throw Error(''fetch-published: lakehouse read credentials missing''); else rm -rf
+      out, cpSync(''fixtures/published'', out, { recursive: true }) and log ''fetch-published: no credentials, using
+      fixtures/published''.'
+    - 'All present: S3Client from ''bun'', prefix ''06_published/v1/'', rm -rf out. Required (missing → throw naming
+      the path): catalog/catalog.json, then kpi/<kpi_key>/latest.json for each catalog KPI with status ''published''.
+      Optional (missing → log): feed/changes.json, feed/calendar.ics, geo/voivodeship.geojson. Write bytes unchanged;
+      finally readCatalog(out).'
+    - 'if (import.meta.main): fetchPublished(publishedDir(), process.env, { require: argv has ''--require'' }); log the
+      count; on error print the message and exit 1. Never print a credential.'
+    - 'package.json build: insert `bun scripts/fetch-published.ts && ` before `react-router build`; .gitignore: `.published/`.'
+    - 'tests/fetchPublished.test.ts (out = mkdtemp): env {} copies the 5 fixture files; env {} with require rejects
+      /credentials missing/.'
+    acceptance:
+    - Without credentials the build uses fixtures/published; with --require it exits 1
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/fetchPublished.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run build
+      expect: 'exit 0; the fixtures notice is logged; build/client/rss.xml exists'
+    out_of_scope:
+    - deploy.yml (Task deploy-env)
+    - series.parquet and catalog/*.parquet downloads
+    depends_on:
+    - com/site/indicators/data/readers
+  - key: com/growth/what-changed/build-data/deploy-env
+    type: Task
+    title: Pass the lakehouse read key to the deploy build
+    effort: S
+    state: open
+    contract: true
+    context: 'After Task fetch-script, `bun run build` runs scripts/fetch-published.ts, which falls back to fixtures
+      without credentials. deploy.yml sets no storage variables today, so production would ship fixture numbers.
+      Target: deploy.yml passes the organisation''s read-only key (org secrets are visible to public repos, O7) and
+      main builds fail instead of using fixtures.'
+    files:
+    - edit: .github/workflows/deploy.yml
+    steps:
+    - 'In the deploy job env add: STORAGE_ENDPOINT_URL: ${{ vars.STORAGE_ENDPOINT_URL }}, STORAGE_LAKEHOUSE_BUCKET_NAME:
+      ${{ vars.STORAGE_LAKEHOUSE_BUCKET_NAME }}, STORAGE_LAKEHOUSE_READ_ACCESS_KEY: ${{ secrets.STORAGE_LAKEHOUSE_READ_ACCESS_KEY
+      }}, STORAGE_LAKEHOUSE_READ_SECRET_KEY: ${{ secrets.STORAGE_LAKEHOUSE_READ_SECRET_KEY }}.'
+    - 'Add a step "Fetch published layer" before Build: `if [ "$BRANCH" = main ]; then bun scripts/fetch-published.ts
+      --require; else bun scripts/fetch-published.ts; fi`. The build''s own fetch then runs again harmlessly; leave
+      package.json unchanged.'
+    - 'Keep every other step unchanged; actions stay pinned by SHA.'
+    acceptance:
+    - deploy.yml names the four variables and never echoes them
+    - A main deploy fails at "Fetch published layer" when the key is missing
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun run build
+      expect: exit 0
+    - workflow: Deploy zohelo.com (deploy.yml), manual run on the PR branch
+      expect: green; step "Fetch published layer" logs either a file count or the fixtures notice
+    out_of_scope:
+    - Rebuild trigger from zohelo-data (Deliverable trigger)
+    - Any change to scripts/fetch-published.ts
+    depends_on:
+    - com/growth/what-changed/build-data/fetch-script
 - key: com/growth/what-changed/page
   title: Home block, /changes and RSS
   depends_on:
@@ -37,9 +111,52 @@ deliverables:
   done_when:
   - Home shows the 10 latest changes; /changes shows 30 days; rss.xml generated at build
   todo:
-  - Route /changes reading .published/feed/changes.json and rendering ChangesList (Task changes-list); home block
-    with the 10 latest changes.
+  - Home block with the 10 latest changes (ChangesList limit 10) once the home page is rebuilt from published data.
   tasks:
+  - key: com/growth/what-changed/page/changes-route
+    type: Task
+    title: Add the /changes page from the published feed
+    effort: S
+    state: open
+    contract: false
+    context: 'ChangesList (src/growth/ChangesList.tsx) renders feed items, and readChanges/readCatalog in src/published.ts
+      read .published/ (filled by scripts/fetch-published.ts, fixtures without credentials). No route shows them yet.
+      Target: /changes and /en/changes, pre-rendered, list the feed with source names. Routes are registered in src/routes.ts
+      (pages(suffix), ids with -en) and pre-rendered from site.config pages; data comes from a route loader, which
+      runs at build only (ssr: false), so node:fs stays out of the client bundle.'
+    files:
+    - create: src/routes/changes.tsx
+    - edit: src/routes.ts
+    - edit: src/site.config.ts
+    - create: tests/changesRoute.test.ts
+    steps:
+    - 'site.config.ts pages: add { path: ''/changes'', title: { pl: ''Co się zmieniło'', en: ''What changed'' }, description:
+      { pl: ''Najnowsze aktualizacje zbiorów danych i wskaźników, które się zmieniły.'', en: ''The latest dataset updates
+      and the indicators they changed.'' } }.'
+    - 'routes.ts pages(): add route(''changes'', ''routes/changes.tsx'', { id: `changes${suffix}` }).'
+    - 'routes/changes.tsx: export async function loader() returning { items: readChanges(publishedDir()).items, sources:
+      readCatalog(publishedDir()).sources }; when feed/changes.json is missing return items [] (catch the ''published
+      file missing'' error only). meta() like routes/portfolio.tsx.'
+    - 'Default component: useLoaderData<typeof loader>(), locale from useLocale(); <main className="mx-auto max-w-3xl
+      px-4 py-12"> with <h1> page title, a link to localizedPath(''/rss.xml'' for pl, ''/en/rss.xml'' for en) labelled
+      ''RSS'', then <ChangesList items sources locale />.'
+    - 'tests/changesRoute.test.ts (bun:test): prerenderPaths() contains ''/changes'' and ''/en/changes''; loader() with
+      PUBLISHED_DIR=fixtures/published returns 2 items and the catalog sources; with PUBLISHED_DIR pointing at an empty
+      mkdtemp dir that has catalog/catalog.json copied but no feed returns items [].'
+    acceptance:
+    - build/client/changes/index.html and build/client/en/changes/index.html exist and list the 2 fixture changes
+    - sitemap.xml lists /changes (it reads site.config pages)
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/changesRoute.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -c '<li' build/client/changes/index.html
+      expect: exit 0; count ≥ 2
+    out_of_scope:
+    - The home block; header navigation links
+    - Filtering by date (the feed already holds 30 days)
+    depends_on:
+    - com/growth/what-changed/build-data/fetch-script
+    - com/growth/what-changed/page/changes-list
   - key: com/growth/what-changed/page/rss-build
     type: Task
     title: Write rss.xml and en/rss.xml at build from the published feed

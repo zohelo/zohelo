@@ -30,8 +30,52 @@ deliverables:
   done_when:
   - Route /portfolio/:slug renders Markdown from content/portfolio/<slug>.md with frontmatter (title, dataset, licence,
     dashboard_url, skills)
-  todo:
-  - Markdown loader at build (remark), frontmatter schema validated with zod at build; index page lists cards.
+  tasks:
+  - key: com/site/portfolio/template/loader
+    type: Task
+    title: Render portfolio case studies from Markdown at build
+    effort: M
+    state: open
+    contract: false
+    context: 'Today /portfolio (src/routes/portfolio.tsx) is a static "in preparation" page. Target: case studies
+      are Markdown files content/portfolio/<slug>.<locale>.md with frontmatter (title, summary, dataset, licence, dashboard_url,
+      skills), validated at build; /portfolio lists them as cards and /portfolio/<slug> renders one. No study exists
+      yet, so the loader ships with one test fixture and the index keeps the current text when the list is empty.'
+    files:
+    - create: src/portfolio/studies.ts
+    - create: tests/fixtures/portfolio/sample.pl.md
+    - create: tests/portfolio.test.ts
+    - create: src/routes/portfolio-study.tsx
+    - edit: src/routes/portfolio.tsx
+    - edit: src/routes.ts
+    - edit: react-router.config.ts
+    - edit: package.json
+    - edit: bun.lock
+    steps:
+    - '`bun add remark remark-html gray-matter zod` (bun.lock updates).'
+    - 'src/portfolio/studies.ts: zod schema { title: string, summary: string, dataset: string, licence: string, dashboard_url:
+      url, skills: string[] min 1 }; export function loadStudies(dir: string, locale: Locale): Study[] reading <dir>/*.<locale>.md
+      (missing dir → []), parsing with gray-matter, validating (error names the file), html = remark().use(html).processSync(body);
+      sorted by slug.'
+    - 'routes.ts pages(): route(''portfolio/:slug'', ''routes/portfolio-study.tsx'', { id: `portfolio-study${suffix}`
+      }); react-router.config.ts prerender adds /portfolio/<slug> and /en/portfolio/<slug> for loadStudies(''content/portfolio'',
+      locale).'
+    - 'portfolio.tsx: add a loader returning loadStudies(''content/portfolio'', locale); when non-empty render <Card>
+      per study (title, summary, link) above the plan text. portfolio-study.tsx: loader by slug (404 Response when
+      missing); render title, dataset · licence line, skills list, dashboard link and the HTML.'
+    - 'tests/portfolio.test.ts: the fixture loads with 1 study and html containing <h2>; a file without dashboard_url
+      throws naming the file; a missing dir returns [].'
+    acceptance:
+    - With no content/portfolio directory the build output of /portfolio is unchanged
+    - Invalid frontmatter fails the build with the file name
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/portfolio.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run build
+      expect: exit 0
+    out_of_scope:
+    - Writing case studies (Deliverable studies)
+    - Screenshots and image handling
 - key: com/site/portfolio/studies
   title: First three case studies
   depends_on:

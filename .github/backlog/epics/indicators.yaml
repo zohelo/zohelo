@@ -35,9 +35,9 @@ deliverables:
   title: Published data available at build
   done_when:
   - Build fails clearly when published files are missing; local dev works from a committed fixture
-  todo:
-  - scripts/fetch-published.ts (shared with com/growth/what-changed/build-data) writing .published/ for the build;
-    ready once gold.publish writes 06_published/v1. The PR check keeps reading fixtures/published/ (no credentials).
+  notes:
+  - 'scripts/fetch-published.ts and the deploy env are Tasks com/growth/what-changed/build-data/fetch-script and deploy-env
+    (shared); the PR check keeps reading fixtures/published/ (no credentials).'
   tasks:
   - key: com/site/indicators/data/readers
     type: Task
@@ -89,12 +89,8 @@ deliverables:
   done_when:
   - /indicators and /indicators/<kpi_key> pre-rendered for the 20 KPIs listed in site.config
   todo:
-  - 'Route /indicators: one section per indicatorGroups() group (Task groups), a KpiTile per KPI from latestTile()
-    (Task latest-tile); needs .published/ at build.'
-  - 'Route /indicators/:kpi: KpiTile, line Chart (series), regional DataTable when kpi_dimension has geography,
-    definition, SourceFooter and licence from kpiSources()/footerProps() (Task kpi-sources), CSV download link to
-    the published extract, Dataset JSON-LD from datasetJsonLd() (Task dataset-jsonld); prerender list from site.config
-    indicators.'
+  - 'On /indicators/:kpi: line Chart from kpi/<key>/series.parquet (needs a Parquet reader at build), definition
+    (catalog.json has no definition field yet), CSV download link to the published extract.'
   tasks:
   - key: com/site/indicators/pages/groups
     type: Task
@@ -254,6 +250,93 @@ deliverables:
     - Dataset codes (not in catalog.json v1)
     depends_on:
     - com/site/indicators/data/readers
+  - key: com/site/indicators/pages/index-route
+    type: Task
+    title: Add the /indicators index page grouped by domain
+    effort: M
+    state: open
+    contract: false
+    context: 'indicatorGroups() (src/indicators/groups.ts) groups catalog KPIs by domain and latestTile() (src/indicators/tile.ts)
+      builds KpiTile props from kpi/<key>/latest.json; .published/ is filled by scripts/fetch-published.ts (fixtures
+      without credentials). Target: /indicators and /en/indicators, pre-rendered, one section per domain with a
+      KpiTile per KPI. Data comes from a route loader (build time only, ssr: false).'
+    files:
+    - create: src/routes/indicators.tsx
+    - edit: src/routes.ts
+    - edit: src/site.config.ts
+    - create: tests/indicatorsRoute.test.ts
+    steps:
+    - 'site.config.ts pages: add { path: ''/indicators'', title: { pl: ''Wskaźniki'', en: ''Indicators'' }, description:
+      { pl: ''Najważniejsze wskaźniki o Polsce z najnowszą wartością, źródłem i datą.'', en: ''Headline indicators on
+      Poland with the latest value, source and date.'' } }.'
+    - 'routes.ts pages(): add route(''indicators'', ''routes/indicators.tsx'', { id: `indicators${suffix}` }).'
+    - 'routes/indicators.tsx: export async function loader({ request }) with locale = localeOf(new URL(request.url).pathname);
+      catalog = readCatalog(publishedDir()); groups = indicatorGroups(catalog, locale); for every KPI in the groups
+      tile = latestTile(kpi, readKpiLatest(dir, kpi_key), catalog.units, locale); return { groups: groups with each
+      kpi''s tile }. A missing latest.json throws (the build must fail).'
+    - 'Component: <main className="mx-auto max-w-5xl px-4 py-12">, <h1>, per group a <section> with <h2> and a grid
+      (grid gap-4 sm:grid-cols-2 lg:grid-cols-3) of <KpiTile label value unit delta period locale href /> (@zohelo/design).'
+    - 'tests/indicatorsRoute.test.ts (bun:test, PUBLISHED_DIR=fixtures/published): loader for http://x/indicators returns
+      4 groups, first group key ''economy''; unemployment_rate tile value 3.2; loader for http://x/en/indicators gives
+      English names; prerenderPaths() contains ''/indicators'' and ''/en/indicators''.'
+    acceptance:
+    - build/client/indicators/index.html links every published fixture KPI to /indicators/<kpi_key>
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/indicatorsRoute.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -o 'href="/indicators/[a-z_]*"' build/client/indicators/index.html | sort -u | wc -l
+      expect: exit 0; count equals the published KPIs in fixtures/published/catalog/catalog.json
+    out_of_scope:
+    - The /indicators/:kpi page (Task kpi-route); home today strip
+    - Header navigation links
+    depends_on:
+    - com/growth/what-changed/build-data/fetch-script
+    - com/site/indicators/pages/groups
+    - com/site/indicators/pages/latest-tile
+  - key: com/site/indicators/pages/kpi-route
+    type: Task
+    title: Add the /indicators/:kpi page with value, regions and sources
+    effort: L
+    state: open
+    contract: false
+    context: 'Task index-route links every KPI to /indicators/<kpi_key>; the pure helpers exist: latestTile(), kpiSources()
+      and footerProps() (src/indicators/sources.ts), datasetJsonLd() (src/seo.ts), rankRegions() (src/regions/ranking.ts).
+      Target: one pre-rendered page per published KPI in PL and EN with KpiTile, a regional table when the KPI has
+      voivodeship rows, SourceFooter and Dataset JSON-LD.'
+    files:
+    - create: src/routes/indicator.tsx
+    - edit: src/routes.ts
+    - edit: react-router.config.ts
+    - create: tests/indicatorRoute.test.ts
+    steps:
+    - 'routes.ts pages(): add route(''indicators/:kpi'', ''routes/indicator.tsx'', { id: `indicator${suffix}` }).'
+    - 'react-router.config.ts prerender(): return [...prerenderPaths(), ...paths] where paths = for each catalog KPI
+      with status ''published'' (readCatalog(publishedDir())) `/indicators/${k}` and `/en/indicators/${k}`.'
+    - 'routes/indicator.tsx loader({ request, params }): locale from the pathname; kpi = catalog KPI params.kpi, else
+      throw new Response(''Not found'', { status: 404 }); latest = readKpiLatest; return { tile: latestTile(...), sources:
+      footerProps(kpiSources(catalog, kpi, locale)), ranking: rankRegions(latest), geo: readGeo(dir, ''voivodeship'') when ranking
+      is not null else null, jsonLd: datasetJsonLd(kpi, catalog, locale), name }.'
+    - 'meta(): pageMeta({ path: `/indicators/${kpi}`, locale, title: name, description: `${name} — zohelo` }).'
+    - 'Component: <main className="mx-auto max-w-4xl px-4 py-12">: <script type="application/ld+json"> with jsonLd
+      (as routes/home.tsx), <h1> name, <KpiTile .../>, when ranking: <h2> Województwa/Voivodeships and <RankingTable
+      ranking geo unit locale />, then <SourceFooter sources licence date={tile.checkedAt ?? tile.period} locale />.'
+    - 'tests/indicatorRoute.test.ts (PUBLISHED_DIR=fixtures/published): unemployment_rate gives tile value 3.2 and
+      a ranking; ''nope'' throws a 404 Response.'
+    acceptance:
+    - build/client/indicators/<kpi_key>/index.html exists for every published fixture KPI in PL and EN
+    - Each page has one application/ld+json Dataset script and a source line
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/indicatorRoute.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -c '"@type":"Dataset"' build/client/en/indicators/unemployment_rate/index.html
+      expect: exit 0; 1
+    out_of_scope:
+    - Line chart, definition, CSV link (todo); sitemap entries for KPI pages
+    depends_on:
+    - com/site/indicators/pages/index-route
+    - com/site/indicators/pages/kpi-sources
+    - com/site/indicators/pages/dataset-jsonld
+    - com/site/regions/map/ranking-table
 - key: com/site/indicators/home
   title: Today strip and real metrics on home
   depends_on:

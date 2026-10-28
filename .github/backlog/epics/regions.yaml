@@ -26,9 +26,6 @@ deliverables:
   title: Map and ranking
   done_when:
   - /regions renders a choropleth (sequential teal ramp) and a ranking table for a KPI selector
-  todo:
-  - 'Route /regions: MapChoropleth rendered after hydration (Task map-client, decision D25); KPI selector from regionalKpis()
-    (Task kpi-options); RankingTable (Task ranking-table).'
   tasks:
   - key: com/site/regions/map/choropleth-spec
     type: Task
@@ -232,6 +229,50 @@ deliverables:
     depends_on:
     - com/site/regions/map/choropleth-spec
     - com/site/site-v1/i18n/routing
+  - key: com/site/regions/map/regions-route
+    type: Task
+    title: Add the /regions page with a voivodeship map and ranking
+    effort: M
+    state: open
+    contract: false
+    context: 'The parts exist: regionalKpis() (src/regions/kpiOptions.ts, Task kpi-options), MapChoropleth (src/components/MapChoropleth.client.tsx,
+      Task map-client, rendered after hydration per D25), rankRegions() and RankingTable (src/regions/), and readGeo()/readKpiLatest()
+      over .published/ (fixtures without credentials). Target: /regions and /en/regions, pre-rendered, with a KPI
+      selector, the map and the ranking table; data from a route loader (build time only, ssr: false).'
+    files:
+    - create: src/routes/regions.tsx
+    - edit: src/routes.ts
+    - edit: src/site.config.ts
+    - create: tests/regionsRoute.test.ts
+    steps:
+    - 'site.config.ts pages: add { path: ''/regions'', title: { pl: ''Regiony'', en: ''Regions'' }, description: { pl:
+      ''Porównanie 16 województw: mapa i ranking wybranego wskaźnika.'', en: ''The 16 voivodeships compared: a map and
+      a ranking for one indicator.'' } }; routes.ts pages(): route(''regions'', ''routes/regions.tsx'', { id: `regions${suffix}`
+      }).'
+    - 'routes/regions.tsx loader({ request }): locale from the pathname; dir = publishedDir(); options = regionalKpis(readCatalog(dir),
+      locale); for each option ranking = rankRegions(readKpiLatest(dir, kpi_key)), kept when not null; return { geo:
+      readGeo(dir, ''voivodeship''), kpis: [{ ...option, ranking }] }. Default KPI: unemployment_rate, else the first.'
+    - 'Component: <main className="mx-auto max-w-5xl px-4 py-12">, <h1>, a labelled <select> of KPI names (useState);
+      for the selected KPI <MapChoropleth geo rows={ranking.regions} valueTitle={unit} locale label={name} /> and <RankingTable
+      ranking geo unit locale />. No KPI → <p> ''Brak danych regionalnych.'' / ''No regional data.''.'
+    - 'tests/regionsRoute.test.ts (bun:test, PUBLISHED_DIR=fixtures/published; never import the .client module):
+      the loader for http://x/regions lists unemployment_rate with a ranking and leaves out inflation; prerenderPaths()
+      has ''/regions'' and ''/en/regions''.'
+    acceptance:
+    - build/client/regions/index.html has the ranking table; the map renders after hydration
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/regionsRoute.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -c '<tr' build/client/regions/index.html
+      expect: exit 0; count ≥ 2
+    out_of_scope:
+    - /regions/:teryt profiles, home spotlight, powiat or gmina maps
+    - Changes to regionalKpis, mapSpec or RankingTable
+    depends_on:
+    - com/growth/what-changed/build-data/fetch-script
+    - com/site/regions/map/kpi-options
+    - com/site/regions/map/map-client
+    - com/site/regions/map/ranking-table
 - key: com/site/regions/profiles
   title: Voivodeship profiles
   depends_on:

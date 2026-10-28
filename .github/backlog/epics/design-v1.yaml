@@ -525,7 +525,9 @@ deliverables:
     verify_only: true
     depends_on:
     - com/design/design-v1/release/workflow
-    context: All v1 Deliverables merged; this Task only runs the release and checks it.
+    context: 'Product Owner answer on #111 (28 Oct): 1.0.0 ships the tokens, components and visuals now on main; the
+      logo and AppHeader/AppFooter follow in 1.1.0 once the owner picks the logo (#106). This Task only runs the
+      release and checks it.'
     files: []
     steps:
     - Run design-release on main with version 1.0.0.
