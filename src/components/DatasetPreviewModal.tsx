@@ -207,7 +207,7 @@ export const DatasetPreviewModal: React.FC<DatasetPreviewModalProps> = ({
 
         {/* Modal Footer */}
         <div className="px-6 py-3 bg-[#F8FAFC] border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
-          <span>Zohelo The Vault • Google Drive (5TB The Cabinet)</span>
+          <span>Zohelo The Vault</span>
           <button
             onClick={onClose}
             className="px-4 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold cursor-pointer"

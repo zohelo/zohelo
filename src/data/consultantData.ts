@@ -35,7 +35,7 @@ export const consultantProfile: ConsultantProfile = {
   ],
   consultingSpecialties: [
     'Public Sector & Municipal Data Strategy',
-    'Modern Data Stack (DuckDB, dbt Core, Parquet, MetricFlow)',
+    'Modern Data Stack (DuckDB, dbt Core, Parquet)',
     'Macroeconomic Risk & Sovereign Debt Analytics',
     'Zero-Maintenance (NoOps) Cloud Infrastructure',
     'Executive BI Dashboards & Boardroom Storytelling'

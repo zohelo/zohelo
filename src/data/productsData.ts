@@ -57,24 +57,5 @@ export const productsList: ProductItem[] = [
       { label: 'Granularity', val: 'District & Postal Code' },
       { label: 'Forecast Horizon', val: '1 to 5 Years' }
     ]
-  },
-  {
-    id: 'eac-lakehouse-blueprint',
-    name: 'NoOps Data Lakehouse Starter Kit (Jarvis EaC)',
-    tagline: 'Deploy a complete $0.00/month DuckDB + dbt Core + Parquet data lakehouse on GCP Always-Free Tier.',
-    description: 'The exact open architecture powering Zohelo.com. Includes Terraform scripts, GitHub Actions crawlers for Polish public APIs, and MetricFlow semantic schemas.',
-    category: 'Enterprise BI',
-    tier: 'Free Open Tier',
-    features: [
-      '100% Everything-as-Code (EaC) declarative repository',
-      'Zero-maintenance automated ingestion from GUS & NBP',
-      'DuckDB columnar analytical engine configuration',
-      'Pre-built dbt Core transformation models'
-    ],
-    previewMetrics: [
-      { label: 'Infrastructure Cost', val: '$0.00 / month' },
-      { label: 'Deployment Time', val: '< 15 minutes' },
-      { label: 'License', val: 'All rights reserved' }
-    ]
   }
 ];

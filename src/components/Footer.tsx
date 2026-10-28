@@ -1,12 +1,10 @@
 import React from 'react';
-import { Database, ShieldCheck, Github, FileCode, ArrowUpRight, Heart } from 'lucide-react';
 
 interface FooterProps {
-  onOpenEacModal: () => void;
   onNavigate: (sectionId: string) => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenEacModal, onNavigate }) => {
+export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   return (
     <footer className="w-full bg-[#1E252B] text-slate-300 border-t border-slate-800 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -24,17 +22,8 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEacModal, onNavigate }) =>
             </div>
 
             <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
-              Independent data powerhouse and high-performance Data Lakehouse transforming Polish public data (GUS, NBP, Atlas Regionów) into commercial-grade intelligence and open research.
+              Public data on Poland and the world, built on Cloudflare and GitHub.
             </p>
-
-            <div className="flex items-center space-x-3 pt-2">
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono-code font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">
-                GCP e2-micro • $0.00/mo NoOps
-              </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono-code font-bold bg-blue-950 text-blue-400 border border-blue-800">
-                DuckDB + Parquet
-              </span>
-            </div>
           </div>
 
           {/* Nav Links (Cols 6-8) */}
@@ -50,7 +39,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEacModal, onNavigate }) =>
               </li>
               <li>
                 <button onClick={() => onNavigate('metrics')} className="hover:text-white transition-colors">
-                  The Metrics (MetricFlow KPIs)
+                  The Metrics (KPIs)
                 </button>
               </li>
               <li>
@@ -69,23 +58,6 @@ export const Footer: React.FC<FooterProps> = ({ onOpenEacModal, onNavigate }) =>
                 </button>
               </li>
             </ul>
-          </div>
-
-          {/* Architecture & EaC (Cols 9-12) */}
-          <div className="md:col-span-4 space-y-2.5">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-              Everything-as-Code (EaC)
-            </h4>
-            <p className="text-slate-400 text-xs leading-relaxed">
-              Governed by CONST-01 (Declarative Code) and CONST-02 (Zero-Maintenance NoOps). Data pipelines execute via GitHub Actions, Colab DuckDB transforms, and Nginx static delivery.
-            </p>
-            <button
-              onClick={onOpenEacModal}
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#3B8B94] hover:bg-[#2C6E76] text-white text-xs font-semibold transition-all mt-1 cursor-pointer"
-            >
-              <FileCode className="w-3.5 h-3.5" />
-              <span>Inspect Architecture Blueprint</span>
-            </button>
           </div>
 
         </div>

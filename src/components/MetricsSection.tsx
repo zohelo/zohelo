@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import { FileCode, Database, CheckCircle, Info, Sparkles } from 'lucide-react';
 import { declarativeMetrics } from '../data/metricsData';
-import { MetricCardData } from '../types';
-
-interface MetricsSectionProps {
-  onInspectMetric: (metric: MetricCardData) => void;
-}
 
 interface SparklineResult {
   linePath: string;
@@ -14,7 +8,7 @@ interface SparklineResult {
   width: number;
 }
 
-export const MetricsSection: React.FC<MetricsSectionProps> = ({ onInspectMetric }) => {
+export const MetricsSection: React.FC = () => {
   const [hoveredMetricId, setHoveredMetricId] = useState<string | null>(null);
 
   // Helper to generate smooth SVG path for sparklines
@@ -57,7 +51,7 @@ export const MetricsSection: React.FC<MetricsSectionProps> = ({ onInspectMetric 
               The Metrics
             </h2>
             <span className="text-[11px] font-medium text-slate-400">
-              • Declarative MetricFlow KPIs (GUS Gold Layer)
+              • Key indicators (GUS)
             </span>
           </div>
           <div className="text-xs text-[#3B8B94] font-medium flex items-center space-x-1 cursor-pointer">
@@ -77,7 +71,6 @@ export const MetricsSection: React.FC<MetricsSectionProps> = ({ onInspectMetric 
                 onMouseEnter={() => setHoveredMetricId(metric.id)}
                 onMouseLeave={() => setHoveredMetricId(null)}
                 className="zohelo-card p-5 relative overflow-hidden flex flex-col justify-between group cursor-pointer"
-                onClick={() => onInspectMetric(metric)}
               >
                 {/* Top Row: Metric Name + Badge Pill */}
                 <div className="flex items-start justify-between">
@@ -159,15 +152,11 @@ export const MetricsSection: React.FC<MetricsSectionProps> = ({ onInspectMetric 
                   </svg>
                 </div>
 
-                {/* Inspect MetricFlow Code hint on hover */}
+                {/* Metric key */}
                 <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 group-hover:text-[#3B8B94] transition-colors">
                   <span className="font-mono-code text-[10px]">
                     {metric.metricKey}
                   </span>
-                  <div className="flex items-center space-x-1 font-semibold">
-                    <FileCode className="w-3 h-3" />
-                    <span>Inspect YAML</span>
-                  </div>
                 </div>
 
               </div>

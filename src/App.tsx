@@ -11,9 +11,8 @@ import { Footer } from './components/Footer';
 import { DataVisualizationModal } from './components/DataVisualizationModal';
 import { ArticleModal } from './components/ArticleModal';
 import { DatasetPreviewModal } from './components/DatasetPreviewModal';
-import { MetricFlowModal } from './components/MetricFlowModal';
 import { CommandPalette } from './components/CommandPalette';
-import { MetricCardData, VoivodeshipData, ArticleItem, DatasetItem, ProductItem } from './types';
+import { VoivodeshipData, ArticleItem, DatasetItem, ProductItem } from './types';
 import confetti from 'canvas-confetti';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -21,8 +20,6 @@ export default function App() {
   const [activeSection, setActiveSection] = useState('top');
   
   // Modals state
-  const [inspectMetric, setInspectMetric] = useState<MetricCardData | null>(null);
-  const [isEacModalOpen, setIsEacModalOpen] = useState(false);
   const [isExploreModalOpen, setIsExploreModalOpen] = useState(false);
   const [exploreRegion, setExploreRegion] = useState<VoivodeshipData | undefined>(undefined);
   const [readArticle, setReadArticle] = useState<ArticleItem | null>(null);
@@ -91,7 +88,6 @@ export default function App() {
         activeSection={activeSection}
         onNavigate={handleNavigate}
         onOpenSearch={() => setIsSearchOpen(true)}
-        onOpenEacModal={() => setIsEacModalOpen(true)}
       />
 
       {/* Main 8-Section Sequential Flow as mandated by PRD & Mockup */}
@@ -104,13 +100,8 @@ export default function App() {
           }}
         />
 
-        {/* 3. The Metrics: Declarative MetricFlow KPIs (GDP, Unemployment, Inflation) */}
-        <MetricsSection
-          onInspectMetric={(metric) => {
-            setInspectMetric(metric);
-            setIsEacModalOpen(true);
-          }}
-        />
+        {/* 3. The Metrics: KPIs (GDP, Unemployment, Inflation) */}
+        <MetricsSection />
 
         {/* 4. The Compass: Polish Regional Map + Public Finance Trends 2024-2025 */}
         <CompassSection
@@ -143,13 +134,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <Footer
-        onOpenEacModal={() => {
-          setInspectMetric(null);
-          setIsEacModalOpen(true);
-        }}
-        onNavigate={handleNavigate}
-      />
+      <Footer onNavigate={handleNavigate} />
 
       {/* Interactive Modals */}
       
@@ -173,17 +158,7 @@ export default function App() {
         onDownload={handleDownloadDataset}
       />
 
-      {/* 4. MetricFlow YAML & Everything-as-Code (EaC) Modal */}
-      <MetricFlowModal
-        isOpen={isEacModalOpen}
-        metric={inspectMetric}
-        onClose={() => {
-          setIsEacModalOpen(false);
-          setInspectMetric(null);
-        }}
-      />
-
-      {/* 5. Command Palette (⌘K) */}
+      {/* 4. Command Palette (⌘K) */}
       <CommandPalette
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
