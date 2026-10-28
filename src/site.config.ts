@@ -38,6 +38,14 @@ export const pages: Page[] = [
       en: 'Tokens and components of the zohelo design system: colours, typography, spacing and components.',
     },
   },
+  {
+    path: '/indicators',
+    title: { pl: 'Wskaźniki', en: 'Indicators' },
+    description: {
+      pl: 'Najważniejsze wskaźniki o Polsce z najnowszą wartością, źródłem i datą.',
+      en: 'Headline indicators on Poland with the latest value, source and date.',
+    },
+  },
 ];
 
 /** Every pre-rendered path: each page in Polish and in English. */
