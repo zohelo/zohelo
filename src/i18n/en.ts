@@ -37,4 +37,8 @@ export const en: Dict = {
     pl: 'PL',
     en: 'EN',
   },
+  sample: {
+    banner:
+      'Sample data: this build of the site is made from synthetic values, not from source data. Numbers, dates and licences are not real.',
+  },
 };

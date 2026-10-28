@@ -93,6 +93,17 @@ export function publishedDir(): string {
 }
 
 /**
+ * The file that marks a copy of the layer as the synthetic fixture set (fixtures/published), never
+ * present in 06_published/v1: a build from fixtures shows the sample-data banner on every page.
+ */
+export const FIXTURE_MARKER = 'FIXTURE.txt';
+
+/** True when `dir` holds the fixture set rather than the published layer. */
+export function isFixtureLayer(dir: string): boolean {
+  return existsSync(join(dir, FIXTURE_MARKER));
+}
+
+/**
  * Published KPIs that have no kpi/<kpi_key>/latest.json by contract. Mirrors SKIP in zohelo-data
  * warehouse/publish.py (docs/published.md, decision D26); keep the two lists equal.
  */
