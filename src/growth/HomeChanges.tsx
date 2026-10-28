@@ -1,3 +1,4 @@
+import { SubscribeCalendar } from '../components/SubscribeCalendar';
 import { localizedPath, type Locale } from '../i18n';
 import type { ChangeItem, Source } from '../published';
 import { ChangesList } from './ChangesList';
@@ -19,6 +20,9 @@ export function HomeChanges({ items, sources, locale }: { items: ChangeItem[]; s
           {all[locale]}
         </a>
       </p>
+      <div className="mt-2">
+        <SubscribeCalendar locale={locale} />
+      </div>
     </section>
   );
 }
