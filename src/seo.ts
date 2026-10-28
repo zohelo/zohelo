@@ -1,5 +1,6 @@
 import type { MetaDescriptor } from 'react-router';
 import { localizedPath, type Locale } from './i18n';
+import type { Catalog, CatalogKpi } from './published';
 import { site } from './site.config';
 
 export type PageMetaInput = { path: string; locale: Locale; title: string; description: string };
@@ -33,4 +34,41 @@ export function pageMeta({ path, locale, title, description }: PageMetaInput): M
     { property: 'og:locale', content: ogLocale[locale] },
     { name: 'twitter:card', content: 'summary' },
   ];
+}
+
+/**
+ * schema.org Dataset JSON-LD for an indicator page. Pure; only types come from published.ts,
+ * which reads files with node:fs and must stay out of the client bundle.
+ */
+export function datasetJsonLd(kpi: CatalogKpi, catalog: Catalog, locale: Locale): Record<string, unknown> {
+  const sources = kpi.source_keys.flatMap((key) => catalog.sources.filter((s) => s.source_key === key));
+  const unit = catalog.units.find((u) => u.unit_key === kpi.unit_key);
+  const names = sources.map((s) => (locale === 'pl' ? s.name_pl : s.name_en)).join(', ');
+  const name = locale === 'pl' ? kpi.name_pl : kpi.name_en;
+  const unitName = unit ? (locale === 'pl' ? unit.name_pl : unit.name_en) : kpi.unit_key;
+  const description =
+    locale === 'pl'
+      ? `${name}: dane od ${kpi.first_period} do ${kpi.last_period}. Źródła: ${names}. Jednostka: ${unitName}.`
+      : `${name}: data from ${kpi.first_period} to ${kpi.last_period}. Sources: ${names}. Unit: ${unitName}.`;
+
+  const jsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name,
+    description,
+    url: absoluteUrl(`/indicators/${kpi.kpi_key}`, locale),
+    identifier: kpi.kpi_key,
+    inLanguage: locale,
+    temporalCoverage: `${kpi.first_period}/${kpi.last_period}`,
+    dateModified: kpi.loaded_at,
+    spatialCoverage: { '@type': 'Place', name: locale === 'pl' ? 'Polska' : 'Poland' },
+    creator: { '@type': 'Organization', name: site.name, url: site.url },
+    isBasedOn: sources.map((s) => ({ '@type': 'CreativeWork', name: locale === 'pl' ? s.name_pl : s.name_en })),
+  };
+
+  // One licence only when every source shares it.
+  const licenceKeys = new Set(sources.map((s) => s.licence_key));
+  const licence = licenceKeys.size === 1 ? catalog.licences.find((l) => licenceKeys.has(l.licence_key)) : undefined;
+  if (licence) jsonLd.license = licence.url;
+  return jsonLd;
 }
