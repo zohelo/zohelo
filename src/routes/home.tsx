@@ -2,7 +2,7 @@ import { useLoaderData } from 'react-router';
 import App from '../App';
 import { localeOf, useLocale, type Locale } from '../i18n';
 import { homeTiles } from '../indicators/home';
-import { publishedDir, readCatalog, readGeo, readKpiLatest, type Catalog } from '../published';
+import { publishedDir, readCatalog, readChanges, readGeo, readKpiLatest, type Catalog } from '../published';
 import type { SpotlightData, SpotRow } from '../regions/HomeSpotlight';
 import { regionalKpis } from '../regions/kpiOptions';
 import { regionName, terytOf } from '../regions/profile';
@@ -13,12 +13,24 @@ import { pages, site } from '../site.config';
 
 const page = pages.find((p) => p.path === '/')!;
 
-// Build time only (ssr: false): the today strip's tiles and the regional spotlight from the published layer.
+// Build time only (ssr: false): the today strip's tiles, the change feed and the regional spotlight from
+// the published layer.
 export async function loader({ request }: { request: Request }) {
   const locale = localeOf(new URL(request.url).pathname);
   const dir = publishedDir();
   const catalog = readCatalog(dir);
-  return { tiles: homeTiles(catalog, (k) => readKpiLatest(dir, k), locale), spotlight: homeSpotlight(dir, catalog, locale) };
+  const tiles = homeTiles(catalog, (k) => readKpiLatest(dir, k), locale);
+  return { tiles, items: readItems(dir), sources: catalog.sources, spotlight: homeSpotlight(dir, catalog, locale) };
+}
+
+// No feed yet is a normal state; any other problem (an invalid feed) fails the build, as on /changes.
+function readItems(dir: string) {
+  try {
+    return readChanges(dir).items;
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith('published file missing')) return [];
+    throw error;
+  }
 }
 
 /** The unemployment_rate spotlight, or null when the KPI has no voivodeship ranking. */
@@ -43,7 +55,7 @@ export function meta({ location }: { location: { pathname: string } }) {
 }
 
 export default function Home() {
-  const { tiles, spotlight } = useLoaderData<typeof loader>();
+  const { tiles, items, sources, spotlight } = useLoaderData<typeof loader>();
   const locale = useLocale();
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -55,7 +67,7 @@ export default function Home() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <App tiles={tiles} spotlight={spotlight} locale={locale} />
+      <App tiles={tiles} items={items} sources={sources} spotlight={spotlight} locale={locale} />
     </>
   );
 }
