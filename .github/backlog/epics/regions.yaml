@@ -280,8 +280,8 @@ deliverables:
   done_when:
   - /regions/<teryt> for all 16 TERYT codes with KPIs vs Poland and rank
   todo:
-  - Route /regions/:teryt from regionProfile() (Task model) as a KpiTile grid with national value and rank 1–16; neighbours
-    list from geometry adjacency computed at build.
+  - Neighbours list from geometry adjacency computed at build; sitemap entries for /regions/<teryt>; links from the
+    /regions map and ranking table to the profiles.
   tasks:
   - key: com/site/regions/profiles/model
     type: Task
@@ -326,6 +326,43 @@ deliverables:
     depends_on:
     - com/site/regions/map/ranking
     - com/site/site-v1/i18n/routing
+  - key: com/site/regions/profiles/profile-route
+    type: Task
+    title: Add the /regions/<teryt> profile page for each voivodeship
+    effort: M
+    state: open
+    contract: false
+    depends_on:
+    - com/site/regions/map/regions-route
+    context: 'regionProfile(), VOIVODESHIP_TERYT, rankRegions() and regionalKpis() exist (src/regions/); /regions (routes/regions.tsx)
+      loads rankings the same way. Each voivodeship gets a pre-rendered page in PL and EN with every regional KPI: value,
+      rank among the voivodeships and the national value.'
+    files:
+    - edit: src/regions/profile.ts
+    - create: src/routes/region.tsx
+    - edit: src/routes.ts
+    - edit: src/site.config.ts
+    - edit: react-router.config.ts
+    - create: tests/regionRoute.test.ts
+    steps:
+    - 'profile.ts: VOIVODESHIP_NAMES and regionName() as .github/backlog/assets/home-regions.md, section ''Voivodeship
+      names''.'
+    - routes/region.tsx, regionPaths() in site.config.ts, react-router.config.ts and routes.ts as section 'Profile page' of the same file.
+    - tests/regionRoute.test.ts as the Tests paragraph of that section.
+    acceptance:
+    - bun run build writes build/client/regions/12/index.html and build/client/en/regions/32/index.html
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/regionRoute.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run build && ls build/client/regions | wc -l
+      expect: 17 (16 codes plus index.html)
+    out_of_scope:
+    - neighbours list
+    - sitemap entries for the profiles
+    - links from the /regions map and table
+    notes:
+    - The fixture values come from zohelo-data .github/backlog/assets/latest-fixtures.md (zohelo-data#2196). If the population
+      fixture has no TERC:12 and TERC:14 rows, comment here and stop.
 - key: com/site/regions/home
   title: Regional spotlight on home
   depends_on:
@@ -334,7 +371,8 @@ deliverables:
   - Home spotlight shows one KPI map and top/bottom 3; CompassSection, DataVisualizationModal and polandRegions.ts/financeTrends.ts
     deleted
   todo:
-  - Replace CompassSection with the spotlight block (map and spotlight(), Task spotlight); delete the sample files.
+  - Map in the home spotlight block (MapChoropleth after hydration, D25); then remove polandRegions.ts and
+    DataVisualizationModal once CommandPalette no longer needs them.
   tasks:
   - key: com/site/regions/home/spotlight
     type: Task
@@ -367,3 +405,40 @@ deliverables:
     - The spotlight block, the map, CompassSection and which KPI the spotlight shows
     depends_on:
     - com/site/regions/map/ranking
+  - key: com/site/regions/home/home-spotlight
+    type: Task
+    title: Replace CompassSection on home with the regional spotlight
+    effort: M
+    state: open
+    contract: false
+    depends_on:
+    - com/site/regions/home/spotlight
+    - com/site/regions/profiles/profile-route
+    - com/site/indicators/home/home-strip
+    context: CompassSection (src/components/CompassSection.tsx) shows invented regional and public-finance numbers from
+      src/content/polandRegions.ts and financeTrends.ts. spotlight() (src/regions/spotlight.ts) and regionName() (src/regions/profile.ts)
+      exist. CommandPalette and DataVisualizationModal still use polandRegions.ts, so it stays.
+    files:
+    - create: src/regions/HomeSpotlight.tsx
+    - edit: src/routes/home.tsx
+    - edit: src/App.tsx
+    - delete: src/components/CompassSection.tsx
+    - delete: src/content/financeTrends.ts
+    - create: tests/homeSpotlight.test.tsx
+    steps:
+    - src/regions/HomeSpotlight.tsx, the home loader's spotlight and tests/homeSpotlight.test.tsx exactly as .github/backlog/assets/home-regions.md,
+      section 'Home spotlight'; the loader returns spotlight with its other data.
+    - 'App.tsx: take a spotlight prop and replace <CompassSection ... /> and its comment with <HomeSpotlight data={spotlight}
+      locale={locale} />; remove handleOpenExploreVisualization only when nothing else uses it.'
+    - Delete CompassSection.tsx and content/financeTrends.ts; `grep -rn 'financeTrends\|CompassSection' src` then prints
+      nothing.
+    acceptance:
+    - build/client/index.html contains 'Najwyżej' and a link to /regions/12; no file in src imports financeTrends or CompassSection
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/homeSpotlight.test.tsx
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -c 'href="/regions/12"' build/client/index.html
+      expect: at least 1
+    out_of_scope:
+    - the map in the block (todo)
+    - CommandPalette, DataVisualizationModal and polandRegions.ts

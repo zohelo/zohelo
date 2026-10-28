@@ -1,0 +1,39 @@
+key: com/portfolio/products
+area: com/portfolio
+title: zohelo-products · discovery
+phase: 2
+priority: P3
+why: >-
+  Every gmina, powiat and voivodeship must present a report on its state each spring, mostly assembled by hand from
+  BDL tables, and analysts screenshot official pages for their slides. Ready, editable, sourced reports and slide
+  packs built from the published layer could reach both audiences and are the most concrete revenue idea so far.
+outcome: >-
+  The owner has decided, from docs/portfolio/zohelo-products.md, whether zohelo-products (proposed name zohelo
+  Reports) becomes a product, under which name and with which first scope.
+in_scope:
+- The brief docs/portfolio/zohelo-products.md
+- Consultation of the Domain expert (indicator set, timeliness, peer groups) and the Architect (powiat/gmina values in
+  the published layer, document rendering in Actions, storage)
+- One owner:decision issue when the brief is complete
+out_of_scope:
+- Any product code, repo, account or scheduled task before the owner approves
+- Contacts with local governments, prices, invoices or any sale (owner actions)
+done_when:
+- The brief has the Domain expert's and the Architect's answers recorded in its "Consultation" section
+- An owner:decision issue for the brief is closed with the owner's answer
+deliverables:
+- key: com/portfolio/products/brief
+  title: zohelo-products brief complete
+  done_when:
+  - docs/portfolio/zohelo-products.md has every section of docs/team.md (Product Owner step 5) and both consultations
+  todo:
+  - Domain expert review of the place-report indicator set, which BDL annual indicators are out before 31 May, the peer-group method and the one-line readings (domains finance, population, labour)
+  - Architect review of powiat/gmina values in 06_published/v1, PDF/DOCX/PPTX rendering in Actions with @zohelo/design and storage of ~2,900 files per vintage
+- key: com/portfolio/products/decision
+  title: Owner decision on zohelo-products
+  depends_on:
+  - com/portfolio/products/brief
+  done_when:
+  - owner:decision issue answered; on approval, the chosen name, home, backlog Epics and Developer row exist
+  todo:
+  - Open the owner:decision issue (assigned to rutkala) with the brief's "What the owner must decide" list
