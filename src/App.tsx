@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { PulseSection } from './components/PulseSection';
-import { CompassSection } from './components/CompassSection';
 import { VaultSection } from './components/VaultSection';
 import { ProductsSection } from './components/ProductsSection';
 import { HeroConsultingSection } from './components/HeroConsultingSection';
@@ -13,8 +12,17 @@ import { VoivodeshipData, DatasetItem, ProductItem } from './types';
 import { CheckCircle2 } from 'lucide-react';
 import type { Locale } from './i18n';
 import { TodayStrip, type TodayTile } from './indicators/TodayStrip';
+import { HomeSpotlight, type SpotlightData } from './regions/HomeSpotlight';
 
-export default function App({ tiles, locale }: { tiles: TodayTile[]; locale: Locale }) {
+export default function App({
+  tiles,
+  spotlight,
+  locale,
+}: {
+  tiles: TodayTile[];
+  spotlight: SpotlightData | null;
+  locale: Locale;
+}) {
   const [activeSection, setActiveSection] = useState('top');
   
   // Modals state
@@ -41,11 +49,6 @@ export default function App({ tiles, locale }: { tiles: TodayTile[]; locale: Loc
     if (elem) {
       elem.scrollIntoView({ behavior: 'smooth' });
     }
-  };
-
-  const handleOpenExploreVisualization = (selectedRegion?: VoivodeshipData) => {
-    setExploreRegion(selectedRegion);
-    setIsExploreModalOpen(true);
   };
 
   const handleSelectProduct = (product: ProductItem) => {
@@ -76,10 +79,7 @@ export default function App({ tiles, locale }: { tiles: TodayTile[]; locale: Loc
 
         <TodayStrip tiles={tiles} locale={locale} />
 
-        {/* 4. The Compass: Polish Regional Map + Public Finance Trends 2024-2025 */}
-        <CompassSection
-          onOpenExploreVisualization={handleOpenExploreVisualization}
-        />
+        <HomeSpotlight data={spotlight} locale={locale} />
 
         {/* 6. The Vault / The Datasets: CSV, Parquet, Power BI, PDF Lakehouse Assets */}
         <VaultSection
