@@ -28,8 +28,10 @@ function filesUnder(dir: string): string[] {
 
 /** Writes the layer to `out` and returns the paths written. */
 export async function fetchPublished(out: string, env: Env, opts: { require: boolean }): Promise<string[]> {
-  if (credentialVars.some((name) => !env[name])) {
-    if (opts.require) throw new Error('fetch-published: lakehouse read credentials missing');
+  const missing = credentialVars.filter((name) => !env[name]);
+  if (missing.length > 0) {
+    // Names only, never values.
+    if (opts.require) throw new Error(`fetch-published: lakehouse read credentials missing (${missing.join(', ')})`);
     rmSync(out, { recursive: true, force: true });
     cpSync(fixtures, out, { recursive: true });
     console.log('fetch-published: no credentials, using fixtures/published');
@@ -83,7 +85,10 @@ if (import.meta.main) {
     console.log(`fetch-published: ${written.length} files in ${relative(process.cwd(), out) || out}`);
   } catch (error) {
     // Messages name paths and variable names only, never a credential value.
-    console.error(error instanceof Error ? error.message : String(error));
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(message);
+    // Job logs are not readable from agent sessions; an annotation is (AGENTS.md).
+    if (process.env.GITHUB_ACTIONS === 'true') console.log(`::error title=fetch-published::${message.replace(/\r?\n/g, ' ')}`);
     process.exit(1);
   }
 }
