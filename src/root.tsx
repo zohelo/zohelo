@@ -13,11 +13,13 @@ import '@fontsource/jetbrains-mono/500.css';
 import '@fontsource/jetbrains-mono/600.css';
 import './index.css';
 import type { ReactNode } from 'react';
+import { useLocale } from './i18n';
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteError } from 'react-router';
 
 export function Layout({ children }: { children: ReactNode }) {
+  const locale = useLocale();
   return (
-    <html lang="pl">
+    <html lang={locale}>
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />

@@ -1,5 +1,6 @@
 // Site-wide names and the list of pre-rendered pages. Routes, pre-rendering and the sitemap read
-// this file, so adding a page to `pages` is the only step needed to pre-render it.
+// this file, so adding a page to `pages` is the only step needed to pre-render it (in Polish at
+// its path and in English under /en).
 
 export type Localized = { pl: string; en: string };
 export type Page = { path: string; title: Localized; description: Localized };
@@ -22,3 +23,8 @@ export const pages: Page[] = [
     description,
   },
 ];
+
+/** Every pre-rendered path: each page in Polish and in English. */
+export function prerenderPaths(): string[] {
+  return pages.flatMap((p) => [p.path, p.path === '/' ? '/en' : `/en${p.path}`]);
+}

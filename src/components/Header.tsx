@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Database, Menu, X } from 'lucide-react';
+import { useLocation } from 'react-router';
+import { localizedPath, useLocale, useT } from '../i18n';
 
 interface HeaderProps {
   onOpenSearch: () => void;
@@ -12,14 +14,35 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const t = useT();
+  const locale = useLocale();
+  const { pathname } = useLocation();
 
   const navItems = [
-    { label: 'Research', target: 'chronicles' },
-    { label: 'Dashboards', target: 'compass' },
-    { label: 'Products', target: 'products' },
-    { label: 'The Vault', target: 'vault' },
-    { label: 'Consulting', target: 'consulting' },
+    { label: t.nav.research, target: 'chronicles' },
+    { label: t.nav.dashboards, target: 'compass' },
+    { label: t.nav.products, target: 'products' },
+    { label: t.nav.vault, target: 'vault' },
+    { label: t.nav.consulting, target: 'consulting' },
   ];
+
+  const languageToggle = (
+    <nav aria-label={t.common.language} className="flex items-center text-xs font-mono-code font-semibold">
+      {(['pl', 'en'] as const).map((l, i) => (
+        <React.Fragment key={l}>
+          {i > 0 && <span className="px-1 text-slate-400">|</span>}
+          <a
+            href={localizedPath(pathname, l)}
+            hrefLang={l}
+            aria-current={l === locale ? 'true' : undefined}
+            className={l === locale ? 'text-[#2C6E76]' : 'text-slate-500 hover:text-[#3B8B94]'}
+          >
+            {t.common[l]}
+          </a>
+        </React.Fragment>
+      ))}
+    </nav>
+  );
 
   const handleNavClick = (target: string) => {
     onNavigate(target);
@@ -38,10 +61,10 @@ export const Header: React.FC<HeaderProps> = ({
               className="group flex items-baseline space-x-2 text-left focus:outline-none"
             >
               <span className="font-serif-heading text-3xl sm:text-4xl font-bold tracking-tight text-[#24292E] group-hover:text-[#3B8B94] transition-colors">
-                Zohelo
+                {t.common.brand}
               </span>
               <span className="hidden sm:inline-block text-[11px] font-mono-code font-semibold tracking-wider text-[#3B8B94] bg-[#3B8B94]/10 px-2 py-0.5 rounded">
-                DATA LAKEHOUSE
+                {t.nav.badge}
               </span>
             </button>
           </div>
@@ -66,29 +89,31 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onOpenSearch}
               className="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-600 hover:border-[#3B8B94]/40 hover:text-[#3B8B94] shadow-xs transition-all cursor-pointer"
-              title="Search indicators, regions and reports"
+              title={t.nav.searchTitle}
             >
               <Search className="w-3.5 h-3.5 text-slate-400" />
-              <span>Quick Search</span>
+              <span>{t.nav.quickSearch}</span>
               <kbd className="font-mono-code text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">
                 ⌘K
               </kbd>
             </button>
+            {languageToggle}
           </div>
 
           {/* Mobile Menu Trigger */}
           <div className="flex md:hidden items-center space-x-2">
+            <span className="sm:hidden">{languageToggle}</span>
             <button
               onClick={onOpenSearch}
               className="p-2 rounded-lg text-slate-600 hover:bg-slate-200/60"
-              aria-label="Search"
+              aria-label={t.nav.search}
             >
               <Search className="w-5 h-5" />
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg text-slate-700 hover:bg-slate-200/60 focus:outline-none"
-              aria-label="Toggle Navigation"
+              aria-label={t.nav.toggleNav}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
