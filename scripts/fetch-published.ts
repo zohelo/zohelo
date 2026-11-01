@@ -17,7 +17,10 @@ const credentialVars = [
   'STORAGE_ENDPOINT_URL',
   'STORAGE_LAKEHOUSE_BUCKET_NAME',
 ] as const;
-const optional = ['feed/changes.json', 'feed/calendar.ics', 'geo/voivodeship.geojson'];
+// Files the build reads without a fallback: /regions, the region pages, the indicator rankings and the home
+// spotlight read geo/voivodeship.geojson, so a deploy without it fails here, not in the pre-render (#298).
+const requiredFiles = ['geo/voivodeship.geojson'];
+const optional = ['feed/changes.json', 'feed/calendar.ics'];
 
 function filesUnder(dir: string): string[] {
   return readdirSync(dir, { recursive: true, withFileTypes: true })
@@ -67,6 +70,7 @@ export async function fetchPublished(out: string, env: Env, opts: { require: boo
   for (const key of requiredLatest(catalog)) {
     await required(`kpi/${key}/latest.json`);
   }
+  for (const path of requiredFiles) await required(path);
   // Published KPIs without latest.json by contract (NO_LATEST): fetched when present, never required.
   const extra = catalog.kpis
     .filter((k) => k.status === 'published' && NO_LATEST.includes(k.kpi_key))
