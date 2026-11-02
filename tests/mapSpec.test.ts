@@ -30,4 +30,19 @@ describe('mapSpec', () => {
     expect(s.encoding.color.scale.range).toEqual(['#aaaaaa', '#bbbbbb']);
     expect(s.encoding.color.condition.value).toBe('#cccccc');
   });
+
+  test('a click opens the profile', () => {
+    const pl = spec('pl');
+    const en = spec('en');
+    expect(pl.encoding.href.field).toBe('href');
+    expect(pl.mark.cursor).toBe('pointer');
+    expect(pl.transform.at(-1)).toEqual({
+      calculate: "'/regions/' + substring(datum.properties.geography_key, 5)",
+      as: 'href',
+    });
+    expect(en.transform.at(-1)).toEqual({
+      calculate: "'/en/regions/' + substring(datum.properties.geography_key, 5)",
+      as: 'href',
+    });
+  });
 });
