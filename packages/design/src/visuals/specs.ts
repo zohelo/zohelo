@@ -1,4 +1,5 @@
 import type { VisualizationSpec } from "vega-embed";
+import { TOOLTIP_FORMAT, VALUE_FORMAT } from "./locale";
 
 // Vega-Lite spec builders: one function per chart type, fed with plain rows.
 // Field names are passed in, so the same builders serve every metric.
@@ -9,7 +10,7 @@ export type Theme = { text: string; muted: string; grid: string; accent: string;
 export function config(t: Theme) {
   return {
     font: "inherit",
-    axis: { labelColor: t.muted, titleColor: t.muted, gridColor: t.grid, domainColor: t.grid, tickColor: t.grid, labelFontSize: 11, titleFontSize: 11, titleFontWeight: 500 },
+    axis: { labelColor: t.muted, titleColor: t.muted, gridColor: t.grid, domainColor: t.grid, tickColor: t.grid, labelFontSize: 11, titleFontSize: 11, titleFontWeight: 500, titlePadding: 12 },
     legend: { labelColor: t.text, titleColor: t.muted, labelFontSize: 12 },
     view: { stroke: null },
     range: { category: t.palette },
@@ -40,7 +41,7 @@ export function lineSpec(rows: object[], o: LineOptions): VisualizationSpec {
     mark: { type: "line", point: rows.length <= 60, strokeWidth: 2, interpolate: "monotone" },
     encoding: {
       x: { field: o.x, type: "temporal", title: null, axis: { tickCount: 7, labelOverlap: true, grid: false } },
-      y: { field: o.y, type: "quantitative", title: o.yTitle, scale: { zero: false }, axis: { format: "~s", tickCount: 5 } },
+      y: { field: o.y, type: "quantitative", title: o.yTitle, scale: { zero: false }, axis: { format: VALUE_FORMAT, tickCount: 5 } },
       color: {
         field: o.series,
         type: "nominal",
@@ -53,7 +54,7 @@ export function lineSpec(rows: object[], o: LineOptions): VisualizationSpec {
       tooltip: [
         { field: o.series, type: "nominal", title: "Series" },
         { field: o.x, type: "temporal", title: "Period" },
-        { field: o.y, type: "quantitative", title: o.yTitle, format: ",.4~f" },
+        { field: o.y, type: "quantitative", title: o.yTitle, format: TOOLTIP_FORMAT },
       ],
     },
   } as VisualizationSpec;
@@ -82,7 +83,7 @@ export function smallMultiplesSpec(rows: object[], o: SmallMultiplesOptions): Vi
       mark: { type: "line", strokeWidth: 1.5 },
       encoding: {
         x: { field: o.x, type: "temporal", title: null },
-        y: { field: o.y, type: "quantitative", title: o.yTitle, axis: { format: "~s" } },
+        y: { field: o.y, type: "quantitative", title: o.yTitle, axis: { format: VALUE_FORMAT } },
       },
     },
     resolve: { scale: { y: "shared" } },
@@ -106,13 +107,13 @@ export function barSpec(rows: object[], o: BarOptions): VisualizationSpec {
     mark: { type: "bar", cornerRadiusEnd: 3, cursor: "pointer" },
     encoding: {
       y: { field: o.category, type: "nominal", sort: "-x", title: null, axis: { labelLimit: 220 } },
-      x: { field: o.value, type: "quantitative", title: o.valueTitle, axis: { format: "~s", tickCount: 5 } },
+      x: { field: o.value, type: "quantitative", title: o.valueTitle, axis: { format: VALUE_FORMAT, tickCount: 5 } },
       color: o.selected
         ? { condition: { test: `datum['${o.category}'] === ${JSON.stringify(o.selected)}`, value: o.accent }, value: o.mutedMark }
         : { value: o.accent },
       tooltip: [
         { field: o.category, type: "nominal", title: "Area" },
-        { field: o.value, type: "quantitative", title: o.valueTitle, format: ",.4~f" },
+        { field: o.value, type: "quantitative", title: o.valueTitle, format: TOOLTIP_FORMAT },
       ],
     },
   } as VisualizationSpec;
@@ -175,11 +176,11 @@ export function choroplethSpec(geojson: object, rows: object[], o: ChoroplethOpt
         type: "quantitative",
         title: o.valueTitle,
         scale: { range: o.colors },
-        legend: { orient: "bottom", direction: "horizontal" },
+        legend: { orient: "bottom", direction: "horizontal", format: VALUE_FORMAT },
       },
       tooltip: [
         { field: `properties.${o.name}`, type: "nominal", title: "Region" },
-        { field: o.value, type: "quantitative", title: o.valueTitle, format: ",.4~f" },
+        { field: o.value, type: "quantitative", title: o.valueTitle, format: TOOLTIP_FORMAT },
       ],
     },
   } as VisualizationSpec;

@@ -14,3 +14,4 @@ export {
   type Theme,
 } from "./specs";
 export { themeFromMode } from "./theme";
+export { numberLocale, timeLocale, TOOLTIP_FORMAT, VALUE_FORMAT, type ChartLocale, type NumberLocale, type TimeLocale } from "./locale";

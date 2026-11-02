@@ -15,5 +15,5 @@ export function SeriesChart({ points, unit, label, locale }: { points: SeriesPoi
     const rows = points.map((p) => ({ date: p.date, value: p.value, series: seriesName[locale] }));
     return lineSpec(rows, { x: 'date', y: 'value', series: 'series', yTitle: unit });
   }, [points, unit, locale]);
-  return <Chart build={build} label={label} />;
+  return <Chart build={build} label={label} locale={locale} />;
 }

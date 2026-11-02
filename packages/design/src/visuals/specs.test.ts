@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { numberLocale, timeLocale, TOOLTIP_FORMAT, VALUE_FORMAT } from "./locale";
 import { barSpec, choroplethSpec, lineSpec, rankingSpec, smallMultiplesSpec, type ChoroplethOptions } from "./specs";
 
 const geojson = JSON.parse(
@@ -87,5 +88,28 @@ describe("rankingSpec", () => {
     expect(JSON.stringify(spec)).toBe(before);
     expect(spec.encoding.y.sort).toBe("-x");
     expect(spec.encoding.tooltip.map((t) => t.title)).toEqual(["Area", "Value"]);
+  });
+});
+
+describe("number and time formats (zohelo#384)", () => {
+  test("legend labels are rounded and grouped, tooltips keep the published precision", () => {
+    const spec = choroplethSpec(geojson, rows, options) as any;
+    expect(spec.encoding.color.legend.format).toBe(VALUE_FORMAT);
+    expect(spec.encoding.tooltip[1].format).toBe(TOOLTIP_FORMAT);
+    expect(VALUE_FORMAT).toBe(",.2~f");
+  });
+
+  test("axes use grouped plain numbers, never SI prefixes", () => {
+    const line = lineSpec([{ month: "2025-01-01", value: 845000, series: "PL" }], { x: "month", y: "value", series: "series", yTitle: "mln EUR" }) as any;
+    expect(line.encoding.y.axis.format).toBe(VALUE_FORMAT);
+    expect(JSON.stringify(line)).not.toContain('"~s"');
+  });
+
+  test("the Polish locale uses a decimal comma, a no-break space and Polish months", () => {
+    expect(numberLocale.pl.decimal).toBe(",");
+    expect(numberLocale.pl.thousands).toBe("\u00a0");
+    expect(timeLocale.pl.shortMonths[6]).toBe("lip");
+    expect(numberLocale.en.decimal).toBe(".");
+    expect(timeLocale.en.shortMonths[6]).toBe("Jul");
   });
 });
