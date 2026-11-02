@@ -1,0 +1,102 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "width": 300,
+  "height": 52,
+  "padding": {
+    "left": 0,
+    "right": 36,
+    "top": 0,
+    "bottom": 0
+  },
+  "data": {
+    "values": [
+      {
+        "name": "Małopolskie",
+        "v": 2.6,
+        "hi": true,
+        "i": 0
+      },
+      {
+        "name": "Polska",
+        "v": 3.2,
+        "i": 1
+      }
+    ]
+  },
+  "config": {
+    "font": "Inter Variable, Plus Jakarta Sans, sans-serif",
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter Variable, Plus Jakarta Sans, sans-serif",
+      "labelFontSize": 11,
+      "labelColor": "#24292E"
+    }
+  },
+  "encoding": {
+    "y": {
+      "field": "name",
+      "type": "nominal",
+      "sort": {
+        "field": "i"
+      },
+      "title": null,
+      "axis": {
+        "domain": false,
+        "ticks": false,
+        "labelPadding": 8,
+        "labelLimit": 140
+      }
+    },
+    "x": {
+      "field": "v",
+      "type": "quantitative",
+      "title": null,
+      "axis": null,
+      "scale": {
+        "zero": true
+      }
+    }
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "bar",
+        "height": 12,
+        "cornerRadiusEnd": 2
+      },
+      "encoding": {
+        "color": {
+          "condition": {
+            "test": "datum.hi",
+            "value": "#2C6E76"
+          },
+          "value": "#7FAEB3"
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "calculate": "format(datum.v, '.1f') + '%'",
+          "as": "lab"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "dx": 6,
+        "fontSize": 11,
+        "font": "Inter Variable, Plus Jakarta Sans, sans-serif",
+        "fontWeight": 600,
+        "color": "#24292E"
+      },
+      "encoding": {
+        "text": {
+          "field": "lab"
+        }
+      }
+    }
+  ]
+}
