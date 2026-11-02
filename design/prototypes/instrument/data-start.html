@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Stan danych · zohelo Data</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="data">
+<a class="skip" href="#main">Przejdź do treści</a>
+<div class="fixture" role="note">Dane przykładowe (fixture): wartości, daty i licencje nie są prawdziwe. <a href="index.html">Prototyp B · Instrument</a></div>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="data-start.html">zohelo Data<small>Polska w danych</small></a>
+  <nav class="switch" aria-label="Produkty zohelo"><a href="com-home.html">zohelo</a><a href="bi-dashboard.html">zohelo BI</a><a href="data-start.html" aria-current="page">zohelo Data</a></nav>
+  <nav class="main" aria-label="Główna"><a href="data-start.html" aria-current="page">Start</a><a href="#">Tabele</a><a href="#">Przebiegi</a><a href="#">SQL</a></nav>
+  <div class="tools"><div class="search" role="search"><span>Szukaj wskaźnika, regionu…</span><kbd>/</kbd></div><a class="lang" href="#" aria-disabled="true">EN</a><button class="btn menu-btn" type="button" aria-expanded="false" aria-label="Menu">☰</button></div>
+</div></header>
+<main id="main" class="wrap">
+
+<div class="head"><div><p class="meta">Narzędzie wewnętrzne · warstwa <span class="fig">06_published/v1</span></p><h1>Stan danych</h1></div>
+<div class="toolbar"><a class="btn primary" href="#">SQL</a><a class="btn" href="#">Tabele</a><a class="btn" href="#">Przebiegi</a><a class="btn" href="#">Katalog JSON</a></div></div>
+<div class="board">
+  <div class="tile" style="min-height:auto"><span class="label">Wskaźniki opublikowane</span><span class="value">5<small>z 5</small></span><span class="prov"><span>katalog</span><span class="fig">1 sty 2026</span></span></div>
+  <div class="tile" style="min-height:auto"><span class="label">Źródła</span><span class="value">4</span><span class="prov"><span>rejestr</span><span>wszystkie ok</span></span></div>
+  <div class="tile" style="min-height:auto"><span class="label">Ostatni przebieg pipeline</span><span class="value"><span class="status-ok">zielony</span></span><span class="prov"><span>gold.publish</span><span class="fig">1 sty 2026</span></span></div>
+  <div class="tile" style="min-height:auto"><span class="label">Najstarsze dane</span><span class="value">2024<small>ludność</small></span><span class="prov"><span>GUS BDL</span><span>rocznie</span></span></div>
+</div>
+<section class="panel" style="margin-top:12px"><h2><span>Wskaźniki w warstwie published</span><span class="meta"><a href="#">catalog.json</a></span></h2>
+  <div class="table-wrap" tabindex="0" role="region" aria-label="Wskaźniki"><table><thead><tr><th>Wskaźnik</th><th>Źródła</th><th>Częst.</th><th class="n">Zakres</th><th>Status</th><th>Wczytano</th><th>Otwórz</th></tr></thead><tbody><tr><td><b>Ludność</b><br><span class="meta fig">population</span></td><td>GUS BDL</td><td>rocznie</td><td class="n">1990–2025</td><td style="white-space:nowrap"><span class="dot" style="background:#15803d"></span>opublikowany</td><td class="fig" style="white-space:nowrap">1 sty 2026</td><td><a href="#">SQL</a> · <a href="#">parquet</a></td></tr><tr><td><b>PKB w cenach bieżących</b><br><span class="meta fig">gdp_current_prices</span></td><td>Eurostat, Bank Światowy</td><td>rocznie</td><td class="n">1995–2024</td><td style="white-space:nowrap"><span class="dot" style="background:#15803d"></span>opublikowany</td><td class="fig" style="white-space:nowrap">1 sty 2026</td><td><a href="#">SQL</a> · <a href="#">parquet</a></td></tr><tr><td><b>Inflacja (ceny konsumpcyjne)</b><br><span class="meta fig">inflation</span></td><td>Eurostat, Bank Światowy</td><td>miesięcznie</td><td class="n">1997–2026-09</td><td style="white-space:nowrap"><span class="dot" style="background:#15803d"></span>opublikowany</td><td class="fig" style="white-space:nowrap">1 sty 2026</td><td><a href="#">SQL</a> · <a href="#">parquet</a></td></tr><tr><td><b>Stopa bezrobocia (BAEL)</b><br><span class="meta fig">unemployment_rate</span></td><td>Eurostat, Bank Światowy</td><td>rocznie</td><td class="n">2000–2025</td><td style="white-space:nowrap"><span class="dot" style="background:#15803d"></span>opublikowany</td><td class="fig" style="white-space:nowrap">1 sty 2026</td><td><a href="#">SQL</a> · <a href="#">parquet</a></td></tr><tr><td><b>Kurs waluty w PLN</b><br><span class="meta fig">fx_rate</span></td><td>NBP</td><td>dziennie</td><td class="n">2002–2026-10</td><td style="white-space:nowrap"><span class="dot" style="background:#15803d"></span>opublikowany</td><td class="fig" style="white-space:nowrap">1 sty 2026</td><td><a href="#">SQL</a> · <a href="#">parquet</a></td></tr></tbody></table></div></section>
+<div class="grid-2">
+  <section class="panel"><h2>Źródła i świeżość</h2><div class="table-wrap"><table><thead><tr><th>Źródło</th><th>Rejestr</th><th>Licencja</th><th>Ostatnie ładowanie</th><th>Stan</th></tr></thead><tbody><tr><td>Eurostat</td><td class="fig" style="white-space:nowrap">GL-001</td><td>Creative Commons Attribution 4.0</td><td class="fig">1 sty 2026</td><td><span class="dot" style="background:#15803d"></span>ok</td></tr><tr><td>Bank Światowy – WDI</td><td class="fig" style="white-space:nowrap">GL-005</td><td>Creative Commons Attribution 4.0</td><td class="fig">1 sty 2026</td><td><span class="dot" style="background:#15803d"></span>ok</td></tr><tr><td>GUS – Bank Danych Lokalnych</td><td class="fig" style="white-space:nowrap">PLS-001</td><td>GUS terms of use (illustrative)</td><td class="fig">1 sty 2026</td><td><span class="dot" style="background:#15803d"></span>ok</td></tr><tr><td>Narodowy Bank Polski</td><td class="fig" style="white-space:nowrap">PLG-001</td><td>NBP terms of use (illustrative)</td><td class="fig">1 sty 2026</td><td><span class="dot" style="background:#15803d"></span>ok</td></tr></tbody></table></div></section>
+  <section class="panel"><h2>Ostatnie zmiany</h2><div class="table-wrap"><table><thead><tr><th>Data</th><th>Źródło</th><th>Zbiór</th><th>Co się zmieniło</th></tr></thead><tbody><tr><td class="fig" style="white-space:nowrap">1 sty 2026</td><td>Eurostat</td><td class="fig">une_rt_a</td><td><a href="#">Eurostat: zaktualizowano stopę bezrobocia (przykład)</a></td></tr><tr><td class="fig" style="white-space:nowrap">1 sty 2026</td><td>Narodowy Bank Polski</td><td class="fig">fx_a</td><td><a href="#">NBP: nowa tabela kursów A (przykład)</a></td></tr><tr><td class="fig" style="white-space:nowrap">1 sty 2026</td><td>Eurostat</td><td class="fig">une_rt_a</td><td><a href="#">Eurostat: zaktualizowano stopę bezrobocia (przykład)</a> <span class="meta">(powtórzone dla gęstości)</span></td></tr><tr><td class="fig" style="white-space:nowrap">1 sty 2026</td><td>Narodowy Bank Polski</td><td class="fig">fx_a</td><td><a href="#">NBP: nowa tabela kursów A (przykład)</a> <span class="meta">(powtórzone dla gęstości)</span></td></tr></tbody></table></div></section>
+</div>
+</main>
+<footer class="site"><div class="wrap"><p>zohelo — otwarte dane publiczne o Polsce. Eurostat, GUS, Bank Światowy, NBP; licencja przy każdej liczbie.</p><p><a href="#">Licencje i cytowanie</a> · <a href="#">Metodologia</a> · <a href="#">RSS</a> · <a href="#">API</a></p></div></footer>
+</body>
+</html>

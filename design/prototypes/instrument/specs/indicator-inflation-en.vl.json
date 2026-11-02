@@ -1,0 +1,510 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "width": 760,
+  "height": 240,
+  "padding": {
+    "left": 0,
+    "right": 0,
+    "top": 6,
+    "bottom": 0
+  },
+  "data": {
+    "values": [
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2024-01",
+        "v": 3.7,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2024-02",
+        "v": 2.8,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2024-03",
+        "v": 2,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2024-04",
+        "v": 2.4,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2024-05",
+        "v": 2.5,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2024-06",
+        "v": 2.6,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2024-07",
+        "v": 4.2,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2024-08",
+        "v": 4.3,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2024-09",
+        "v": 4.9,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2024-10",
+        "v": 5,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2024-11",
+        "v": 4.7,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2024-12",
+        "v": 4.7,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2025-01",
+        "v": 4.9,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2025-02",
+        "v": 4.9,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2025-03",
+        "v": 4.9,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2025-04",
+        "v": 4.3,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2025-05",
+        "v": 4,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2025-06",
+        "v": 4.1,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2025-07",
+        "v": 3.1,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2025-08",
+        "v": 2.9,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2025-09",
+        "v": 2.9,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2025-10",
+        "v": 2.8,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2025-11",
+        "v": 2.9,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2025-12",
+        "v": 3,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2026-01",
+        "v": 3.1,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2026-02",
+        "v": 3.3,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2026-03",
+        "v": 3.2,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2026-04",
+        "v": 3.1,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2026-05",
+        "v": 3,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2026-06",
+        "v": 3.1,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2026-07",
+        "v": 3.1,
+        "ill": true,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2026-08",
+        "v": 3,
+        "ill": false,
+        "joint": true,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "HICP y/y",
+        "role": "accent",
+        "t": "2026-09",
+        "v": 2.9,
+        "ill": false,
+        "joint": false,
+        "prelim": false,
+        "last": true
+      }
+    ]
+  },
+  "config": {
+    "font": "Inter Variable, Plus Jakarta Sans, sans-serif",
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter Variable, Plus Jakarta Sans, sans-serif",
+      "labelFontSize": 11,
+      "labelColor": "#5D636B"
+    }
+  },
+  "encoding": {
+    "x": {
+      "field": "t",
+      "type": "temporal",
+      "title": null,
+      "axis": {
+        "format": "%b %Y",
+        "tickCount": 3,
+        "tickColor": "#D9DEE3",
+        "domainColor": "#D9DEE3",
+        "grid": false,
+        "labelFlush": true
+      }
+    },
+    "y": {
+      "field": "v",
+      "type": "quantitative",
+      "title": null,
+      "scale": {
+        "zero": false,
+        "nice": true
+      },
+      "axis": {
+        "format": ".1f",
+        "orient": "right",
+        "gridColor": "#E8ECEF",
+        "gridDash": [
+          1,
+          3
+        ],
+        "domain": false,
+        "ticks": false,
+        "tickCount": 3,
+        "labelPadding": 4,
+        "labelExpr": "datum.label + '%'"
+      }
+    },
+    "color": {
+      "field": "role",
+      "type": "nominal",
+      "legend": null,
+      "scale": {
+        "domain": [
+          "accent"
+        ],
+        "range": [
+          "#2C6E76"
+        ]
+      }
+    }
+  },
+  "layer": [
+    {
+      "transform": [
+        {
+          "filter": "datum.ill || datum.joint"
+        }
+      ],
+      "mark": {
+        "type": "line",
+        "strokeWidth": 1.25,
+        "strokeDash": [
+          2,
+          3
+        ],
+        "opacity": 0.7
+      },
+      "encoding": {
+        "detail": {
+          "field": "s"
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "!datum.ill"
+        }
+      ],
+      "mark": {
+        "type": "line",
+        "strokeWidth": 2
+      },
+      "encoding": {
+        "detail": {
+          "field": "s"
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.last"
+        }
+      ],
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "size": 34,
+        "strokeWidth": 1.5
+      },
+      "encoding": {
+        "fill": {
+          "condition": {
+            "test": "datum.prelim",
+            "value": "white"
+          },
+          "field": "role",
+          "type": "nominal",
+          "scale": {
+            "domain": [
+              "accent"
+            ],
+            "range": [
+              "#2C6E76"
+            ]
+          },
+          "legend": null
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.last"
+        },
+        {
+          "calculate": "format(datum.v, '.1f') + '%'",
+          "as": "lab"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "align": "right",
+        "baseline": "bottom",
+        "dy": -7,
+        "fontSize": 11,
+        "fontWeight": 600,
+        "font": "Inter Variable, Plus Jakarta Sans, sans-serif"
+      },
+      "encoding": {
+        "text": {
+          "field": "lab"
+        },
+        "color": {
+          "condition": {
+            "test": "datum.role === 'context'",
+            "value": "#5D636B"
+          },
+          "value": "#24292E"
+        }
+      }
+    }
+  ]
+}
