@@ -27,9 +27,6 @@ deliverables:
   title: /data downloads
   done_when:
   - Downloads served from the site build (copied published extracts) with licence and citation per file
-  todo:
-  - The /data route listing build/client/downloads (Task downloads) with citation() (Task citation) per file; KPIs
-    over the 200 kB cap link to zohelo-bi.
   tasks:
   - key: com/site/data-pages/data/citation
     type: Task
@@ -95,6 +92,72 @@ deliverables:
     - Files over 200 kB
     depends_on:
     - com/site/indicators/pages/series-reader
+  - key: com/site/data-pages/data/plan
+    type: Task
+    title: Decide the download files once for the build script and the pages
+    effort: S
+    state: open
+    contract: false
+    context: >-
+      Today scripts/downloads.ts decides after the build which files it writes to build/client/downloads (a KPI's
+      kpi/<kpi_key>/series.parquet exists and is at most DOWNLOAD_LIMIT bytes; its CSV is at most DOWNLOAD_LIMIT bytes).
+      Pages are pre-rendered before that script runs (package.json build order), so a page cannot look at
+      build/client/downloads to know which links exist. Target: one exported function in src/dataPages/downloads.ts
+      that applies the same rules, used by the script now and by the /data page and the indicator page next (Tasks
+      com/site/data-pages/data/page and com/site/indicators/pages/downloads-block). Output of the build is unchanged.
+    files:
+    - edit: src/dataPages/downloads.ts
+    - edit: scripts/downloads.ts
+    - edit: tests/downloads.test.ts
+    steps:
+    - Follow every step of section 'Task com/site/data-pages/data/plan' in .github/backlog/assets/data-downloads.md, in order.
+    acceptance:
+    - planKpiDownloads applies the size rules exactly as the script did; the script uses it and writes the same files
+    - The fixture build still writes 10 files
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/downloads.test.ts
+      expect: exit 0; 6 pass, 0 fail
+    - run: bun run build 2>&1 | grep '^downloads:' | tail -1
+      expect: 'downloads: 10 files written to build/client/downloads'
+    out_of_scope:
+    - Any page or link (Tasks page and downloads-block)
+    - Changing DOWNLOAD_LIMIT or the CSV format
+  - key: com/site/data-pages/data/page
+    type: Task
+    title: Add the /data page listing every download with licence and citation
+    effort: M
+    state: open
+    contract: false
+    context: >-
+      The site build writes a CSV and a Parquet file per published KPI to /downloads/ (#382), but no page links to
+      them, so nobody can find them. The Epic's outcome is a /data page (PL at /data, EN at /en/data) with every
+      download, its licence and a citation; citation() exists in src/dataPages/citation.ts and planKpiDownloads() in
+      src/dataPages/downloads.ts (Task plan). Layout uses today's tokens and the page container, like /sources; the
+      design decision of review round 1 restyles it later. The PR is `ui`: Designer review before the Architect.
+    files:
+    - edit: src/site.config.ts
+    - edit: src/routes.ts
+    - create: src/routes/data.tsx
+    - create: tests/dataRoute.test.ts
+    steps:
+    - Follow every step of section 'Task com/site/data-pages/data/page' in .github/backlog/assets/data-downloads.md, in order.
+    acceptance:
+    - /data and /en/data are pre-rendered and listed in sitemap.xml (pages drives both)
+    - Every published KPI is one row with its CSV and Parquet links, licence and citation
+    - Designer `Design review:` approved on the PR head
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/dataRoute.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -o 'href="/downloads/[^"]*"' build/client/data/index.html | wc -l && grep -c '/en/data' build/client/sitemap.xml
+      expect: 10; at least 1
+    out_of_scope:
+    - Header and footer links to /data (Task com/site/site-v1/shell/nav-data)
+    - The download block on indicator pages (Task com/site/indicators/pages/downloads-block)
+    - Region-level downloads, an API
+    depends_on:
+    - com/site/data-pages/data/plan
+    notes:
+    - zohelo#401 (open) also edits src/site.config.ts neighbours; update the branch from main before review.
 - key: com/site/data-pages/sources
   title: /sources page
   done_when:
