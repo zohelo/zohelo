@@ -15,10 +15,10 @@ describe('kpiSources', () => {
     });
   });
 
-  test('population in English with two licences', () => {
+  test('population in English: GUS only', () => {
     const sources = kpiSources(catalog, 'population', 'en');
-    expect(sources.map((s) => s.name)).toEqual(['Eurostat', 'World Bank – WDI', 'Statistics Poland – Local Data Bank']);
-    expect(footerProps(sources).licence).toBe('Creative Commons Attribution 4.0 · GUS terms of use (illustrative)');
+    expect(sources.map((s) => s.name)).toEqual(['Statistics Poland – Local Data Bank']);
+    expect(footerProps(sources).licence).toBe('GUS terms of use (illustrative)');
   });
 
   test('an unknown source_key is skipped', () => {

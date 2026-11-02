@@ -2,6 +2,7 @@ import { KpiTile, SourceFooter } from '@zohelo/design';
 import { useLoaderData } from 'react-router';
 import { SubscribeCalendar } from '../components/SubscribeCalendar';
 import { localeOf, useLocale } from '../i18n';
+import { indicatorDescription } from '../indicators/description';
 import { footerProps, kpiSources } from '../indicators/sources';
 import { latestTile, type LatestTile } from '../indicators/tile';
 import { unitLabel } from '../indicators/unitLabel';
@@ -26,26 +27,37 @@ export async function loader({ request, params }: { request: Request; params: { 
   if (NO_LATEST.includes(kpi.kpi_key)) {
     const unit = unitLabel(catalog.units, kpi.unit_key, locale);
     const tile: LatestTile = { label: name, value: null, unit, delta: null, period: '', sourceKey: null, checkedAt: null, provisional: false };
-    return { tile, sources, ranking: null, geo: null, jsonLd, name, lastPeriod: kpi.last_period };
+    const description = indicatorDescription(name, tile, sources.sources.map((s) => s.name), locale);
+    return { tile, sources, ranking: null, geo: null, jsonLd, name, lastPeriod: kpi.last_period, description };
   }
 
   const latest = readKpiLatest(dir, kpi.kpi_key);
   const ranking = rankRegions(latest);
+  const tile = latestTile(kpi, latest, catalog.units, locale);
   return {
-    tile: latestTile(kpi, latest, catalog.units, locale),
+    tile,
     sources,
     ranking,
     geo: ranking ? readGeo(dir, 'voivodeship') : null,
     jsonLd,
     name,
     lastPeriod: kpi.last_period,
+    description: indicatorDescription(name, tile, sources.sources.map((s) => s.name), locale),
   };
 }
 
-export function meta({ data, params, location }: { data?: { name: string }; params: { kpi?: string }; location: { pathname: string } }) {
+export function meta({
+  data,
+  params,
+  location,
+}: {
+  data?: { name: string; description: string };
+  params: { kpi?: string };
+  location: { pathname: string };
+}) {
   const locale = localeOf(location.pathname);
   const name = data?.name ?? params.kpi ?? '';
-  return pageMeta({ path: `/indicators/${params.kpi}`, locale, title: name, description: `${name} — zohelo` });
+  return pageMeta({ path: `/indicators/${params.kpi}`, locale, title: name, description: data?.description ?? `${name} — zohelo` });
 }
 
 export default function Indicator() {
