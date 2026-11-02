@@ -1,6 +1,7 @@
 // Writes build/client/sitemap.xml and robots.txt after the build: one <url> per page and language
 // (the pages from src/site.config.ts, every published KPI page and every voivodeship profile, at their
-// trailing-slash URL), each with its hreflang alternates.
+// trailing-slash URL), each with its hreflang alternates. Indicator pages carry <lastmod> from the catalog
+// loaded_at (the date their data last loaded); other pages have no date and get none.
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { publishedDir, readCatalog } from '../src/published';
@@ -16,19 +17,20 @@ const escape = (s: string) =>
 // The same URL as the pages' canonical and hreflang tags (src/seo.ts).
 const url = (path: string, lang: Lang) => escape(absoluteUrl(path, lang));
 
-const paths = [
-  ...pages.map((p) => p.path),
+const paths: { path: string; lastmod?: string }[] = [
+  ...pages.map((p) => ({ path: p.path })),
   ...readCatalog(publishedDir())
     .kpis.filter((k) => k.status === 'published')
-    .map((k) => `/indicators/${k.kpi_key}`),
-  ...VOIVODESHIP_TERYT.map((t) => `/regions/${t}`),
+    .map((k) => ({ path: `/indicators/${k.kpi_key}`, lastmod: k.loaded_at.slice(0, 10) })),
+  ...VOIVODESHIP_TERYT.map((t) => ({ path: `/regions/${t}` })),
 ];
 
-const entries = paths.flatMap((path) =>
+const entries = paths.flatMap(({ path, lastmod }) =>
   (['pl', 'en'] as const).map((lang) =>
     [
       '  <url>',
       `    <loc>${url(path, lang)}</loc>`,
+      ...(lastmod ? [`    <lastmod>${lastmod}</lastmod>`] : []),
       `    <xhtml:link rel="alternate" hreflang="pl" href="${url(path, 'pl')}"/>`,
       `    <xhtml:link rel="alternate" hreflang="en" href="${url(path, 'en')}"/>`,
       `    <xhtml:link rel="alternate" hreflang="x-default" href="${url(path, 'pl')}"/>`,
