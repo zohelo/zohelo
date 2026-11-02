@@ -7,7 +7,7 @@ export const tokens = {
     "brand-azure": "#3A6FA4",
     "text": "#24292E",
     "text-muted": "#5D636B",
-    "text-faint": "#8A9099",
+    "text-faint": "#686E76",
     "bg": "#F4F7F9",
     "surface": "#FFFFFF",
     "surface-2": "#EDF1F4",
