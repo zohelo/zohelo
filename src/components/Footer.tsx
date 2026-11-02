@@ -1,12 +1,16 @@
 import React from 'react';
-import { useT } from '../i18n';
+import { localizedPath, useLocale, useT } from '../i18n';
 
-interface FooterProps {
-  onNavigate: (sectionId: string) => void;
-}
+const links = [
+  { key: 'indicators', path: '/indicators' },
+  { key: 'regions', path: '/regions' },
+  { key: 'changes', path: '/changes' },
+  { key: 'sources', path: '/sources' },
+] as const;
 
-export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+export const Footer: React.FC = () => {
   const t = useT();
+  const locale = useLocale();
   return (
     <footer className="w-full bg-[#1E252B] text-slate-300 border-t border-slate-800 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -34,26 +38,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               {t.footer.navHeading}
             </h4>
             <ul className="space-y-1.5 text-slate-400">
-              <li>
-                <button onClick={() => onNavigate('pulse')} className="hover:text-white transition-colors">
-                  {t.footer.pulse}
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('metrics')} className="hover:text-white transition-colors">
-                  {t.footer.metrics}
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('compass')} className="hover:text-white transition-colors">
-                  {t.footer.compass}
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onNavigate('vault')} className="hover:text-white transition-colors">
-                  {t.footer.vault}
-                </button>
-              </li>
+              {links.map((link) => (
+                <li key={link.path}>
+                  <a href={localizedPath(link.path, locale)} className="hover:text-white transition-colors">
+                    {t.nav[link.key]}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -66,8 +57,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           </div>
           <div className="flex items-center space-x-4">
             <span>{t.footer.sources}</span>
-            <span>•</span>
-            <span className="text-[#3B8B94]">{t.footer.credit}</span>
           </div>
         </div>
       </div>

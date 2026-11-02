@@ -94,7 +94,7 @@ export default function App({
       </main>
 
       {/* Footer */}
-      <Footer onNavigate={handleNavigate} />
+      <Footer />
 
       {/* Toast Notification Alert */}
       {toastMessage && (

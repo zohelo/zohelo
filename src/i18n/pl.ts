@@ -1,25 +1,20 @@
 // Polish shell texts (nav, footer, buttons). Polish is the default language at /.
 export const pl = {
   nav: {
-    badge: 'DATA LAKEHOUSE',
-    dashboards: 'Dashboardy',
-    products: 'Produkty',
-    vault: 'Skarbiec',
-    consulting: 'Doradztwo',
+    badge: 'POLSKA W DANYCH',
+    indicators: 'Wskaźniki',
+    regions: 'Regiony',
+    changes: 'Zmiany',
+    sources: 'Źródła',
     toggleNav: 'Pokaż lub ukryj nawigację',
   },
   footer: {
-    badge: 'OTWARTE RAPORTOWANIE',
+    badge: 'POLSKA W DANYCH',
     about: 'Dane publiczne o Polsce i świecie, zbudowane na Cloudflare i GitHub.',
     navHeading: 'Nawigacja',
-    pulse: 'Puls (wskaźniki na żywo)',
-    metrics: 'Metryki (KPI)',
-    compass: 'Kompas (16 województw)',
-    vault: 'Skarbiec (lakehouse Parquet)',
     foundedBy: 'Założyciel:',
     founder: 'Radosław Utkała',
     sources: 'Źródła danych: Główny Urząd Statystyczny (GUS), NBP, RIO',
-    credit: 'Tony Stark & Jarvis Model',
   },
   products: {
     heading: 'Produkty',
