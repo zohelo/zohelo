@@ -377,9 +377,45 @@ deliverables:
   todo:
   - Replace PulseSection with a rates block (NBP EUR/PLN, USD/PLN, CHF/PLN with table number and date, reference rate;
     no WIBOR; Domain expert finance proposal 1 on zohelo-data#2074) from published KPIs. fx_rate has no latest.json
-    under D26, so the block needs a series.parquet reader. Delete src/content/pulseData.ts. The today strip grows from
+    under D26, so the block needs a series.parquet reader. The today strip grows from
     HOME_KPIS to the six KPIs of the Epic's done_when as they are published.
   tasks:
+  - key: com/site/indicators/home/pulse-removal
+    type: Task
+    title: Remove the invented market ticker (PulseSection) from home
+    effort: S
+    state: open
+    contract: false
+    context: The first home section, PulseSection (src/components/PulseSection.tsx, data src/content/pulseData.ts, about 2,800
+      lines), shows a market ticker with invented quotes and 'live quote' toasts. zohelo shows only published values, so it
+      goes now; the real NBP rates block that replaces it waits for a series.parquet reader (Deliverable todo). After Task vault-removal/delete
+      nothing else imports pulseData.
+    files:
+    - delete: src/components/PulseSection.tsx
+    - delete: src/content/pulseData.ts
+    - edit: src/types.ts
+    - edit: src/App.tsx
+    steps:
+    - Delete the two files listed under Files with git rm.
+    - 'src/App.tsx: remove the PulseSection import and the <PulseSection ... /> element with its comment ''{/* 2. The Pulse:
+      Live Ticker & Indicators */}''. Keep showToast (still used by ProductsSection and HeroConsultingSection).'
+    - 'src/types.ts: delete the interfaces QuoteSnapshot, StockAssetInfo, MarketIndicator, MetricCardData and FinanceTrendItem
+      (no other file uses them).'
+    - '`grep -rn ''PulseSection\|pulseData\|QuoteSnapshot\|StockAssetInfo\|MarketIndicator'' src tests` prints nothing.'
+    acceptance:
+    - Home has no element with id="pulse" in PL and EN
+    - The two files are deleted; lint and tests pass
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -c 'id="pulse"' build/client/index.html build/client/en/index.html
+      expect: build exits 0; both counts 0
+    out_of_scope:
+    - The NBP rates block (todo)
+    - The Footer link to the pulse section (Task nav-links)
+    - IllustrativeBadge
+    depends_on:
+    - com/site/data-pages/vault-removal/delete
   - key: com/site/indicators/home/today-strip
     type: Task
     title: Add the TodayStrip component for the home page

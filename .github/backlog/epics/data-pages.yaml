@@ -179,4 +179,50 @@ deliverables:
   done_when:
   - VaultSection, DatasetPreviewModal and datasetsData.ts deleted; home links to /data
   todo:
-  - Delete the three files and their App.tsx wiring; add a home link card to /data.
+  - Add a home link card to /data once the /data page exists (Deliverable data).
+  tasks:
+  - key: com/site/data-pages/vault-removal/delete
+    type: Task
+    title: Remove the Vault, dataset preview and command palette from home
+    effort: M
+    state: open
+    contract: false
+    context: 'Home (src/App.tsx) still renders prototype parts with invented content: VaultSection (fake lakehouse datasets
+      from datasetsData.ts), DatasetPreviewModal, the ⌘K CommandPalette and DataVisualizationModal (polandRegions.ts). Target:
+      the six files are gone and the header has no search buttons.'
+    files:
+    - delete: src/components/VaultSection.tsx
+    - delete: src/components/DatasetPreviewModal.tsx
+    - delete: src/components/CommandPalette.tsx
+    - delete: src/components/DataVisualizationModal.tsx
+    - delete: src/content/datasetsData.ts
+    - delete: src/content/polandRegions.ts
+    - edit: src/types.ts
+    - edit: src/App.tsx
+    - edit: src/components/Header.tsx
+    - edit: src/i18n/pl.ts
+    - edit: src/i18n/en.ts
+    steps:
+    - Delete the six files listed under Files with git rm.
+    - 'src/types.ts: delete the interfaces VoivodeshipData and DatasetItem; keep all others.'
+    - 'src/App.tsx: remove the imports of DataVisualizationModal, DatasetPreviewModal, CommandPalette and VaultSection; the
+      types import becomes `import { ProductItem } from ''./types'';`. Remove the state isExploreModalOpen, exploreRegion, previewDataset,
+      isSearchOpen, the <VaultSection> element and the three modal elements, each with its comment. Render <Header activeSection={activeSection}
+      onNavigate={handleNavigate} /> (no onOpenSearch).'
+    - 'src/components/Header.tsx: remove onOpenSearch from HeaderProps and from the destructured props; delete the desktop and
+      the mobile search <button> (onClick={onOpenSearch}) and the desktop one''s comment; remove Search from the lucide-react
+      import.'
+    - 'src/i18n/pl.ts and src/i18n/en.ts: delete the nav keys quickSearch, searchTitle and search.'
+    - '`grep -rn ''VaultSection\|DatasetPreviewModal\|CommandPalette\|DataVisualizationModal\|datasetsData\|polandRegions''
+      src tests` prints nothing.'
+    acceptance:
+    - The six files are deleted and nothing in src or tests references them
+    - No Vault section or search button on home (PL, EN); tests pass
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -c '⌘K' build/client/index.html build/client/en/index.html
+      expect: build exits 0; both counts 0
+    out_of_scope:
+    - PulseSection and src/content/pulseData.ts (Task pulse-removal)
+    - Header nav items and the Footer (Task nav-links)
