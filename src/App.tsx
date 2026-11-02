@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Header } from './components/Header';
-import { PulseSection } from './components/PulseSection';
 import { ProductsSection } from './components/ProductsSection';
 import { HeroConsultingSection } from './components/HeroConsultingSection';
 import { Footer } from './components/Footer';
@@ -66,13 +65,6 @@ export default function App({
       {/* Main 8-Section Sequential Flow as mandated by PRD & Mockup */}
       <main className="flex-1">
         
-        {/* 2. The Pulse: Live Ticker & Indicators */}
-        <PulseSection
-          onSelectIndicator={(ind) => {
-            showToast(`Inspecting live quote for ${ind.name}`);
-          }}
-        />
-
         <TodayStrip tiles={tiles} locale={locale} />
         <HomeChanges items={items} sources={sources} locale={locale} />
 
