@@ -56,4 +56,22 @@ describe('shell navigation', () => {
     expect(html).toMatch(/<a href="\/sources" class="underline[^"]*">Źródła danych:<\/a>/);
     expect(html).not.toContain('RIO');
   });
+
+  test('Language and footer links have a 24 px target (WCAG 2.5.8)', () => {
+    const header = renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/en']}>
+        <Header />
+      </MemoryRouter>,
+    );
+    // The toggle renders twice (desktop and mobile), two links each.
+    expect(header.match(/hrefLang="(pl|en)"[^>]*min-h-6 min-w-6/g)?.length).toBe(4);
+    const footer = renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/']}>
+        <Footer />
+      </MemoryRouter>,
+    );
+    const footerLinks = footer.match(/<li><a /g)?.length ?? 0;
+    expect(footerLinks).toBeGreaterThan(0);
+    expect(footer.match(/min-h-6/g)?.length).toBe(footerLinks);
+  });
 });

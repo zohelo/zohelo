@@ -42,7 +42,10 @@ export const Footer: React.FC<{ sources?: string[] }> = ({ sources = [] }) => {
             <ul className="space-y-1.5 text-slate-400">
               {links.map((link) => (
                 <li key={link.path}>
-                  <a href={localizedPath(link.path, locale)} className="hover:text-white transition-colors">
+                  <a
+                    href={localizedPath(link.path, locale)}
+                    className="inline-flex min-h-6 items-center hover:text-white transition-colors"
+                  >
                     {t.nav[link.key]}
                   </a>
                 </li>
