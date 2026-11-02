@@ -35,19 +35,20 @@ export default function Sources() {
       <h1 className="font-display text-[length:var(--z-size-display)] font-semibold">{page.title[locale]}</h1>
       <div className="mt-8 overflow-x-auto">
         <table className="w-full border-collapse text-[length:var(--z-size-sm)]">
+          <caption className="sr-only">{page.title[locale]}</caption>
           <thead className="border-b border-border">
             <tr>
-              <th className={th}>{t.source}</th>
-              <th className={th}>{t.register}</th>
-              <th className={th}>{t.licence}</th>
-              <th className={th}>{t.lastLoaded}</th>
-              <th className={th}>{t.indicators}</th>
+              <th scope="col" className={th}>{t.source}</th>
+              <th scope="col" className={th}>{t.register}</th>
+              <th scope="col" className={th}>{t.licence}</th>
+              <th scope="col" className={th}>{t.lastLoaded}</th>
+              <th scope="col" className={th}>{t.indicators}</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.source_key} className="border-b border-border">
-                <td className={td}>{row.name}</td>
+                <th scope="row" className={`${td} text-left font-normal`}>{row.name}</th>
                 <td className={`${td} text-text-muted`}>{row.register_id}</td>
                 <td className={td}>
                   {row.licence ? (

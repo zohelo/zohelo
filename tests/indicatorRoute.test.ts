@@ -20,6 +20,7 @@ describe('/indicators/:kpi loader', () => {
     expect(data.geo).not.toBeNull();
     expect(data.jsonLd['@type']).toBe('Dataset');
     expect(data.name).toBe('Stopa bezrobocia (BAEL)');
+    expect(data.description).toBe('Stopa bezrobocia (BAEL): 3,2 % (2025). Źródła: Eurostat, Bank Światowy – WDI.');
   });
 
   test('English name under /en', async () => {
