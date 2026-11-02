@@ -1,7 +1,10 @@
 // Writes build/client/sitemap.xml and robots.txt after the build: one <url> per page and language
-// (the pre-rendered paths from src/site.config.ts, at their trailing-slash URL), each with its hreflang alternates.
+// (the pages from src/site.config.ts, every published KPI page and every voivodeship profile, at their
+// trailing-slash URL), each with its hreflang alternates.
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { publishedDir, readCatalog } from '../src/published';
+import { VOIVODESHIP_TERYT } from '../src/regions/profile';
 import { absoluteUrl } from '../src/seo';
 import { pages, site } from '../src/site.config';
 
@@ -12,14 +15,22 @@ const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').rep
 // The same URL as the pages' canonical and hreflang tags (src/seo.ts).
 const url = (path: string, lang: Lang) => escape(absoluteUrl(path, lang));
 
-const entries = pages.flatMap((page) =>
+const paths = [
+  ...pages.map((p) => p.path),
+  ...readCatalog(publishedDir())
+    .kpis.filter((k) => k.status === 'published')
+    .map((k) => `/indicators/${k.kpi_key}`),
+  ...VOIVODESHIP_TERYT.map((t) => `/regions/${t}`),
+];
+
+const entries = paths.flatMap((path) =>
   (['pl', 'en'] as const).map((lang) =>
     [
       '  <url>',
-      `    <loc>${url(page.path, lang)}</loc>`,
-      `    <xhtml:link rel="alternate" hreflang="pl" href="${url(page.path, 'pl')}"/>`,
-      `    <xhtml:link rel="alternate" hreflang="en" href="${url(page.path, 'en')}"/>`,
-      `    <xhtml:link rel="alternate" hreflang="x-default" href="${url(page.path, 'pl')}"/>`,
+      `    <loc>${url(path, lang)}</loc>`,
+      `    <xhtml:link rel="alternate" hreflang="pl" href="${url(path, 'pl')}"/>`,
+      `    <xhtml:link rel="alternate" hreflang="en" href="${url(path, 'en')}"/>`,
+      `    <xhtml:link rel="alternate" hreflang="x-default" href="${url(path, 'pl')}"/>`,
       '  </url>',
     ].join('\n'),
   ),
