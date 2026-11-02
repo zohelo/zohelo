@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { choroplethSpec, lineSpec, smallMultiplesSpec, type ChoroplethOptions } from "./specs";
+import { barSpec, choroplethSpec, lineSpec, rankingSpec, smallMultiplesSpec, type ChoroplethOptions } from "./specs";
 
 const geojson = JSON.parse(
   readFileSync(join(import.meta.dir, "../../../../fixtures/published/geo/voivodeship.geojson"), "utf8"),
@@ -61,5 +61,31 @@ describe("smallMultiplesSpec", () => {
   test("lineSpec encoding keys are unchanged", () => {
     const spec = lineSpec([], { x: "period", y: "value", series: "s", yTitle: "Value" }) as { encoding: object };
     expect(Object.keys(spec.encoding)).toEqual(["x", "y", "color", "opacity", "tooltip"]);
+  });
+});
+
+describe("rankingSpec", () => {
+  const rk = { category: "name", value: "value", rank: "rank", valueTitle: "Value", accent: "#111111", mutedMark: "#cccccc" };
+  const bar = { category: "name", value: "value", valueTitle: "Value", accent: "#111111", mutedMark: "#cccccc" };
+  const data = [{ name: "A", value: 2, rank: 1 }];
+  type Enc = { encoding: { y: { sort: unknown }; tooltip: { field: string; title: string }[] } };
+
+  test("y is sorted by the rank field ascending", () => {
+    const spec = rankingSpec(data, rk) as Enc;
+    expect(spec.encoding.y.sort).toEqual({ field: "rank", order: "ascending" });
+  });
+
+  test("the tooltip has the Rank entry", () => {
+    const spec = rankingSpec(data, rk) as Enc;
+    expect(spec.encoding.tooltip).toContainEqual({ field: "rank", type: "quantitative", title: "Rank" });
+  });
+
+  test("barSpec output is unchanged", () => {
+    const before = JSON.stringify(barSpec(data, bar));
+    rankingSpec(data, rk);
+    const spec = barSpec(data, bar) as Enc;
+    expect(JSON.stringify(spec)).toBe(before);
+    expect(spec.encoding.y.sort).toBe("-x");
+    expect(spec.encoding.tooltip.map((t) => t.title)).toEqual(["Area", "Value"]);
   });
 });
