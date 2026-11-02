@@ -1,5 +1,6 @@
 import { KpiTile, SourceFooter } from '@zohelo/design';
 import { useLoaderData } from 'react-router';
+import { SubscribeCalendar } from '../components/SubscribeCalendar';
 import { localeOf, useLocale } from '../i18n';
 import { footerProps, kpiSources } from '../indicators/sources';
 import { latestTile, type LatestTile } from '../indicators/tile';
@@ -66,6 +67,9 @@ export default function Indicator() {
       ) : null}
       <div className="mt-10">
         <SourceFooter {...sources} date={tile.checkedAt ?? (tile.period || lastPeriod)} locale={locale} />
+      </div>
+      <div className="mt-4">
+        <SubscribeCalendar locale={locale} />
       </div>
     </main>
   );
