@@ -1,4 +1,7 @@
 import { describe, expect, test } from 'bun:test';
+import { cpSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { chartOfDay } from '../src/growth/chartOfDay';
 import { homeChartOfDay } from '../src/growth/homeChartOfDay';
 import { readCatalog, readKpiLatest, requiredLatest } from '../src/published';
@@ -28,6 +31,24 @@ describe('homeChartOfDay', () => {
     expect(result.pick.kpi_key).toBe('inflation');
     expect(result.pick.period).toBe('2026-09');
     expect(result.pick.source_key).toBe('eurostat');
+  });
+
+  test('a release in feed/calendar.ics within 7 days decides the pick (#410)', () => {
+    const layer = mkdtempSync(join(tmpdir(), 'zohelo-layer-'));
+    cpSync(dir, layer, { recursive: true });
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'BEGIN:VEVENT',
+      'UID:20261102T100000Z-eurostat-unemployment_rate@zohelo.com',
+      'DTSTART:20261102T100000Z',
+      'END:VEVENT',
+      'END:VCALENDAR',
+      '',
+    ].join('\r\n');
+    writeFileSync(join(layer, 'feed', 'calendar.ics'), ics);
+    const result = homeChartOfDay(layer, catalog, 'en', new Date('2026-11-03T00:00:00Z'))!;
+    expect(result.pick.kpi_key).toBe('unemployment_rate');
+    expect(result.pick.period).toBe('2025');
   });
 
   test('nothing fresh gives null (the block is not rendered)', () => {

@@ -49,6 +49,12 @@ describe('chartOfDay picks the newest release, not the largest change (#410)', (
     expect(c.headline_en).toBe('HICP inflation: up from 2.9 to 3.4 (2026-09, preliminary)');
   });
 
+  test('a provisional flash without a previous value gives the value and the label', () => {
+    const c = chartOfDay([inflation([row({ period: '2026-10', value: 3.1, previous_value: undefined, flags: ['p'] })])], names, now)!;
+    expect(c.headline_pl).toBe('Inflacja HICP: 3,1 (2026-10, dane wstępne)');
+    expect(c.headline_en).toBe('HICP inflation: 3.1 (2026-10, preliminary)');
+  });
+
   test('freshness: annual ≤ 18 months, quarterly ≤ 6, monthly ≤ 3 after the end of the period', () => {
     // 2024 ended 1 Jan 2025: 18 months later is 1 Jul 2026, before 3 Nov 2026.
     expect(chartOfDay([unemployment([row({ period: '2024' })])], names, now)).toBeNull();
