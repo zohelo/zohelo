@@ -1,8 +1,6 @@
 import React, { useState, type ReactNode } from 'react';
-import { Header } from './components/Header';
 import { ProductsSection } from './components/ProductsSection';
 import { HeroConsultingSection } from './components/HeroConsultingSection';
-import { Footer } from './components/Footer';
 import { ProductItem } from './types';
 import { CheckCircle2 } from 'lucide-react';
 import type { Locale } from './i18n';
@@ -30,8 +28,6 @@ export default function App({
   chartOfDay: HomeChartOfDay | null;
   locale: Locale;
 }) {
-  const [activeSection, setActiveSection] = useState('top');
-  
   // Toast notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -41,11 +37,6 @@ export default function App({
   };
 
   const handleNavigate = (sectionId: string) => {
-    setActiveSection(sectionId);
-    if (sectionId === 'top') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
     const elem = document.getElementById(sectionId);
     if (elem) {
       elem.scrollIntoView({ behavior: 'smooth' });
@@ -59,11 +50,9 @@ export default function App({
   };
 
   return (
-    <div className="min-h-screen bg-[#F3F6F8] text-[#24292E] flex flex-col selection:bg-[#3B8B94]/20 selection:text-[#18484F]">
+    <div className="flex-1 bg-[#F3F6F8] text-[#24292E] flex flex-col selection:bg-[#3B8B94]/20 selection:text-[#18484F]">
       
-      {/* 1. The Header matching Mockup */}
-      <Header activeSection={activeSection} onNavigate={handleNavigate} />
-
+      {/* The header and footer come from root.tsx (#385). */}
       {/* Main 8-Section Sequential Flow as mandated by PRD & Mockup */}
       <main className="flex-1">
         
@@ -92,9 +81,6 @@ export default function App({
         />
 
       </main>
-
-      {/* Footer */}
-      <Footer />
 
       {/* Toast Notification Alert */}
       {toastMessage && (
