@@ -51,47 +51,12 @@ export interface MetricCardData {
   dbtModel: string;
 }
 
-export interface VoivodeshipData {
-  id: string;
-  name: string;
-  namePl: string;
-  code: string;
-  capital: string;
-  population: string;
-  populationNum: number;
-  gdpPerCapitaPln: number;
-  gdpSharePercent: number;
-  unemploymentRate: number;
-  avgSalaryPln: number;
-  publicFinanceIndex: number;
-  innovationScore: number;
-  colorIntensity: string; // for choropleth map
-  topSectors: string[];
-  keyInsight: string;
-  trend2020to2025: { year: number; gdpIndex: number; budgetMln: number }[];
-}
-
 export interface FinanceTrendItem {
   year: string;
   dataValue: number; // Primary Data value (GUS public revenue/expenditure index)
   azureValue: number; // Comparative Azure benchmark / forecast index
   label: string;
   growthYoY: string;
-}
-
-export interface DatasetItem {
-  id: string;
-  title: string;
-  format: 'CSV' | 'Parquet' | 'Power BI' | 'PDF';
-  formatColor: string;
-  size: string;
-  recordsCount: string;
-  period: string;
-  description: string;
-  updateFrequency: string;
-  schema: { column: string; type: string; description: string }[];
-  sampleData: Record<string, string | number>[];
-  downloadUrl: string;
 }
 
 export type ProductStatus = 'concept' | 'building' | 'live';

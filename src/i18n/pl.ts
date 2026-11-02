@@ -6,9 +6,6 @@ export const pl = {
     products: 'Produkty',
     vault: 'Skarbiec',
     consulting: 'Doradztwo',
-    quickSearch: 'Szybkie wyszukiwanie',
-    searchTitle: 'Szukaj wskaźników, regionów i raportów',
-    search: 'Szukaj',
     toggleNav: 'Pokaż lub ukryj nawigację',
   },
   footer: {

@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
-import { Search, Database, Menu, X } from 'lucide-react';
+import { Database, Menu, X } from 'lucide-react';
 import { useLocation } from 'react-router';
 import { localizedPath, useLocale, useT } from '../i18n';
 
 interface HeaderProps {
-  onOpenSearch: () => void;
   activeSection: string;
   onNavigate: (sectionId: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  onOpenSearch,
   onNavigate
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -84,31 +82,12 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Action Tools */}
           <div className="hidden sm:flex items-center space-x-3">
-            {/* Search / Command palette button */}
-            <button
-              onClick={onOpenSearch}
-              className="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-600 hover:border-[#3B8B94]/40 hover:text-[#3B8B94] shadow-xs transition-all cursor-pointer"
-              title={t.nav.searchTitle}
-            >
-              <Search className="w-3.5 h-3.5 text-slate-400" />
-              <span>{t.nav.quickSearch}</span>
-              <kbd className="font-mono-code text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">
-                ⌘K
-              </kbd>
-            </button>
             {languageToggle}
           </div>
 
           {/* Mobile Menu Trigger */}
           <div className="flex md:hidden items-center space-x-2">
             <span className="sm:hidden">{languageToggle}</span>
-            <button
-              onClick={onOpenSearch}
-              className="p-2 rounded-lg text-slate-600 hover:bg-slate-200/60"
-              aria-label={t.nav.search}
-            >
-              <Search className="w-5 h-5" />
-            </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg text-slate-700 hover:bg-slate-200/60 focus:outline-none"
