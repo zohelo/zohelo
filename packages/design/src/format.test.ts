@@ -29,10 +29,11 @@ test('formatCompact folds the scale word of the unit into the value (pl)', () =>
   expect(formatCompact(-150000, 'os.', 'pl')).toEqual({ text: '-150 tys.', unit: 'os.' });
 });
 
-test('formatCompact uses long scale words in English', () => {
-  expect(formatCompact(37490000, 'persons', 'en')).toEqual({ text: '37.5 million', unit: 'persons' });
-  expect(formatCompact(845000, 'million EUR', 'en')).toEqual({ text: '845 billion', unit: 'EUR' });
-  expect(formatCompact(3940, 'bn PLN', 'en')).toEqual({ text: '3.9 trillion', unit: 'PLN' });
+test('formatCompact uses the short English scale letters (zohelo#406)', () => {
+  expect(formatCompact(37490000, 'persons', 'en')).toEqual({ text: '37.5m', unit: 'persons' });
+  expect(formatCompact(845000, 'million EUR', 'en')).toEqual({ text: '845bn', unit: 'EUR' });
+  expect(formatCompact(3940, 'bn PLN', 'en')).toEqual({ text: '3.9tn', unit: 'PLN' });
+  expect(formatCompact(-150000, 'persons', 'en')).toEqual({ text: '-150k', unit: 'persons' });
 });
 
 test('formatCompact leaves small levels, rates and null alone', () => {
