@@ -44,8 +44,7 @@ export function num(v: number, lang: Lang, decimals = 0): string {
     useGrouping: 'always' as any,
   })
     .format(v)
-    .replace(/[  ]/g, NBSP)
-    .replace('−', '−');
+    .replace(/[  ]/g, NBSP); // Intl already writes the typographic minus (U+2212); keep it
 }
 
 /** Compact level for tiles only (rule 9): 36,6 mln / 36.6m; 845 mld € / €845bn. */
