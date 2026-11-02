@@ -2,10 +2,11 @@
 // `react-router build`: downloads what the site reads from 06_published/v1/ (zohelo-data
 // docs/published.md) with the lakehouse read key, or copies fixtures/published/ when the key is
 // absent, so PR checks need no credentials. `--require` (deploy) fails instead of using fixtures.
+// Every published KPI's kpi/<kpi_key>/series.parquet is fetched when present (optional, never required).
 import { S3Client } from 'bun';
 import { cpSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
-import { NO_LATEST, publishedDir, readCatalog, requiredLatest } from '../src/published';
+import { NO_LATEST, publishedDir, readCatalog, requiredLatest, type Catalog } from '../src/published';
 
 type Env = Record<string, string | undefined>;
 
@@ -21,6 +22,11 @@ const credentialVars = [
 // spotlight read geo/voivodeship.geojson, so a deploy without it fails here, not in the pre-render (#298).
 const requiredFiles = ['geo/voivodeship.geojson'];
 const optional = ['feed/changes.json', 'feed/calendar.ics'];
+
+/** kpi/<kpi_key>/series.parquet of every published KPI, in catalog order. */
+export function seriesPaths(catalog: Catalog): string[] {
+  return catalog.kpis.filter((k) => k.status === 'published').map((k) => `kpi/${k.kpi_key}/series.parquet`);
+}
 
 function filesUnder(dir: string): string[] {
   return readdirSync(dir, { recursive: true, withFileTypes: true })
@@ -75,7 +81,7 @@ export async function fetchPublished(out: string, env: Env, opts: { require: boo
   const extra = catalog.kpis
     .filter((k) => k.status === 'published' && NO_LATEST.includes(k.kpi_key))
     .map((k) => `kpi/${k.kpi_key}/latest.json`);
-  for (const path of [...extra, ...optional]) {
+  for (const path of [...extra, ...seriesPaths(catalog), ...optional]) {
     if (!(await download(path))) console.log(`fetch-published: ${prefix}${path} missing, skipped`);
   }
   readCatalog(out);
