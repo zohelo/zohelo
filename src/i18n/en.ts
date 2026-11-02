@@ -8,9 +8,6 @@ export const en: Dict = {
     products: 'Products',
     vault: 'The Vault',
     consulting: 'Consulting',
-    quickSearch: 'Quick Search',
-    searchTitle: 'Search indicators, regions and reports',
-    search: 'Search',
     toggleNav: 'Toggle Navigation',
   },
   footer: {

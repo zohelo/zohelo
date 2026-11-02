@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { PulseSection } from './components/PulseSection';
-import { VaultSection } from './components/VaultSection';
 import { ProductsSection } from './components/ProductsSection';
 import { HeroConsultingSection } from './components/HeroConsultingSection';
 import { Footer } from './components/Footer';
-import { DataVisualizationModal } from './components/DataVisualizationModal';
-import { DatasetPreviewModal } from './components/DatasetPreviewModal';
-import { CommandPalette } from './components/CommandPalette';
-import { VoivodeshipData, DatasetItem, ProductItem } from './types';
+import { ProductItem } from './types';
 import { CheckCircle2 } from 'lucide-react';
 import type { Locale } from './i18n';
 import { TodayStrip, type TodayTile } from './indicators/TodayStrip';
@@ -34,12 +30,6 @@ export default function App({
   locale: Locale;
 }) {
   const [activeSection, setActiveSection] = useState('top');
-  
-  // Modals state
-  const [isExploreModalOpen, setIsExploreModalOpen] = useState(false);
-  const [exploreRegion, setExploreRegion] = useState<VoivodeshipData | undefined>(undefined);
-  const [previewDataset, setPreviewDataset] = useState<DatasetItem | null>(null);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   
   // Toast notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -71,11 +61,7 @@ export default function App({
     <div className="min-h-screen bg-[#F3F6F8] text-[#24292E] flex flex-col selection:bg-[#3B8B94]/20 selection:text-[#18484F]">
       
       {/* 1. The Header matching Mockup */}
-      <Header
-        activeSection={activeSection}
-        onNavigate={handleNavigate}
-        onOpenSearch={() => setIsSearchOpen(true)}
-      />
+      <Header activeSection={activeSection} onNavigate={handleNavigate} />
 
       {/* Main 8-Section Sequential Flow as mandated by PRD & Mockup */}
       <main className="flex-1">
@@ -97,11 +83,6 @@ export default function App({
           </section>
         ) : null}
 
-        {/* 6. The Vault / The Datasets: CSV, Parquet, Power BI, PDF Lakehouse Assets */}
-        <VaultSection
-          onPreviewDataset={(dataset) => setPreviewDataset(dataset)}
-        />
-
         {/* 7. The Products: Commercial Analytics Suites */}
         <ProductsSection
           onSelectProduct={handleSelectProduct}
@@ -118,33 +99,6 @@ export default function App({
 
       {/* Footer */}
       <Footer onNavigate={handleNavigate} />
-
-      {/* Interactive Modals */}
-      
-      {/* 1. Regional Analytics Studio Deep Dive */}
-      <DataVisualizationModal
-        isOpen={isExploreModalOpen}
-        onClose={() => setIsExploreModalOpen(false)}
-        initialVoivodeship={exploreRegion}
-      />
-
-      {/* 3. Dataset Schema & DuckDB Query Modal */}
-      <DatasetPreviewModal
-        dataset={previewDataset}
-        onClose={() => setPreviewDataset(null)}
-      />
-
-      {/* 4. Command Palette (⌘K) */}
-      <CommandPalette
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        onSelectRegion={(r) => {
-          setExploreRegion(r);
-          setIsExploreModalOpen(true);
-        }}
-        onSelectDataset={(d) => setPreviewDataset(d)}
-        onNavigateSection={handleNavigate}
-      />
 
       {/* Toast Notification Alert */}
       {toastMessage && (
