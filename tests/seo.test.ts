@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { absoluteUrl, pageMeta } from '../src/seo';
+import { absoluteUrl, breadcrumbJsonLd, pageMeta } from '../src/seo';
 import { pages, site } from '../src/site.config';
 
 const home = pages.find((p) => p.path === '/')!;
@@ -50,5 +50,27 @@ describe('page URLs', () => {
     expect(href(meta, 'alternate', 'pl')?.href).toBe('https://zohelo.com/design/');
     expect(href(meta, 'alternate', 'en')?.href).toBe('https://zohelo.com/en/design/');
     expect(href(meta, 'alternate', 'x-default')?.href).toBe('https://zohelo.com/design/');
+  });
+});
+
+describe('breadcrumbJsonLd', () => {
+  const items = [
+    { name: 'zohelo', path: '/' },
+    { name: 'Indicators', path: '/indicators' },
+  ];
+
+  test('English items with absolute trailing-slash URLs', () => {
+    const list = breadcrumbJsonLd(items, 'en').itemListElement as Record<string, unknown>[];
+    expect(list[0]).toEqual({ '@type': 'ListItem', position: 1, name: 'zohelo', item: 'https://zohelo.com/en/' });
+    expect(list[1].item).toBe('https://zohelo.com/en/indicators/');
+  });
+
+  test('Polish root URL', () => {
+    const list = breadcrumbJsonLd(items, 'pl').itemListElement as Record<string, unknown>[];
+    expect(list[0].item).toBe('https://zohelo.com/');
+  });
+
+  test('no items', () => {
+    expect(breadcrumbJsonLd([], 'pl').itemListElement).toEqual([]);
   });
 });
