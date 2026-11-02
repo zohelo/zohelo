@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { choroplethSpec, type ChoroplethOptions } from "./specs";
+import { choroplethSpec, lineSpec, smallMultiplesSpec, type ChoroplethOptions } from "./specs";
 
 const geojson = JSON.parse(
   readFileSync(join(import.meta.dir, "../../../../fixtures/published/geo/voivodeship.geojson"), "utf8"),
@@ -42,5 +42,24 @@ describe("choroplethSpec", () => {
     expect(JSON.stringify(geojson)).toBe(geoBefore);
     expect(JSON.stringify(rows)).toBe(rowsBefore);
     expect(JSON.stringify(options)).toBe(optionsBefore);
+  });
+});
+
+describe("smallMultiplesSpec", () => {
+  const sm = { x: "period", y: "value", panel: "region", yTitle: "Value" };
+
+  test("facets on the panel field", () => {
+    const spec = smallMultiplesSpec([{ period: "2025-01-01", value: 1, region: "A" }], sm) as { facet: { field: string } };
+    expect(spec.facet.field).toBe("region");
+  });
+
+  test("more than 16 panels throws", () => {
+    const many = Array.from({ length: 17 }, (_, i) => ({ period: "2025-01-01", value: i, region: `R${i}` }));
+    expect(() => smallMultiplesSpec(many, sm)).toThrow("max 16 panels");
+  });
+
+  test("lineSpec encoding keys are unchanged", () => {
+    const spec = lineSpec([], { x: "period", y: "value", series: "s", yTitle: "Value" }) as { encoding: object };
+    expect(Object.keys(spec.encoding)).toEqual(["x", "y", "color", "opacity", "tooltip"]);
   });
 });
