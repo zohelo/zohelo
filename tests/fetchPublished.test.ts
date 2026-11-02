@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test } from 'bun:test';
 import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
-import { fetchPublished } from '../scripts/fetch-published';
+import { fetchPublished, seriesPaths } from '../scripts/fetch-published';
 import { isFixtureLayer, NO_LATEST, readCatalog, requiredLatest } from '../src/published';
 
 const dirs: string[] = [];
@@ -50,6 +50,24 @@ describe('fetchPublished without credentials', () => {
     const out = tempOut();
     await expect(fetchPublished(out, {}, { require: true })).rejects.toThrow(/credentials missing/);
     expect(existsSync(out)).toBe(false);
+  });
+});
+
+describe('seriesPaths', () => {
+  test('every published KPI in catalog order', () => {
+    expect(seriesPaths(readCatalog('fixtures/published'))).toEqual([
+      'kpi/population/series.parquet',
+      'kpi/gdp_current_prices/series.parquet',
+      'kpi/inflation/series.parquet',
+      'kpi/unemployment_rate/series.parquet',
+      'kpi/fx_rate/series.parquet',
+    ]);
+  });
+
+  test('a draft KPI has no series path', () => {
+    const catalog = structuredClone(readCatalog('fixtures/published'));
+    catalog.kpis.find((k) => k.kpi_key === 'inflation')!.status = 'draft';
+    expect(seriesPaths(catalog)).not.toContain('kpi/inflation/series.parquet');
   });
 });
 
