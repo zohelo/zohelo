@@ -249,6 +249,143 @@ deliverables:
       expect: preview 200
     out_of_scope:
     - Section content
+  - key: com/site/site-v1/shell/nav-data
+    type: Task
+    title: Link /data from the header and the footer
+    effort: S
+    state: open
+    contract: false
+    context: >-
+      The header and footer list Wskaźniki, Regiony, Zmiany, Źródła (src/components/Header.tsx navItems,
+      src/components/Footer.tsx links). The /data page (Task com/site/data-pages/data/page) is the only way to the
+      downloads, so it belongs in both. The PR is `ui`: Designer review before the Architect.
+    files:
+    - edit: src/i18n/pl.ts
+    - edit: src/i18n/en.ts
+    - edit: src/components/Header.tsx
+    - edit: src/components/Footer.tsx
+    - edit: tests/shellNav.test.tsx
+    steps:
+    - "src/i18n/pl.ts nav: add data: 'Dane' after sources; src/i18n/en.ts nav: add data: 'Data' after sources."
+    - "Header.tsx navItems: append { label: t.nav.data, path: '/data' } after the sources item (desktop and mobile lists use the same array)."
+    - "Footer.tsx links: append { key: 'data', path: '/data' } after the sources entry."
+    - >-
+      tests/shellNav.test.tsx: in the first test also expect href="/en/data"; add a test rendering <Footer /> in a
+      MemoryRouter at '/' that contains href="/data" and the text 'Dane'.
+    acceptance:
+    - Header (desktop and mobile menu) and footer link /data in PL and /en/data in EN; aria-current marks it on /data
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/shellNav.test.tsx
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The shell redesign and product switcher (zohelo#105, zohelo#140)
+    depends_on:
+    - com/site/data-pages/data/page
+  - key: com/site/site-v1/shell/skip-link
+    type: Task
+    title: Add a skip-to-content link before the header
+    effort: S
+    state: open
+    contract: false
+    context: >-
+      Since #393 every page renders the sticky header with the navigation and the language switch before the content,
+      so a keyboard or screen-reader user tabs through it on every page. WCAG 2.2 AA 2.4.1 (Bypass Blocks, research §4)
+      asks for a way to skip it. Target: the first focusable element of every page is a link "Przejdź do treści" /
+      "Skip to content", visible only when focused, that moves focus to the page content. The PR is `ui`: Designer
+      review before the Architect.
+    files:
+    - edit: src/root.tsx
+    - edit: src/i18n/pl.ts
+    - edit: src/i18n/en.ts
+    steps:
+    - "src/i18n/pl.ts common: add skip: 'Przejdź do treści'; src/i18n/en.ts common: add skip: 'Skip to content'."
+    - >-
+      src/root.tsx Layout: get t = useT() (import from './i18n'); as the first child of <body>, before the sample banner,
+      render <a href="#content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50
+      focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-[#24292E] focus:shadow">{t.common.skip}</a>.
+    - >-
+      Give the existing content wrapper <div className="flex-1"> the attributes id="content" and tabIndex={-1} and add
+      the class focus:outline-none.
+    acceptance:
+    - On every pre-rendered page the first <a> in <body> is href="#content" and the wrapper has id="content"
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun run build && grep -o '<body[^>]*><a href="#content"' build/client/index.html build/client/en/indicators/index.html | wc -l
+      expect: '2'
+    out_of_scope:
+    - Focus styles of other links
+  - key: com/site/site-v1/shell/target-size
+    type: Task
+    title: Give the language switch and footer links a 24 px target
+    effort: S
+    state: open
+    contract: false
+    context: >-
+      WCAG 2.2 AA 2.5.8 (Target Size, research §3.6 and §4) asks for targets of at least 24 × 24 px or enough spacing.
+      Today the PL | EN links in the header are bare text-xs links (about 16 px tall, 8 px apart) and the footer links
+      are text-xs list items 6 px apart, so both fail. Target: each of these links is at least 24 px tall and the
+      language links at least 24 px wide, with the same look. The PR is `ui`: Designer review before the Architect.
+    files:
+    - edit: src/components/Header.tsx
+    - edit: src/components/Footer.tsx
+    - edit: tests/shellNav.test.tsx
+    steps:
+    - >-
+      Header.tsx languageToggle: add 'inline-flex min-h-6 min-w-6 items-center justify-center' to the className of both
+      language <a> (keep the colour classes; the className becomes a template string).
+    - "Footer.tsx: add 'inline-flex min-h-6 items-center' to the className of the nav <a> in links.map."
+    - >-
+      tests/shellNav.test.tsx: add a test that the Header markup at '/en' has 2 matches of /hrefLang="(pl|en)"[^>]*min-h-6 min-w-6/
+      and the Footer markup has as many 'min-h-6' as footer links.
+    acceptance:
+    - Language and footer links are at least 24 px tall (min-h-6 = 1.5rem); colours and font unchanged
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/shellNav.test.tsx
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - The header nav items and the mobile menu (already larger), any colour change
+  - key: com/site/site-v1/shell/footer-sources
+    type: Task
+    title: List the real sources in the footer from the catalogue
+    effort: S
+    state: open
+    contract: false
+    context: >-
+      The footer's bottom line is hard-coded: pl 'Źródła danych: Główny Urząd Statystyczny (GUS), NBP, RIO', en 'Data
+      Sources: Central Statistical Office (GUS), NBP, RIO' (src/i18n). RIO is not a zohelo source, and Eurostat and the
+      World Bank, which feed most KPIs, are missing: a false statement on every page. Target: the label links to
+      /sources and is followed by the source names from the published catalogue (catalog.sources, in the page
+      language), read by the root loader at build.
+    files:
+    - edit: src/root.tsx
+    - edit: src/components/Footer.tsx
+    - edit: src/i18n/pl.ts
+    - edit: src/i18n/en.ts
+    - edit: tests/shellNav.test.tsx
+    steps:
+    - "src/i18n/pl.ts footer.sources: 'Źródła danych:'; src/i18n/en.ts footer.sources: 'Data sources:'."
+    - >-
+      src/root.tsx: loader becomes loader({ request }: { request: Request }); it returns { sample, sources } with sources
+      = readCatalog(publishedDir()).sources.map((s) => (localeOf(new URL(request.url).pathname) === 'pl' ? s.name_pl :
+      s.name_en)) (import readCatalog from './published' and localeOf from './i18n'). Layout reads sources from
+      useRouteLoaderData('root')?.sources ?? [] and renders <Footer sources={sources} />.
+    - >-
+      Footer.tsx: props { sources?: string[] } (default []); the bottom-right <span> becomes <a href={localizedPath('/sources',
+      locale)} className="underline hover:text-white">{t.footer.sources}</a> followed by ' ' and sources.join(', ') when
+      sources is not empty.
+    - >-
+      tests/shellNav.test.tsx: render <Footer sources={['Eurostat', 'Narodowy Bank Polski']} /> in a MemoryRouter at '/'
+      and expect 'Eurostat, Narodowy Bank Polski', href="/sources" and no 'RIO'.
+    acceptance:
+    - The footer on every page names exactly the catalogue's sources and links /sources; no 'RIO' in src/
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/shellNav.test.tsx && grep -rc 'RIO' src/i18n
+      expect: tests exit 0; both files 0
+    - run: bun run build && grep -c 'Bank Światowy – WDI' build/client/index.html
+      expect: at least 1
+    out_of_scope:
+    - Founder line and the rest of the footer (shell redesign, zohelo#140)
+    notes:
+    - zohelo#401 (open) edits Footer.tsx and root.tsx; update the branch from main before review.
 - key: com/site/site-v1/seo
   title: Meta, sitemap and robots
   depends_on:
@@ -386,6 +523,30 @@ deliverables:
     - com/site/site-v1/seo/meta
     - com/site/about/pages/portfolio-stub
     - com/design/design-v1/adopt/design-page
+  - key: com/site/site-v1/seo/home-h1
+    type: Bug
+    title: Give the home page one h1
+    effort: S
+    state: open
+    contract: false
+    context: >-
+      The home page has no h1 (axe; research §3.2 and §7: unchanged since the beginning), while every other route has
+      one. Screen-reader users navigate by headings and search engines read the h1 as the page topic. The visible
+      headline of the home page is a design decision (home page spec after review round 1); until then the h1 is
+      visually hidden and carries the page title from site.config ('Polska w danych' / 'Poland in data').
+    files:
+    - edit: src/App.tsx
+    steps:
+    - >-
+      src/App.tsx: import { pages } from './site.config'; as the first child of <main className="flex-1"> render <h1
+      className="sr-only">{pages.find((p) => p.path === '/')!.title[locale]}</h1>.
+    acceptance:
+    - build/client/index.html and build/client/en/index.html have exactly one <h1> each, with the page title
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun run build && grep -o '<h1[^>]*>[^<]*' build/client/index.html build/client/en/index.html
+      expect: two lines, ending 'Polska w danych' and 'Poland in data'
+    out_of_scope:
+    - A visible hero or headline (home page spec, design round 1)
 - key: com/site/site-v1/og
   title: Sharing cards
   depends_on:
