@@ -25,11 +25,15 @@ describe('ChangesList', () => {
     expect(html).toContain('href="/indicators/unemployment_rate"');
     expect(html).toContain('Narodowy Bank Polski · fx_a');
     expect(html).toContain('dateTime="2026-01-01T00:00:00Z"');
+    // The visible date is in the page language, never the ISO string (zohelo#404).
+    expect(html).toContain('>1 sty 2026</time>');
+    expect(html).not.toContain('>2026-01-01<');
   });
 
   test('English links', () => {
     const html = renderToStaticMarkup(<ChangesList items={items} sources={sources} locale="en" />);
     expect(html).toContain('href="/en/indicators/fx_rate"');
+    expect(html).toContain('>1 Jan 2026</time>');
   });
 
   test('limit', () => {

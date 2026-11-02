@@ -1,35 +1,10 @@
 import React, { useState } from 'react';
-import { Send, CheckCircle2, User, Mail, Building, MessageSquare, Award, Clock, ArrowRight } from 'lucide-react';
+import { User, Award } from 'lucide-react';
 import { consultantProfile } from '../content/consultantData';
 import { CONTAINER } from './container';
 
-interface HeroConsultingSectionProps {
-  onSubmitSuccess?: () => void;
-}
-
-export const HeroConsultingSection: React.FC<HeroConsultingSectionProps> = ({ onSubmitSuccess }) => {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    company: '',
-    message: ''
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+export const HeroConsultingSection: React.FC = () => {
   const [activeTimelineIndex, setActiveTimelineIndex] = useState(3);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.fullName || !formData.email) return;
-
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-
-      if (onSubmitSuccess) onSubmitSuccess();
-    }, 600);
-  };
 
   return (
     <section id="consulting" className="w-full pt-4 pb-16">
@@ -55,7 +30,7 @@ export const HeroConsultingSection: React.FC<HeroConsultingSectionProps> = ({ on
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
             
             {/* LEFT COLUMN (Cols 1-7): Profile & Timeline */}
-            <div className="lg:col-span-7 flex flex-col justify-between h-full space-y-6">
+            <div className="lg:col-span-12 flex flex-col justify-between h-full space-y-6">
               
               {/* Header Profile Block matching Mockup */}
               <div>
@@ -152,117 +127,6 @@ export const HeroConsultingSection: React.FC<HeroConsultingSectionProps> = ({ on
                 </div>
 
               </div>
-
-            </div>
-
-            {/* RIGHT COLUMN (Cols 8-12): Contact Form matching Mockup */}
-            <div className="lg:col-span-5 bg-white p-6 sm:p-7 rounded-xl border border-slate-200 shadow-sm">
-              
-              {!isSubmitted ? (
-                <form onSubmit={handleSubmit} className="space-y-3.5">
-                  <h4 className="text-sm font-bold text-slate-800 tracking-tight pb-1">
-                    Request Strategy Consultation
-                  </h4>
-
-                  {/* Full Name Input */}
-                  <div>
-                    <label htmlFor="fullName" className="sr-only">Full Name</label>
-                    <input
-                      type="text"
-                      id="fullName"
-                      required
-                      placeholder="Full Name"
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#3B8B94] focus:ring-1 focus:ring-[#3B8B94] transition-all"
-                    />
-                  </div>
-
-                  {/* Email Address Input */}
-                  <div>
-                    <label htmlFor="email" className="sr-only">Email Address</label>
-                    <input
-                      type="email"
-                      id="email"
-                      required
-                      placeholder="Email Address"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#3B8B94] focus:ring-1 focus:ring-[#3B8B94] transition-all"
-                    />
-                  </div>
-
-                  {/* Company/Organization Input */}
-                  <div>
-                    <label htmlFor="company" className="sr-only">Company/Organization</label>
-                    <input
-                      type="text"
-                      id="company"
-                      placeholder="Company/Organization"
-                      value={formData.company}
-                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#3B8B94] focus:ring-1 focus:ring-[#3B8B94] transition-all"
-                    />
-                  </div>
-
-                  {/* Message Input */}
-                  <div>
-                    <label htmlFor="message" className="sr-only">Message</label>
-                    <textarea
-                      id="message"
-                      rows={3}
-                      placeholder="Message (e.g. Polish data pipeline, municipal audit, custom BI dashboard)"
-                      value={formData.message}
-                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#3B8B94] focus:ring-1 focus:ring-[#3B8B94] transition-all resize-none"
-                    />
-                  </div>
-
-                  {/* Send Message Button matching Mockup's solid Teal button */}
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-3 rounded-lg bg-[#3B8B94] hover:bg-[#2C6E76] text-white font-semibold text-xs tracking-wide shadow-sm hover:shadow transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-75"
-                  >
-                    {isSubmitting ? (
-                      <span className="flex items-center space-x-2">
-                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Sending Request...</span>
-                      </span>
-                    ) : (
-                      <span className="flex items-center space-x-2">
-                        <span>Send Message</span>
-                        <Send className="w-3.5 h-3.5" />
-                      </span>
-                    )}
-                  </button>
-
-                  <p className="text-[10px] text-slate-400 text-center pt-1">
-                    Direct confidential reply within 24 business hours.
-                  </p>
-                </form>
-              ) : (
-                <div className="py-6 flex flex-col items-center text-center space-y-3 animate-in zoom-in-95">
-                  <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                    <CheckCircle2 className="w-6 h-6" />
-                  </div>
-                  <h4 className="text-base font-bold text-slate-900">
-                    Consultation Request Sent
-                  </h4>
-                  <p className="text-xs text-slate-600 max-w-xs">
-                    Thank you, <strong className="text-slate-800">{formData.fullName}</strong>. Radosław Utkała has received your inquiry and will reach out via <span className="font-mono-code text-[#3B8B94]">{formData.email}</span>.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setIsSubmitted(false);
-                      setFormData({ fullName: '', email: '', company: '', message: '' });
-                    }}
-                    className="mt-3 text-xs text-[#3B8B94] font-semibold underline cursor-pointer"
-                  >
-                    Send another inquiry
-                  </button>
-                </div>
-              )}
 
             </div>
 

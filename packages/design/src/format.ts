@@ -103,7 +103,9 @@ export const COMPACT_FROM = 1e5;
 
 /**
  * A level in compact notation per locale (number rules 9–10): 37490000 'os.' → '37,5 mln' + 'os.' (pl),
- * '37.5 million' + 'persons' (en); 845000 'mln EUR' → '845 mld' + 'EUR'. A scale word at the start of the
+ * '37.5m' + 'persons' (en); 845000 'mln EUR' → '845 mld' + 'EUR', '845bn' + 'EUR'. Both languages use the
+ * short compact form of Intl.NumberFormat (pl-PL 'mln'/'mld'/'bln', en-GB 'k'/'m'/'bn'/'tn'): the long
+ * English words ('37.5 million') overflowed a 390 px tile (zohelo#406). A scale word at the start of the
  * unit is folded into the value and dropped from the unit. Values below COMPACT_FROM (after the scale) and
  * rates keep formatNumber(); the caller decides what is a level (unit not '%', 'p.p.' or an index).
  */
@@ -119,7 +121,7 @@ export function formatCompact(
   if (Math.abs(scaled) < COMPACT_FROM) return { text: formatNumber(value, locale), unit };
   const text = new Intl.NumberFormat(locale === 'pl' ? 'pl-PL' : 'en-GB', {
     notation: 'compact',
-    compactDisplay: locale === 'pl' ? 'short' : 'long',
+    compactDisplay: 'short',
     maximumFractionDigits: 1,
   })
     .format(scaled)
