@@ -53,7 +53,8 @@ export function Layout({ children }: { children: ReactNode }) {
         {/* The shell (header with navigation and language switch, footer) on every route, once (#385). */}
         <Header />
         {/* A block, not a flex container: a flex column would shrink-wrap the routes' `mx-auto` <main>. */}
-        <div id="content" tabIndex={-1} className="flex-1 focus:outline-none">
+        {/* scroll-mt-20: the sticky 80 px header must not cover the first lines after the skip link (WCAG 2.4.11). */}
+        <div id="content" tabIndex={-1} className="flex-1 scroll-mt-20 focus:outline-none">
           {children}
         </div>
         <Footer sources={sources} />
