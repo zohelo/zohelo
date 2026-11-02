@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { productsList } from '../content/productsData';
 import { localizedPath, useLocale, useT, type Locale } from '../i18n';
 import { ProductItem, ProductStatus } from '../types';
+import { CONTAINER } from './container';
 
 interface ProductsSectionProps {
   /** Kept for App.tsx's current call; the roadmap has no actions (removed with the CTAs). */
@@ -28,7 +29,7 @@ export const ProductsSection: React.FC<ProductsSectionProps> = () => {
   const locale = useLocale();
   return (
     <section id="products" className="w-full pt-4 pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className={CONTAINER}>
 
         {/* Section Header */}
         <div className="mb-4">

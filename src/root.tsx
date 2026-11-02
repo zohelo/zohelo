@@ -1,6 +1,8 @@
 import '@zohelo/design/fonts.css';
 import './index.css';
 import type { ReactNode } from 'react';
+import { Footer } from './components/Footer';
+import { Header } from './components/Header';
 import { SampleDataBanner } from './components/SampleDataBanner';
 import { useLocale } from './i18n';
 import { isFixtureLayer, publishedDir } from './published';
@@ -14,6 +16,7 @@ import {
   useRouteError,
   useRouteLoaderData,
 } from 'react-router';
+import { CONTAINER } from './components/container';
 
 // Runs at build only (ssr: false): a build from fixtures/published marks every page as sample data.
 export async function loader() {
@@ -31,9 +34,13 @@ export function Layout({ children }: { children: ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="bg-[#F8FAFC] text-[#24292E] font-sans antialiased selection:bg-[#3B8B94]/20 selection:text-[#18484F]">
+      <body className="min-h-screen flex flex-col bg-[#F8FAFC] text-[#24292E] font-sans antialiased selection:bg-[#3B8B94]/20 selection:text-[#18484F]">
         {sample && <SampleDataBanner locale={locale} />}
-        {children}
+        {/* The shell (header with navigation and language switch, footer) on every route, once (#385). */}
+        <Header />
+        {/* A block, not a flex container: a flex column would shrink-wrap the routes' `mx-auto` <main>. */}
+        <div className="flex-1">{children}</div>
+        <Footer />
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -53,7 +60,7 @@ export function ErrorBoundary() {
       ? error.message
       : 'Unknown error';
   return (
-    <main className="max-w-3xl mx-auto px-4 py-16">
+    <main className={`${CONTAINER} py-16`}>
       <h1 className="text-2xl font-semibold">Something went wrong</h1>
       <p className="mt-2 text-slate-600">{message}</p>
       <a className="mt-4 inline-block text-[#2C6E76] underline" href="/">

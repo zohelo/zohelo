@@ -11,6 +11,7 @@ import { RankingTable } from '../regions/RankingTable';
 import { rankRegions } from '../regions/ranking';
 import { breadcrumbJsonLd, datasetJsonLd, pageMeta } from '../seo';
 import { pages, site } from '../site.config';
+import { CONTAINER } from '../components/container';
 
 // One page per published KPI, built at build time only (ssr: false). KPIs in NO_LATEST have no
 // latest.json by contract (D26): a tile without value, no regional table; any other missing
@@ -74,12 +75,12 @@ export default function Indicator() {
   const { tile, sources, ranking, geo, jsonLd, breadcrumb, name, lastPeriod } = useLoaderData<typeof loader>();
   const locale = useLocale();
   return (
-    <main className="mx-auto max-w-4xl px-4 py-12 text-text">
+    <main className={`${CONTAINER} py-12 text-text`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <h1 className="font-display text-[length:var(--z-size-display)] font-semibold">{name}</h1>
       <div className="mt-6 max-w-sm">
-        <KpiTile label={tile.label} value={tile.value} unit={tile.unit} delta={tile.delta ?? undefined} period={tile.period} locale={locale} />
+        <KpiTile label={tile.label} value={tile.value} unit={tile.unit} delta={tile.delta ?? undefined} period={tile.period} locale={locale} compact={false} />
       </div>
       {ranking && geo ? (
         <section className="mt-10">

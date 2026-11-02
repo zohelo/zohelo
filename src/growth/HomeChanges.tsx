@@ -2,6 +2,7 @@ import { SubscribeCalendar } from '../components/SubscribeCalendar';
 import { localizedPath, type Locale } from '../i18n';
 import type { ChangeItem, Source } from '../published';
 import { ChangesList } from './ChangesList';
+import { CONTAINER } from '../components/container';
 
 // The home page's "what changed" block: the 10 latest feed items and a link to /changes.
 
@@ -10,7 +11,7 @@ const all: Record<Locale, string> = { pl: 'Wszystkie zmiany', en: 'All changes' 
 
 export function HomeChanges({ items, sources, locale }: { items: ChangeItem[]; sources: Source[]; locale: Locale }) {
   return (
-    <section aria-labelledby="what-changed" className="mx-auto max-w-6xl px-4 py-8">
+    <section aria-labelledby="what-changed" className={`${CONTAINER} py-8`}>
       <h2 id="what-changed" className="mb-4 font-display text-[length:var(--z-size-xl)] text-text">
         {heading[locale]}
       </h2>
