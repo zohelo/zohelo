@@ -517,10 +517,51 @@ deliverables:
   done_when:
   - Home spotlight shows one KPI map and top/bottom 3; CompassSection, DataVisualizationModal and polandRegions.ts/financeTrends.ts
     deleted
-  todo:
-  - Map in the home spotlight block (MapChoropleth after hydration, D25); then remove polandRegions.ts and
-    DataVisualizationModal once CommandPalette no longer needs them.
   tasks:
+  - key: com/site/regions/home/home-map
+    type: Task
+    title: Show the voivodeship map in the home regional spotlight
+    effort: M
+    state: open
+    contract: false
+    context: The home spotlight (src/regions/HomeSpotlight.tsx, data from homeSpotlight() in src/routes/home.tsx) lists the
+      top and bottom 3 voivodeships for unemployment_rate but has no map; done_when asks for one. /regions (src/routes/regions.tsx)
+      already renders MapChoropleth (.client module) only after hydration (D25). Here the route builds the map element and App
+      passes it to HomeSpotlight as children, so HomeSpotlight and its tests never import the .client module.
+    files:
+    - edit: src/regions/HomeSpotlight.tsx
+    - edit: tests/homeSpotlight.test.tsx
+    - edit: src/routes/home.tsx
+    - edit: src/App.tsx
+    steps:
+    - 'HomeSpotlight.tsx: add children?: ReactNode (import type { ReactNode } from ''react'') to the props; when children is
+      not null or undefined, render <div className="mt-6 min-h-[300px]">{children}</div> between the grid <div> and the <p>
+      with the map link.'
+    - 'tests/homeSpotlight.test.tsx: with children <span>MAP</span> the markup contains ''<span>MAP</span>'' and ''min-h-[300px]'';
+      without children it contains neither.'
+    - 'routes/home.tsx: homeSpotlight() returns { data: SpotlightData; map: { geo: GeoCollection; rows: MapRow[] } } | null,
+      where map.geo is the geo it already reads and map.rows is ranking.regions (types GeoCollection from ''../published'',
+      MapRow from ''../regions/mapSpec''). The loader returns spotlight: result?.data ?? null and spotlightMap: result?.map
+      ?? null.'
+    - 'routes/home.tsx Home(): import { useEffect, useState } from ''react'' and { MapChoropleth } from ''../components/MapChoropleth.client'';
+      const [mounted, setMounted] = useState(false); useEffect(() => setMounted(true), []); const map = mounted && spotlight
+      && spotlightMap ? <MapChoropleth geo={spotlightMap.geo} rows={spotlightMap.rows} valueTitle={spotlight.unit} locale={locale}
+      label={spotlight.name} /> : null; pass spotlightMap={map} to <App>.'
+    - 'App.tsx: add the prop spotlightMap: ReactNode (import type { ReactNode } from ''react'') and render <HomeSpotlight data={spotlight}
+      locale={locale}>{spotlightMap}</HomeSpotlight>.'
+    acceptance:
+    - After hydration the home spotlight shows the unemployment_rate map (PL, EN); the children slot is tested
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/homeSpotlight.test.tsx
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -c 'Najwyżej' build/client/index.html
+      expect: build exits 0; 1
+    out_of_scope:
+    - A KPI selector on home
+    - MapChoropleth, mapSpec and /regions
+    depends_on:
+    - com/site/data-pages/vault-removal/delete
+    - com/site/indicators/home/pulse-removal
   - key: com/site/regions/home/spotlight
     type: Task
     title: Pick the top and bottom regions for the home spotlight

@@ -59,6 +59,36 @@ export function lineSpec(rows: object[], o: LineOptions): VisualizationSpec {
   } as VisualizationSpec;
 }
 
+export type SmallMultiplesOptions = {
+  x: string;
+  y: string;
+  panel: string;
+  yTitle: string;
+  columns?: number;
+};
+
+/** One line panel per member of `panel`, all on the same y scale; at most 16 panels. */
+export function smallMultiplesSpec(rows: object[], o: SmallMultiplesOptions): VisualizationSpec {
+  const panels = new Set(rows.map((r) => (r as Record<string, unknown>)[o.panel]));
+  if (panels.size > 16) throw new Error("max 16 panels");
+  return {
+    ...base,
+    data: { values: rows },
+    facet: { field: o.panel, type: "nominal", title: null },
+    columns: o.columns ?? 4,
+    spec: {
+      width: 180,
+      height: 120,
+      mark: { type: "line", strokeWidth: 1.5 },
+      encoding: {
+        x: { field: o.x, type: "temporal", title: null },
+        y: { field: o.y, type: "quantitative", title: o.yTitle, axis: { format: "~s" } },
+      },
+    },
+    resolve: { scale: { y: "shared" } },
+  } as VisualizationSpec;
+}
+
 export type BarOptions = {
   category: string;
   value: string;

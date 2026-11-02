@@ -166,6 +166,51 @@ deliverables:
   done_when:
   - The site uses AppHeader/AppFooter from @zohelo/design; old Header/Footer components deleted
   tasks:
+  - key: com/site/site-v1/shell/nav-links
+    type: Task
+    title: Link the header and footer to the indicator and region pages
+    effort: M
+    state: open
+    contract: false
+    context: The home Header and Footer scroll to prototype sections that are gone (compass, vault, pulse, metrics), show the
+      badge 'DATA LAKEHOUSE' and the credit 'Tony Stark & Jarvis Model'. Until Task shell/adopt, they link to /indicators, /regions,
+      /changes, /sources and use the brand line (owner 27 Oct).
+    files:
+    - edit: src/components/Header.tsx
+    - edit: src/components/Footer.tsx
+    - edit: src/App.tsx
+    - edit: src/i18n/pl.ts
+    - edit: src/i18n/en.ts
+    - create: tests/shellNav.test.tsx
+    steps:
+    - 'i18n pl/en nav: keys dashboards, products, vault, consulting become indicators ''Wskaźniki''/''Indicators'', regions
+      ''Regiony''/''Regions'', changes ''Zmiany''/''Changes'', sources ''Źródła''/''Sources''; nav.badge, footer.badge: ''POLSKA
+      W DANYCH''/''POLAND IN DATA''. Delete footer keys pulse, metrics, compass, vault, credit.'
+    - 'Header.tsx: navItems = [{ label: t.nav.indicators, path: ''/indicators'' }, { label: t.nav.regions, path: ''/regions''
+      }, { label: t.nav.changes, path: ''/changes'' }, { label: t.nav.sources, path: ''/sources'' }]. Desktop <nav> and mobile
+      drawer: each item is <a key={item.path} href={localizedPath(item.path, locale)} aria-current={pathname === localizedPath(item.path,
+      locale) ? ''page'' : undefined}> with the replaced <button>''s className (desktop keeps the underline <span>). Delete
+      handleNavClick.'
+    - 'Footer.tsx: delete FooterProps/onNavigate; the four <li> become <a href={localizedPath(path, locale)} className="hover:text-white
+      transition-colors"> with the same paths and nav labels (useLocale). Delete the bottom bar''s ''•'' and credit <span>s.'
+    - 'App.tsx: render <Footer /> without props.'
+    - 'tests/shellNav.test.tsx (bun:test, renderToStaticMarkup inside MemoryRouter): Header at initialEntries [''/en/regions'']
+      contains href="/en/indicators", href="/en/changes", href="/en/sources", ''POLAND IN DATA'', and aria-current="page" on
+      the href="/en/regions" link; Footer at [''/''] contains href="/sources" and ''POLSKA W DANYCH'' and not ''Jarvis''.'
+    acceptance:
+    - Header and footer link to the four pages in PL and EN; the current page has aria-current="page"
+    - No 'Jarvis', 'DATA LAKEHOUSE' or 'OTWARTE RAPORTOWANIE' text remains in src
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/shellNav.test.tsx
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -c 'href="/en/regions"' build/client/en/index.html
+      expect: build exits 0; count ≥ 1
+    out_of_scope:
+    - The design-system shell (Task shell/adopt)
+    - Other home sections
+    depends_on:
+    - com/site/data-pages/vault-removal/delete
+    - com/site/indicators/home/pulse-removal
   - key: com/site/site-v1/shell/adopt
     type: Task
     title: Replace Header and Footer with the design-system shell

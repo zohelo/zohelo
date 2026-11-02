@@ -1,5 +1,6 @@
 import { useLoaderData } from 'react-router';
 import App from '../App';
+import { homeChartOfDay } from '../growth/homeChartOfDay';
 import { localeOf, useLocale, type Locale } from '../i18n';
 import { homeTiles } from '../indicators/home';
 import { publishedDir, readCatalog, readChanges, readGeo, readKpiLatest, type Catalog } from '../published';
@@ -20,7 +21,13 @@ export async function loader({ request }: { request: Request }) {
   const dir = publishedDir();
   const catalog = readCatalog(dir);
   const tiles = homeTiles(catalog, (k) => readKpiLatest(dir, k), locale);
-  return { tiles, items: readItems(dir), sources: catalog.sources, spotlight: homeSpotlight(dir, catalog, locale) };
+  return {
+    tiles,
+    items: readItems(dir),
+    sources: catalog.sources,
+    spotlight: homeSpotlight(dir, catalog, locale),
+    chartOfDay: homeChartOfDay(dir, catalog, locale),
+  };
 }
 
 // No feed yet is a normal state; any other problem (an invalid feed) fails the build, as on /changes.
@@ -55,7 +62,7 @@ export function meta({ location }: { location: { pathname: string } }) {
 }
 
 export default function Home() {
-  const { tiles, items, sources, spotlight } = useLoaderData<typeof loader>();
+  const { tiles, items, sources, spotlight, chartOfDay } = useLoaderData<typeof loader>();
   const locale = useLocale();
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -67,7 +74,7 @@ export default function Home() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <App tiles={tiles} items={items} sources={sources} spotlight={spotlight} locale={locale} />
+      <App tiles={tiles} items={items} sources={sources} spotlight={spotlight} chartOfDay={chartOfDay} locale={locale} />
     </>
   );
 }
