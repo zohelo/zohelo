@@ -1,12 +1,13 @@
 import { DataTable, formatNumber, type DataTableColumn } from '@zohelo/design';
 import type { Locale } from '../i18n';
 import type { GeoCollection } from '../published';
+import { regionPath, terytOf } from './profile';
 import type { RegionRanking } from './ranking';
 
 // The voivodeship ranking of one KPI as a sortable table, with the national value under it.
 // published.ts reads files with node:fs, so only its types are imported here.
 
-export type RankingRow = { rank: number; region: string; value: number; note: string };
+export type RankingRow = { rank: number; region: string; value: number; note: string; href: string | null };
 
 const labels: Record<
   Locale,
@@ -35,11 +36,13 @@ export function rankingRows(ranking: RegionRanking, geo: GeoCollection, locale: 
   const names = new Map(geo.features.map((f) => [f.properties.geography_key, f.properties]));
   return ranking.regions.map((r) => {
     const props = names.get(r.geography_key);
+    const teryt = terytOf(r.geography_key);
     return {
       rank: r.rank,
       region: props ? (locale === 'pl' ? props.name_pl : props.name_en) : r.geography_key,
       value: r.value,
       note: r.provisional ? labels[locale].provisional : '',
+      href: teryt ? regionPath(teryt, locale) : null,
     };
   });
 }
@@ -50,7 +53,18 @@ export function RankingTable({ ranking, geo, unit, locale }: RankingTableProps) 
   const t = labels[locale];
   const columns: DataTableColumn<RankingRow>[] = [
     { key: 'rank', label: '#' },
-    { key: 'region', label: t.region },
+    {
+      key: 'region',
+      label: t.region,
+      format: (v, row) =>
+        row.href ? (
+          <a href={row.href} className="text-brand-teal underline">
+            {String(v)}
+          </a>
+        ) : (
+          String(v)
+        ),
+    },
     { key: 'value', label: t.value(unit), align: 'right', format: (v) => formatNumber(v as number, locale) },
     { key: 'note', label: t.note },
   ];

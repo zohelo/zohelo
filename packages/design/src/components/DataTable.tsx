@@ -5,7 +5,7 @@ export type DataTableColumn<T> = {
   label: string;
   /** Numeric columns are right-aligned with tabular figures. */
   align?: 'left' | 'right';
-  format?: (value: T[keyof T]) => ReactNode;
+  format?: (value: T[keyof T], row: T) => ReactNode;
 };
 
 export type DataTableProps<T> = {
@@ -80,7 +80,7 @@ export function DataTable<T extends Record<string, unknown>>({ columns, rows, so
           <tr key={i} className="border-b border-border">
             {columns.map((c) => (
               <td key={c.key} className={`px-3 py-2 ${c.align === 'right' ? 'z-figures text-right' : 'text-left'}`}>
-                {c.format ? c.format(row[c.key]) : String(row[c.key] ?? '–')}
+                {c.format ? c.format(row[c.key], row) : String(row[c.key] ?? '–')}
               </td>
             ))}
           </tr>

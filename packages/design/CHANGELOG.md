@@ -1,6 +1,7 @@
 ## Unreleased
 
 - `./visuals` — `choroplethSpec` for region maps.
+- `DataTable` — a column's `format` also receives the row.
 
 ## 1.0.0
 

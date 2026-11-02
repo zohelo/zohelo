@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { useLoaderData } from 'react-router';
 import { localeOf, useLocale, type Locale } from '../i18n';
 import { sourceRows } from '../dataPages/sources';
@@ -58,7 +59,18 @@ export default function Sources() {
                   )}
                 </td>
                 <td className={`${td} z-figures`}>{row.last_loaded ? row.last_loaded.slice(0, 10) : '–'}</td>
-                <td className={td}>{row.kpis.map((k) => k.name).join(', ')}</td>
+                <td className={td}>
+                  {row.kpis.length === 0
+                    ? '–'
+                    : row.kpis.map((k, i) => (
+                        <Fragment key={k.kpi_key}>
+                          {i > 0 ? ', ' : null}
+                          <a href={k.href} className="text-brand-teal underline">
+                            {k.name}
+                          </a>
+                        </Fragment>
+                      ))}
+                </td>
               </tr>
             ))}
           </tbody>
