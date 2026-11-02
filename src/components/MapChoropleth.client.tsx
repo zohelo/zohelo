@@ -29,5 +29,5 @@ export function MapChoropleth({
       noData: v('--z-color-border', '#E2E8F0'),
     });
   }, [geo, rows, valueTitle, locale]);
-  return <Chart build={build} label={label} />;
+  return <Chart build={build} label={label} locale={locale} />;
 }

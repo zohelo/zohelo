@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import embed, { type VisualizationSpec } from "vega-embed";
+import { numberLocale, timeLocale, type ChartLocale } from "./locale";
 import { config, type Theme } from "./specs";
 
 // Renders a Vega-Lite spec. The spec is built from the current theme (CSS tokens on :root),
@@ -38,9 +39,11 @@ export type ChartProps = {
   build: (theme: Theme) => VisualizationSpec;
   onPick?: (datum: Record<string, unknown>) => void;
   label: string;
+  /** The page language: number and date formats of axes, legends and tooltips (zohelo#384). Default "en". */
+  locale?: ChartLocale;
 };
 
-export function Chart({ build, onPick, label }: ChartProps) {
+export function Chart({ build, onPick, label, locale = "en" }: ChartProps) {
   const ref = useRef<HTMLDivElement>(null);
   const theme = useTheme();
   const pick = useRef(onPick);
@@ -51,10 +54,11 @@ export function Chart({ build, onPick, label }: ChartProps) {
     // Vega sets the container's aria-label from the spec's description (else "Vega visualization"),
     // so the label goes in as the description unless the spec has its own (zohelo#389).
     const built = build(theme) as VisualizationSpec & { description?: string };
-    const spec = { ...built, description: built.description ?? label, config: config(theme) } as VisualizationSpec;
+    const spec = { ...built, description: built.description ?? label, config: config(theme, locale) } as VisualizationSpec;
     let finalize: (() => void) | undefined;
     let cancelled = false;
-    embed(ref.current, spec, { actions: false, renderer: "svg" }).then((result) => {
+    const options = { actions: false, renderer: "svg", formatLocale: numberLocale[locale], timeFormatLocale: timeLocale[locale] } as const;
+    embed(ref.current, spec, options).then((result) => {
       if (cancelled) return result.finalize();
       finalize = () => result.finalize();
       result.view.addEventListener("click", (_event, item) => {
@@ -66,7 +70,7 @@ export function Chart({ build, onPick, label }: ChartProps) {
       cancelled = true;
       finalize?.();
     };
-  }, [build, theme, label]);
+  }, [build, theme, label, locale]);
 
   return <div className="chart" ref={ref} role="img" aria-label={label} />;
 }

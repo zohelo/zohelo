@@ -1,4 +1,5 @@
 import type { VisualizationSpec } from "vega-embed";
+import { labels, TIME_FORMAT, TOOLTIP_FORMAT, VALUE_FORMAT, type ChartLocale } from "./locale";
 
 // Vega-Lite spec builders: one function per chart type, fed with plain rows.
 // Field names are passed in, so the same builders serve every metric.
@@ -6,10 +7,12 @@ import type { VisualizationSpec } from "vega-embed";
 /** Colours read from the page's CSS tokens, so charts follow light and dark mode. */
 export type Theme = { text: string; muted: string; grid: string; accent: string; mutedMark: string; palette: string[] };
 
-export function config(t: Theme) {
+export function config(t: Theme, locale: ChartLocale = "en") {
   return {
     font: "inherit",
-    axis: { labelColor: t.muted, titleColor: t.muted, gridColor: t.grid, domainColor: t.grid, tickColor: t.grid, labelFontSize: 11, titleFontSize: 11, titleFontWeight: 500 },
+    // The fallback date order per locale ("1 sty 2024"); axes with their own format override it.
+    timeFormat: TIME_FORMAT,
+    axis: { labelColor: t.muted, titleColor: t.muted, gridColor: t.grid, domainColor: t.grid, tickColor: t.grid, labelFontSize: 11, titleFontSize: 11, titleFontWeight: 500, titlePadding: 12 },
     legend: { labelColor: t.text, titleColor: t.muted, labelFontSize: 12 },
     view: { stroke: null },
     range: { category: t.palette },
@@ -18,6 +21,8 @@ export function config(t: Theme) {
 }
 
 export type LineOptions = {
+  /** The page language of the tooltip titles (zohelo#399). Default "en". */
+  locale?: ChartLocale;
   x: string;
   y: string;
   series: string;
@@ -59,7 +64,7 @@ export function lineSpec(rows: object[], o: LineOptions): VisualizationSpec {
         scale: { zero: false },
         axis:
           o.yDecimals === undefined
-            ? { format: "~s", tickCount: 5 }
+            ? { format: VALUE_FORMAT, tickCount: 5 }
             : { format: `,.${o.yDecimals}f`, tickMinStep: 10 ** -o.yDecimals, tickCount: 5 },
       },
       color: {
@@ -72,9 +77,9 @@ export function lineSpec(rows: object[], o: LineOptions): VisualizationSpec {
         ? { condition: { test: `datum['${o.series}'] === ${JSON.stringify(o.highlight)}`, value: 1 }, value: 0.25 }
         : { value: 1 },
       tooltip: [
-        { field: o.series, type: "nominal", title: "Series" },
-        { field: o.x, type: "temporal", title: "Period" },
-        { field: o.y, type: "quantitative", title: o.yTitle, format: ",.4~f" },
+        { field: o.series, type: "nominal", title: labels[o.locale ?? "en"].series },
+        { field: o.x, type: "temporal", title: labels[o.locale ?? "en"].period },
+        { field: o.y, type: "quantitative", title: o.yTitle, format: TOOLTIP_FORMAT },
       ],
     },
   } as VisualizationSpec;
@@ -103,7 +108,7 @@ export function smallMultiplesSpec(rows: object[], o: SmallMultiplesOptions): Vi
       mark: { type: "line", strokeWidth: 1.5 },
       encoding: {
         x: { field: o.x, type: "temporal", title: null },
-        y: { field: o.y, type: "quantitative", title: o.yTitle, axis: { format: "~s" } },
+        y: { field: o.y, type: "quantitative", title: o.yTitle, axis: { format: VALUE_FORMAT } },
       },
     },
     resolve: { scale: { y: "shared" } },
@@ -111,6 +116,8 @@ export function smallMultiplesSpec(rows: object[], o: SmallMultiplesOptions): Vi
 }
 
 export type BarOptions = {
+  /** The page language of the tooltip titles (zohelo#399). Default "en". */
+  locale?: ChartLocale;
   category: string;
   value: string;
   valueTitle: string;
@@ -127,19 +134,21 @@ export function barSpec(rows: object[], o: BarOptions): VisualizationSpec {
     mark: { type: "bar", cornerRadiusEnd: 3, cursor: "pointer" },
     encoding: {
       y: { field: o.category, type: "nominal", sort: "-x", title: null, axis: { labelLimit: 220 } },
-      x: { field: o.value, type: "quantitative", title: o.valueTitle, axis: { format: "~s", tickCount: 5 } },
+      x: { field: o.value, type: "quantitative", title: o.valueTitle, axis: { format: VALUE_FORMAT, tickCount: 5 } },
       color: o.selected
         ? { condition: { test: `datum['${o.category}'] === ${JSON.stringify(o.selected)}`, value: o.accent }, value: o.mutedMark }
         : { value: o.accent },
       tooltip: [
-        { field: o.category, type: "nominal", title: "Area" },
-        { field: o.value, type: "quantitative", title: o.valueTitle, format: ",.4~f" },
+        { field: o.category, type: "nominal", title: labels[o.locale ?? "en"].area },
+        { field: o.value, type: "quantitative", title: o.valueTitle, format: TOOLTIP_FORMAT },
       ],
     },
   } as VisualizationSpec;
 }
 
 export type RankingOptions = {
+  /** The page language of the tooltip titles (zohelo#399). Default "en". */
+  locale?: ChartLocale;
   category: string;
   value: string;
   rank: string;
@@ -160,18 +169,21 @@ export function rankingSpec(rows: object[], o: RankingOptions): VisualizationSpe
     accent: o.accent,
     mutedMark: o.mutedMark,
     selected: o.selected,
+    locale: o.locale,
   }) as { encoding: BarEncoding };
   return {
     ...spec,
     encoding: {
       ...spec.encoding,
       y: { ...spec.encoding.y, sort: { field: o.rank, order: "ascending" } },
-      tooltip: [...spec.encoding.tooltip, { field: o.rank, type: "quantitative", title: "Rank" }],
+      tooltip: [...spec.encoding.tooltip, { field: o.rank, type: "quantitative", title: labels[o.locale ?? "en"].rank }],
     },
   } as VisualizationSpec;
 }
 
 export type ChoroplethOptions = {
+  /** The page language of the tooltip titles (zohelo#399). Default "en". */
+  locale?: ChartLocale;
   key: string;
   value: string;
   name: string;
@@ -196,11 +208,11 @@ export function choroplethSpec(geojson: object, rows: object[], o: ChoroplethOpt
         type: "quantitative",
         title: o.valueTitle,
         scale: { range: o.colors },
-        legend: { orient: "bottom", direction: "horizontal" },
+        legend: { orient: "bottom", direction: "horizontal", format: VALUE_FORMAT },
       },
       tooltip: [
-        { field: `properties.${o.name}`, type: "nominal", title: "Region" },
-        { field: o.value, type: "quantitative", title: o.valueTitle, format: ",.4~f" },
+        { field: `properties.${o.name}`, type: "nominal", title: labels[o.locale ?? "en"].region },
+        { field: o.value, type: "quantitative", title: o.valueTitle, format: TOOLTIP_FORMAT },
       ],
     },
   } as VisualizationSpec;

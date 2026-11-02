@@ -18,6 +18,7 @@ export function mapSpec(
     valueTitle: o.valueTitle,
     colors: o.colors,
     noData: o.noData,
+    locale: o.locale,
   });
   const c: Record<string, any> = s;
   const prefix = o.locale === 'pl' ? '/regions/' : '/en/regions/';
