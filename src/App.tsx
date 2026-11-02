@@ -1,8 +1,6 @@
-import React, { useState, type ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import { ProductsSection } from './components/ProductsSection';
 import { HeroConsultingSection } from './components/HeroConsultingSection';
-import { ProductItem } from './types';
-import { CheckCircle2 } from 'lucide-react';
 import type { Locale } from './i18n';
 import { TodayStrip, type TodayTile } from './indicators/TodayStrip';
 import { HomeChanges } from './growth/HomeChanges';
@@ -33,14 +31,6 @@ export default function App({
   chartOfDayChart?: ReactNode;
   locale: Locale;
 }) {
-  // Toast notification
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3500);
-  };
-
   const handleNavigate = (sectionId: string) => {
     const elem = document.getElementById(sectionId);
     if (elem) {
@@ -48,11 +38,8 @@ export default function App({
     }
   };
 
-  const handleSelectProduct = (product: ProductItem) => {
-    // Scroll to consulting section to book demo or open exploration
-    handleNavigate('consulting');
-    showToast(`Selected "${product.name}". Consultation request ready below.`);
-  };
+  // A product card scrolls to the consulting section.
+  const handleSelectProduct = () => handleNavigate('consulting');
 
   return (
     <div className="flex-1 flex flex-col">
@@ -81,21 +68,9 @@ export default function App({
         />
 
         {/* 8. The Hero Section / The Gateway: B2B Consulting & Radosław Utkała Profile */}
-        <HeroConsultingSection
-          onSubmitSuccess={() => {
-            showToast('Consultation request transmitted to Radosław Utkała.');
-          }}
-        />
+        <HeroConsultingSection />
 
       </main>
-
-      {/* Toast Notification Alert */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#24292E] text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 flex items-center space-x-2.5 text-xs font-medium animate-in slide-in-from-bottom-3 duration-200">
-          <CheckCircle2 className="w-4 h-4 text-[#3B8B94] flex-shrink-0" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
 
     </div>
   );
