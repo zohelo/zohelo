@@ -27,11 +27,14 @@ function deltaColour(direction: Direction, good?: 'up' | 'down') {
 /** One headline figure with its unit, period and change; direction is told by arrow and text, never colour alone. */
 export function KpiTile({ label, value, unit, delta, period, locale, href, goodDirection, decimals }: KpiTileProps) {
   const d = delta === undefined ? null : formatDelta(delta, locale, { decimals });
+  const text = formatNumber(value, locale, { decimals });
+  // Long figures ('36 620 000') step down a size so they fit a narrow tile without breaking (zohelo#357).
+  const size = text.length > 7 ? 'text-[length:var(--z-size-lg)]' : 'text-[length:var(--z-size-2xl)]';
   const body = (
     <>
       <div className="font-ui text-[length:var(--z-size-sm)] text-text-muted">{label}</div>
-      <div className="mt-1 flex items-baseline gap-1 text-text">
-        <span className="z-figures text-[length:var(--z-size-2xl)] font-semibold">{formatNumber(value, locale, { decimals })}</span>
+      <div className="mt-1 flex flex-wrap items-baseline gap-x-1 text-text">
+        <span className={`z-figures whitespace-nowrap ${size} font-semibold`}>{text}</span>
         <span className="font-ui text-[length:var(--z-size-sm)] text-text-muted">{unit}</span>
       </div>
       {d ? (
@@ -43,7 +46,7 @@ export function KpiTile({ label, value, unit, delta, period, locale, href, goodD
       <div className="mt-2 font-ui text-[length:var(--z-size-xs)] text-text-faint">{period}</div>
     </>
   );
-  const box = 'block rounded-lg border border-border bg-surface p-4 shadow-[var(--z-shadow-card)]';
+  const box = 'block min-w-0 rounded-lg border border-border bg-surface p-4 shadow-[var(--z-shadow-card)]';
   return href ? (
     <a href={href} className={`${box} hover:border-brand-teal focus-visible:outline-2 focus-visible:outline-focus`}>
       {body}
