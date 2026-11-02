@@ -62,7 +62,9 @@ export function tablePoints(points: SeriesPoint[], max = 24): { rows: SeriesPoin
  * counted, so a float artefact of a derived value (0.1 + 0.2 = 0.30000000000000004) counts as one
  * decimal, not four (Architect review of zohelo#408).
  */
-export function seriesDecimals(points: SeriesPoint[]): number {
+export type Decimals = 0 | 1 | 2 | 3 | 4;
+
+export function seriesDecimals(points: SeriesPoint[]): Decimals {
   let max = 0;
   for (const p of points) {
     if (!Number.isFinite(p.value)) continue;
@@ -71,7 +73,7 @@ export function seriesDecimals(points: SeriesPoint[]): number {
     const i = text.indexOf('.');
     if (i >= 0) max = Math.max(max, text.length - i - 1);
   }
-  return Math.min(max, 4);
+  return Math.min(max, 4) as Decimals;
 }
 
 export type TickInterval = 'year' | 'quarter' | 'month' | 'day';

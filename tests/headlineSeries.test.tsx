@@ -101,6 +101,20 @@ describe('tablePoints and SeriesTable', () => {
     );
     expect(integers).toContain('>37 490 000<');
   });
+
+  test('a truncated table keeps the precision of a point hidden in the middle (#408 review)', () => {
+    // 30 annual points: whole values everywhere except 2.5 in the hidden middle; the visible rows still read x,0.
+    const series: SeriesPoint[] = Array.from({ length: 30 }, (_, i) => ({
+      date: `${1996 + i}-01-01`,
+      period: String(1996 + i),
+      value: i === 15 ? 2.5 : 3,
+    }));
+    const html = renderToStaticMarkup(<SeriesTable points={series} unit="%" caption="Test" locale="pl" />);
+    expect(html).toContain('Pierwsze i ostatnie');
+    expect(html).not.toContain('>2011<');
+    expect(html).toContain('>3,0<');
+    expect(html).not.toContain('>3<');
+  });
 });
 
 describe('axis helpers (design review of #397)', () => {
