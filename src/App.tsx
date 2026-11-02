@@ -20,6 +20,7 @@ export default function App({
   spotlight,
   spotlightMap,
   chartOfDay,
+  chartOfDayChart,
   locale,
 }: {
   tiles: TodayTile[];
@@ -28,6 +29,8 @@ export default function App({
   spotlight: SpotlightData | null;
   spotlightMap: ReactNode;
   chartOfDay: HomeChartOfDay | null;
+  /** The series chart and its table for the chart of the day; the chart is client-only (D25). */
+  chartOfDayChart?: ReactNode;
   locale: Locale;
 }) {
   const [activeSection, setActiveSection] = useState('top');
@@ -75,7 +78,9 @@ export default function App({
         </HomeSpotlight>
         {chartOfDay ? (
           <section aria-label={locale === 'pl' ? 'Wykres dnia' : 'Chart of the day'} className="mx-auto max-w-6xl px-4 py-8">
-            <ChartOfDayBlock pick={chartOfDay.pick} sourceName={chartOfDay.sourceName} date={chartOfDay.date} locale={locale} />
+            <ChartOfDayBlock pick={chartOfDay.pick} sourceName={chartOfDay.sourceName} date={chartOfDay.date} locale={locale}>
+              {chartOfDayChart}
+            </ChartOfDayBlock>
           </section>
         ) : null}
 

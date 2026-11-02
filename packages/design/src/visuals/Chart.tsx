@@ -48,7 +48,10 @@ export function Chart({ build, onPick, label }: ChartProps) {
 
   useEffect(() => {
     if (!ref.current) return;
-    const spec = { ...build(theme), config: config(theme) } as VisualizationSpec;
+    // Vega sets the container's aria-label from the spec's description (else "Vega visualization"),
+    // so the label goes in as the description unless the spec has its own (zohelo#389).
+    const built = build(theme) as VisualizationSpec & { description?: string };
+    const spec = { ...built, description: built.description ?? label, config: config(theme) } as VisualizationSpec;
     let finalize: (() => void) | undefined;
     let cancelled = false;
     embed(ref.current, spec, { actions: false, renderer: "svg" }).then((result) => {
@@ -63,7 +66,7 @@ export function Chart({ build, onPick, label }: ChartProps) {
       cancelled = true;
       finalize?.();
     };
-  }, [build, theme]);
+  }, [build, theme, label]);
 
   return <div className="chart" ref={ref} role="img" aria-label={label} />;
 }

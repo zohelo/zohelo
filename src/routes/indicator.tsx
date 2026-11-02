@@ -1,8 +1,12 @@
 import { KpiTile, SourceFooter } from '@zohelo/design';
+import { useEffect, useState } from 'react';
 import { useLoaderData } from 'react-router';
+import { SeriesChart } from '../components/SeriesChart.client';
 import { SubscribeCalendar } from '../components/SubscribeCalendar';
 import { localeOf, useLocale } from '../i18n';
 import { indicatorDescription } from '../indicators/description';
+import { readHeadlineSeries } from '../indicators/readHeadline';
+import { SeriesTable } from '../indicators/SeriesTable';
 import { footerProps, kpiSources } from '../indicators/sources';
 import { latestTile, type LatestTile } from '../indicators/tile';
 import { unitLabel } from '../indicators/unitLabel';
@@ -37,15 +41,18 @@ export async function loader({ request, params }: { request: Request; params: { 
     const unit = unitLabel(catalog.units, kpi.unit_key, locale);
     const tile: LatestTile = { label: name, value: null, unit, delta: null, period: '', sourceKey: null, checkedAt: null, provisional: false };
     const description = indicatorDescription(name, tile, sources.sources.map((s) => s.name), locale);
-    return { tile, sources, ranking: null, geo: null, jsonLd, breadcrumb, name, lastPeriod: kpi.last_period, description };
+    return { tile, sources, ranking: null, geo: null, jsonLd, breadcrumb, name, lastPeriod: kpi.last_period, description, series: null };
   }
 
   const latest = readKpiLatest(dir, kpi.kpi_key);
   const ranking = rankRegions(latest);
   const tile = latestTile(kpi, latest, catalog.units, locale);
+  // The headline series for the line chart below the tile (#389); null without series.parquet.
+  const series = await readHeadlineSeries(dir, kpi.kpi_key, tile.sourceKey, catalog.units, locale);
   return {
     tile,
     sources,
+    series,
     ranking,
     geo: ranking ? readGeo(dir, 'voivodeship') : null,
     jsonLd,
@@ -71,8 +78,12 @@ export function meta({
 }
 
 export default function Indicator() {
-  const { tile, sources, ranking, geo, jsonLd, breadcrumb, name, lastPeriod } = useLoaderData<typeof loader>();
+  const { tile, sources, series, ranking, geo, jsonLd, breadcrumb, name, lastPeriod, description } = useLoaderData<typeof loader>();
   const locale = useLocale();
+  // The chart is client-only (D25): rendered after hydration; the table is in the pre-rendered page.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const takeaway = description.split('. ')[0].replace(/\.$/, '');
   return (
     <main className="mx-auto max-w-4xl px-4 py-12 text-text">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -81,6 +92,15 @@ export default function Indicator() {
       <div className="mt-6 max-w-sm">
         <KpiTile label={tile.label} value={tile.value} unit={tile.unit} delta={tile.delta ?? undefined} period={tile.period} locale={locale} />
       </div>
+      {series ? (
+        <section aria-labelledby="series-chart" className="mt-10">
+          <h2 id="series-chart" className="font-ui text-[length:var(--z-size-lg)] font-semibold">{takeaway}</h2>
+          <div className="mt-4">
+            {mounted ? <SeriesChart points={series.points} unit={series.unit} label={takeaway} locale={locale} /> : null}
+            <SeriesTable points={series.points} unit={series.unit} caption={takeaway} locale={locale} />
+          </div>
+        </section>
+      ) : null}
       {ranking && geo ? (
         <section className="mt-10">
           <h2 className="font-ui text-[length:var(--z-size-lg)] font-semibold">{locale === 'pl' ? 'Województwa' : 'Voivodeships'}</h2>
