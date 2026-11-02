@@ -80,7 +80,7 @@ export default function Indicator() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <h1 className="font-display text-[length:var(--z-size-display)] font-semibold">{name}</h1>
       <div className="mt-6 max-w-sm">
-        <KpiTile label={tile.label} value={tile.value} unit={tile.unit} delta={tile.delta ?? undefined} period={tile.period} locale={locale} />
+        <KpiTile label={tile.label} value={tile.value} unit={tile.unit} delta={tile.delta ?? undefined} period={tile.period} locale={locale} compact={false} />
       </div>
       {ranking && geo ? (
         <section className="mt-10">

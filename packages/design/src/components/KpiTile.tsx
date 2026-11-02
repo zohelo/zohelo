@@ -1,4 +1,4 @@
-import { formatDelta, formatNumber, type Direction, type Locale } from '../format';
+import { formatCompact, formatDelta, formatNumber, type Direction, type Locale } from '../format';
 
 export type KpiTileProps = {
   label: string;
@@ -11,7 +11,20 @@ export type KpiTileProps = {
   /** When given, a delta in this direction is shown in the ok colour and the opposite in danger. */
   goodDirection?: 'up' | 'down';
   decimals?: number;
+  /** Levels in compact notation ('37,5 mln os.'); the exact value stays in the title. Default true. */
+  compact?: boolean;
 };
+
+const RATE_UNITS = new Set(['%', 'p.p.', 'pp', 'pkt', 'pkt.', 'index']);
+
+/** The value as the tile shows it: compact for levels (number rules 9–10), in full for rates and when compact is off. */
+export function tileValue(value: number | null, unit: string, locale: Locale, compact: boolean, decimals?: number) {
+  const text = formatNumber(value, locale, { decimals });
+  const full = `${text} ${unit}`.trim();
+  if (!compact || RATE_UNITS.has(unit.trim())) return { text, unit, full, compacted: false };
+  const c = formatCompact(value, unit, locale);
+  return { text: c.text, unit: c.unit, full, compacted: c.text !== text };
+}
 
 const arrow: Record<Direction, string> = { up: '▲', down: '▼', flat: '' };
 const words: Record<Locale, Record<Direction, string>> = {
@@ -25,17 +38,17 @@ function deltaColour(direction: Direction, good?: 'up' | 'down') {
 }
 
 /** One headline figure with its unit, period and change; direction is told by arrow and text, never colour alone. */
-export function KpiTile({ label, value, unit, delta, period, locale, href, goodDirection, decimals }: KpiTileProps) {
+export function KpiTile({ label, value, unit, delta, period, locale, href, goodDirection, decimals, compact = true }: KpiTileProps) {
   const d = delta === undefined ? null : formatDelta(delta, locale, { decimals });
-  const text = formatNumber(value, locale, { decimals });
-  // Long figures ('36 620 000') step down a size so they fit a narrow tile without breaking (zohelo#357).
-  const size = text.length > 7 ? 'text-[length:var(--z-size-lg)]' : 'text-[length:var(--z-size-2xl)]';
+  // Every tile has one value size: long levels are written compactly ('37,5 mln') instead of stepping
+  // down a size (zohelo#387, replaces the #357 rule); the exact value is the title.
+  const v = tileValue(value, unit, locale, compact, decimals);
   const body = (
     <>
       <div className="font-ui text-[length:var(--z-size-sm)] text-text-muted">{label}</div>
-      <div className="mt-1 flex flex-wrap items-baseline gap-x-1 text-text">
-        <span className={`z-figures whitespace-nowrap ${size} font-semibold`}>{text}</span>
-        <span className="font-ui text-[length:var(--z-size-sm)] text-text-muted">{unit}</span>
+      <div className="mt-1 flex flex-wrap items-baseline gap-x-1 text-text" title={v.compacted ? v.full : undefined}>
+        <span className="z-figures whitespace-nowrap text-[length:var(--z-size-2xl)] font-semibold">{v.text}</span>
+        <span className="font-ui text-[length:var(--z-size-sm)] text-text-muted">{v.unit}</span>
       </div>
       {d ? (
         <div className={`z-figures mt-1 text-[length:var(--z-size-sm)] ${deltaColour(d.direction, goodDirection)}`}>
