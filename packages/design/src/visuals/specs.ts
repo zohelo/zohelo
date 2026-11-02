@@ -118,6 +118,38 @@ export function barSpec(rows: object[], o: BarOptions): VisualizationSpec {
   } as VisualizationSpec;
 }
 
+export type RankingOptions = {
+  category: string;
+  value: string;
+  rank: string;
+  valueTitle: string;
+  accent: string;
+  mutedMark: string;
+  selected?: string | null;
+};
+
+type BarEncoding = { y: Record<string, unknown>; tooltip: object[] };
+
+/** Pre-ranked rows as bars: barSpec sorted by the rank field (1 first), with the rank in the tooltip. */
+export function rankingSpec(rows: object[], o: RankingOptions): VisualizationSpec {
+  const spec = barSpec(rows, {
+    category: o.category,
+    value: o.value,
+    valueTitle: o.valueTitle,
+    accent: o.accent,
+    mutedMark: o.mutedMark,
+    selected: o.selected,
+  }) as { encoding: BarEncoding };
+  return {
+    ...spec,
+    encoding: {
+      ...spec.encoding,
+      y: { ...spec.encoding.y, sort: { field: o.rank, order: "ascending" } },
+      tooltip: [...spec.encoding.tooltip, { field: o.rank, type: "quantitative", title: "Rank" }],
+    },
+  } as VisualizationSpec;
+}
+
 export type ChoroplethOptions = {
   key: string;
   value: string;
