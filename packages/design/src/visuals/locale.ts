@@ -32,7 +32,8 @@ export const timeLocale: Record<ChartLocale, TimeLocale> = {
     periods: ["AM", "PM"],
     days: ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"],
     shortDays: ["nie", "pon", "wto", "śro", "czw", "pią", "sob"],
-    months: ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"],
+    // Nominative, as d3-time-format's pl-PL: Vega labels month ticks with %B on its own ("luty", not "lutego").
+    months: ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"],
     shortMonths: ["sty", "lut", "mar", "kwi", "maj", "cze", "lip", "sie", "wrz", "paź", "lis", "gru"],
   },
   en: {

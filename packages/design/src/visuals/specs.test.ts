@@ -109,6 +109,8 @@ describe("number and time formats (zohelo#384)", () => {
     expect(numberLocale.pl.decimal).toBe(",");
     expect(numberLocale.pl.thousands).toBe("\u00a0");
     expect(timeLocale.pl.shortMonths[6]).toBe("lip");
+    expect(timeLocale.pl.months[1]).toBe("luty");
+    expect(timeLocale.pl.months[7]).toBe("sierpień");
     expect(numberLocale.en.decimal).toBe(".");
     expect(timeLocale.en.shortMonths[6]).toBe("Jul");
   });
