@@ -1,0 +1,65 @@
+key: com/design/design-process
+area: com/design
+title: Design process for all three products (O17)
+phase: 1
+priority: P1
+target: 2026-11-25
+why: >-
+  The owner wants a high-quality, modern UX/UI for zohelo.com, bi.zohelo.com and data.zohelo.com, decided the
+  professional way (research, prototype directions, scored team review) rather than by taste. Until the direction is
+  decided, visual work on the products would be built twice.
+outcome: >-
+  One design direction is chosen and recorded as a decision, and the design system and page specs built from it are
+  ready for the Developers to roll out per product.
+in_scope:
+- Research (docs/design/research.md, zohelo#333)
+- Two prototype directions (a third only if A and B miss the map-led idea) in design/prototypes/<direction>/
+- A scored review issue `Design review: round 1` and the decision D<n> in zohelo-data docs/decisions.md
+- Design system v2 and page specs as Developer Tasks after the decision
+out_of_scope:
+- Shipping prototypes; changing data
+- Visual redesign by Developers 3 and 4 before the decision (bug fixes, accessibility fixes and functional wiring
+  continue)
+done_when:
+- A decision D<n> in zohelo-data docs/decisions.md names the chosen direction with its review scores
+- '@zohelo/design has a release built from the chosen direction'
+- Page specs for the indicator page, home, BI explorer and Data start page are in docs/design/
+decisions:
+- O17 (owner 2 Nov 2026), docs/team.md "Design process"
+deliverables:
+- key: com/design/design-process/research
+  title: Design research
+  done_when:
+  - docs/design/research.md is merged in zohelo
+  todo:
+  - Designer PR zohelo#333 (closes zohelo#331)
+- key: com/design/design-process/directions
+  title: Prototype directions
+  depends_on:
+  - com/design/design-process/research
+  done_when:
+  - design/prototypes/editorial/ and design/prototypes/instrument/ show the same key screens at 1440 and 390 px, PL
+    and EN, with fixture data
+  todo:
+  - Direction A · Editorial prototype (Designer; one-off Task issue `Designer: Editorial prototype`, its PR closes it)
+  - Direction B · Instrument prototype (Designer; one-off Task issue `Designer: Instrument prototype`)
+  - Direction C · Atlas, only if the round-1 reviewers say A and B miss the map-led idea
+- key: com/design/design-process/review
+  title: Review round and decision
+  depends_on:
+  - com/design/design-process/directions
+  done_when:
+  - '`Design review: round 1` in zohelo has scores from the Product Owner, Domain expert, Quality Engineer, Architect
+    and Developers 3 and 4, and the decision D<n> is recorded'
+  todo:
+  - Designer opens the review issue and starts the reviewers; Product Owner reports the decision in the Weekly status
+- key: com/design/design-process/system
+  title: Design system v2 and page specs
+  depends_on:
+  - com/design/design-process/review
+  done_when:
+  - '@zohelo/design release from the chosen direction (tokens incl. the text-faint fix zohelo#332, shared header and
+    footer with product switcher, KPI tile value-fit, chart style); specs in docs/design/'
+  todo:
+  - Designer specs → Developer 4 Tasks (tokens, header/footer, chart style) and Developer 3/4 Tasks per page spec,
+    written by the Product Owner with the Designer
