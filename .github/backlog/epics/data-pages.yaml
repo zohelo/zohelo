@@ -28,8 +28,8 @@ deliverables:
   done_when:
   - Downloads served from the site build (copied published extracts) with licence and citation per file
   todo:
-  - Copy selected published extracts into build/client/downloads at build (size cap 200 kB per file, else link to
-    bi); show citation() (Task citation) with each file.
+  - The /data route listing build/client/downloads (Task downloads) with citation() (Task citation) per file; KPIs
+    over the 200 kB cap link to zohelo-bi.
   tasks:
   - key: com/site/data-pages/data/citation
     type: Task
@@ -61,12 +61,47 @@ deliverables:
       expect: exit 0; 0 fail
     out_of_scope:
     - Copying extracts into build/client/downloads and the /data route (todo above)
+  - key: com/site/data-pages/data/downloads
+    type: Task
+    title: Write the KPI series downloads into the build
+    effort: M
+    state: open
+    contract: false
+    context: '/data will offer real downloads (Deliverable done_when: each file matches the published extract). The published
+      extract of a KPI is kpi/<kpi_key>/series.parquet; readKpiSeries() (src/published.ts, Task series-reader) reads it. Target:
+      after the build, build/client/downloads/<kpi_key>.parquet (exact bytes) and <kpi_key>.csv for every published KPI, each
+      only when it is at most 200 kB (bigger extracts are left to zohelo-bi), skipped with a log line when the series file is
+      missing. No page links to them yet.'
+    files:
+    - create: src/dataPages/downloads.ts
+    - create: scripts/downloads.ts
+    - create: tests/downloads.test.ts
+    - edit: package.json
+    steps:
+    - The three new files exactly as .github/backlog/assets/series-parquet.md, sections 'src/dataPages/downloads.ts', 'scripts/downloads.ts'
+      and 'tests/downloads.test.ts'.
+    - 'package.json, script build: append '' && bun scripts/downloads.ts'' after ''bun scripts/calendar.ts''.'
+    acceptance:
+    - A fixture build writes 10 files to build/client/downloads; each .parquet is byte-identical to its fixtures/published series.parquet
+    - 'CSV header = the contract columns, then dim_<key> columns (fx_rate: dim_currency)'
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/downloads.test.ts
+      expect: exit 0; 4 pass, 0 fail
+    - run: bun run build 2>&1 | grep '^downloads:' && ls build/client/downloads | wc -l && cmp fixtures/published/kpi/fx_rate/series.parquet
+        build/client/downloads/fx_rate.parquet
+      expect: '''downloads: 10 files written to build/client/downloads''; 10; cmp prints nothing'
+    out_of_scope:
+    - The /data page, links and citation text (Deliverable todo)
+    - Files over 200 kB
+    depends_on:
+    - com/site/indicators/pages/series-reader
 - key: com/site/data-pages/sources
   title: /sources page
   done_when:
   - 'One row per onboarded source: name, provider, family, licence, last loaded, KPIs fed'
   todo:
-  - Last-load freshness from catalog/freshness.parquet on /sources (needs a Parquet reader at build).
+  - Last-load freshness from catalog/freshness.parquet on /sources (hyparquet reader from Task series-reader;
+    the contract does not name the gold.freshness columns yet).
   tasks:
   - key: com/site/data-pages/sources/model
     type: Task
@@ -172,6 +207,36 @@ deliverables:
     - Changing src/dataPages/sources.ts; freshness.parquet
     depends_on:
     - com/site/data-pages/sources/sources-page
+  - key: com/site/data-pages/sources/table-a11y
+    type: Task
+    title: Give the /sources table a caption and header scopes
+    effort: S
+    state: open
+    contract: false
+    context: '/sources (src/routes/sources.tsx) is a hand-written <table> without a caption; its <th> cells have no scope and
+      each source name is a plain <td>, so a screen reader cannot tell which source a licence or date belongs to. DataTable
+      in @zohelo/design already does this (sr-only caption, scope="col"). Target: the same semantics here with no visible change
+      (the Designer is reworking the look, O17).'
+    files:
+    - edit: src/routes/sources.tsx
+    steps:
+    - 'First child of <table>: <caption className="sr-only">{page.title[locale]}</caption>.'
+    - Every <th> in <thead> gets scope="col".
+    - The source-name cell <td className={td}>{row.name}</td> becomes <th scope="row" className={`${td} text-left font-normal`}>{row.name}</th>.
+    acceptance:
+    - Built /sources and /en/sources have one caption, 5 scope="col" and one scope="row" per source
+    - The page looks the same in PL and EN
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -o 'scope="col"' build/client/sources/index.html | wc -l && grep -o 'scope="row"' build/client/sources/index.html
+        | wc -l && grep -c '<caption class="sr-only">Data sources</caption>' build/client/en/sources/index.html
+      expect: build exits 0; 5; 4; 1
+    out_of_scope:
+    - Switching to DataTable; columns and styling
+    - src/dataPages/sources.ts
+    notes:
+    - If the page looks different after the change, label the PR ui (docs/team.md) and start the Designer.
 - key: com/site/data-pages/vault-removal
   title: Vault removed
   depends_on:
