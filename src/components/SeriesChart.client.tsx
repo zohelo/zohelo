@@ -36,6 +36,7 @@ export function SeriesChart({
       xTicks: { interval: ticks.interval, step: ticks.step },
       xFormat: ticks.format,
       yDecimals: seriesDecimals(points),
+      locale,
     });
   }, [points, unit, frequency, locale]);
   return <Chart build={build} label={label} locale={locale} />;

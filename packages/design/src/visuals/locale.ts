@@ -26,7 +26,8 @@ export const numberLocale: Record<ChartLocale, NumberLocale> = {
 
 export const timeLocale: Record<ChartLocale, TimeLocale> = {
   pl: {
-    dateTime: "%A, %e %B %Y, %X",
+    // Short-month forms only: a combined date has no case ("1 sty 2024"); %B stays for standalone ticks.
+    dateTime: "%A, %e %b %Y, %X",
     date: "%d.%m.%Y",
     time: "%H:%M:%S",
     periods: ["AM", "PM"],
@@ -52,3 +53,12 @@ export const timeLocale: Record<ChartLocale, TimeLocale> = {
 export const VALUE_FORMAT = ",.2~f";
 /** Tooltips keep up to 4 decimals (the published precision), grouped. */
 export const TOOLTIP_FORMAT = ",.4~f";
+
+/** Vega's fallback date format for tooltips and axes (`config.timeFormat`): "1 sty 2024" / "1 Jan 2024". */
+export const TIME_FORMAT = "%e %b %Y";
+
+/** Tooltip titles per page language (design review of zohelo#399). */
+export const labels: Record<ChartLocale, { series: string; period: string; area: string; region: string; rank: string }> = {
+  pl: { series: "Seria", period: "Okres", area: "Obszar", region: "Region", rank: "Pozycja" },
+  en: { series: "Series", period: "Period", area: "Area", region: "Region", rank: "Rank" },
+};

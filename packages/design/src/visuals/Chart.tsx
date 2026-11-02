@@ -54,7 +54,7 @@ export function Chart({ build, onPick, label, locale = "en" }: ChartProps) {
     // Vega sets the container's aria-label from the spec's description (else "Vega visualization"),
     // so the label goes in as the description unless the spec has its own (zohelo#389).
     const built = build(theme) as VisualizationSpec & { description?: string };
-    const spec = { ...built, description: built.description ?? label, config: config(theme) } as VisualizationSpec;
+    const spec = { ...built, description: built.description ?? label, config: config(theme, locale) } as VisualizationSpec;
     let finalize: (() => void) | undefined;
     let cancelled = false;
     const options = { actions: false, renderer: "svg", formatLocale: numberLocale[locale], timeFormatLocale: timeLocale[locale] } as const;

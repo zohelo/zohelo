@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { numberLocale, timeLocale, TOOLTIP_FORMAT, VALUE_FORMAT } from "./locale";
+import { numberLocale, timeLocale, TIME_FORMAT, TOOLTIP_FORMAT, VALUE_FORMAT } from "./locale";
+import { config } from "./specs";
 import { barSpec, choroplethSpec, lineSpec, rankingSpec, smallMultiplesSpec, type ChoroplethOptions } from "./specs";
 
 const geojson = JSON.parse(
@@ -131,5 +132,28 @@ describe("lineSpec axes (zohelo#389)", () => {
     expect(spec.encoding.x.axis.format).toBe("%Y");
     expect(spec.encoding.y.axis.format).toBe(",.1f");
     expect(spec.encoding.y.axis.tickMinStep).toBeCloseTo(0.1, 10);
+  });
+});
+
+describe("tooltip titles and dates per page language (zohelo#399)", () => {
+  const line = [{ date: "2024-01-01", value: 2.8, series: "PL" }];
+
+  test("Polish titles on Polish pages, English by default", () => {
+    const pl = lineSpec(line, { x: "date", y: "value", series: "series", yTitle: "%", locale: "pl" }) as any;
+    expect(pl.encoding.tooltip.map((t: any) => t.title)).toEqual(["Seria", "Okres", "%"]);
+    const en = lineSpec(line, { x: "date", y: "value", series: "series", yTitle: "%" }) as any;
+    expect(en.encoding.tooltip.map((t: any) => t.title)).toEqual(["Series", "Period", "%"]);
+    const map = choroplethSpec(geojson, rows, { ...options, locale: "pl" }) as any;
+    expect(map.encoding.tooltip[0].title).toBe("Region");
+    const bar = barSpec([{ area: "A", value: 1 }], { category: "area", value: "value", valueTitle: "V", accent: "#000", mutedMark: "#ccc", locale: "pl" }) as any;
+    expect(bar.encoding.tooltip[0].title).toBe("Obszar");
+  });
+
+  test("the fallback date format is day month year in both languages; no long month in a combined date", () => {
+    expect(TIME_FORMAT).toBe("%e %b %Y");
+    const theme = { text: "#000", muted: "#555", grid: "#eee", accent: "#00f", mutedMark: "#ccc", palette: ["#000"] };
+    expect((config(theme, "pl") as any).timeFormat).toBe(TIME_FORMAT);
+    expect(timeLocale.pl.dateTime).not.toContain("%B");
+    expect(timeLocale.pl.date).not.toContain("%B");
   });
 });
