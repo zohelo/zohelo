@@ -4,8 +4,8 @@ import type { ReactNode } from 'react';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { SampleDataBanner } from './components/SampleDataBanner';
-import { useLocale } from './i18n';
-import { isFixtureLayer, publishedDir } from './published';
+import { localeOf, useLocale } from './i18n';
+import { isFixtureLayer, publishedDir, readCatalog } from './published';
 import {
   isRouteErrorResponse,
   Links,
@@ -18,14 +18,20 @@ import {
 } from 'react-router';
 import { CONTAINER } from './components/container';
 
-// Runs at build only (ssr: false): a build from fixtures/published marks every page as sample data.
-export async function loader() {
-  return { sample: isFixtureLayer(publishedDir()) };
+// Runs at build only (ssr: false): a build from fixtures/published marks every page as sample data,
+// and the footer names the catalogue's sources in the page language.
+export async function loader({ request }: { request: Request }) {
+  const dir = publishedDir();
+  const locale = localeOf(new URL(request.url).pathname);
+  const sources = readCatalog(dir).sources.map((s) => (locale === 'pl' ? s.name_pl : s.name_en));
+  return { sample: isFixtureLayer(dir), sources };
 }
 
 export function Layout({ children }: { children: ReactNode }) {
   const locale = useLocale();
-  const sample = useRouteLoaderData<typeof loader>('root')?.sample ?? false;
+  const root = useRouteLoaderData<typeof loader>('root');
+  const sample = root?.sample ?? false;
+  const sources = root?.sources ?? [];
   return (
     <html lang={locale} data-theme="light">
       <head>
@@ -40,7 +46,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <Header />
         {/* A block, not a flex container: a flex column would shrink-wrap the routes' `mx-auto` <main>. */}
         <div className="flex-1">{children}</div>
-        <Footer />
+        <Footer sources={sources} />
         <ScrollRestoration />
         <Scripts />
       </body>

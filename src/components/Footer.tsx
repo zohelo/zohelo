@@ -9,7 +9,8 @@ const links = [
   { key: 'sources', path: '/sources' },
 ] as const;
 
-export const Footer: React.FC = () => {
+/** `sources`: the catalogue's source names in the page language, read by the root loader at build. */
+export const Footer: React.FC<{ sources?: string[] }> = ({ sources = [] }) => {
   const t = useT();
   const locale = useLocale();
   return (
@@ -57,7 +58,12 @@ export const Footer: React.FC = () => {
             © {new Date().getFullYear()} {t.common.site} • {t.footer.foundedBy} <strong className="text-slate-300">{t.footer.founder}</strong>.
           </div>
           <div className="flex items-center space-x-4">
-            <span>{t.footer.sources}</span>
+            <span>
+              <a href={localizedPath('/sources', locale)} className="underline hover:text-white">
+                {t.footer.sources}
+              </a>
+              {sources.length > 0 ? ` ${sources.join(', ')}` : null}
+            </span>
           </div>
         </div>
       </div>
