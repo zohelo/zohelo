@@ -11,6 +11,7 @@ import { HomeSpotlight, type SpotlightData } from './regions/HomeSpotlight';
 import { ChartOfDayBlock } from './growth/ChartOfDayBlock';
 import type { HomeChartOfDay } from './growth/homeChartOfDay';
 import { CONTAINER } from './components/container';
+import { pages } from './site.config';
 
 export default function App({
   tiles,
@@ -59,7 +60,7 @@ export default function App({
       {/* The header, footer and page background come from root.tsx (#385, #386). */}
       {/* Main 8-Section Sequential Flow as mandated by PRD & Mockup */}
       <main className="flex-1">
-        
+        <h1 className="sr-only">{pages.find((p) => p.path === '/')!.title[locale]}</h1>
         <TodayStrip tiles={tiles} locale={locale} />
         <HomeChanges items={items} sources={sources} locale={locale} />
 
