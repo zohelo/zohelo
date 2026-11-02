@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Database, Menu, X } from 'lucide-react';
 import { useLocation } from 'react-router';
 import { localizedPath, useLocale, useT } from '../i18n';
+import { CONTAINER } from './container';
 
 /** The site header, rendered once per page from root.tsx on every route (#385). */
 export const Header: React.FC = () => {
@@ -42,7 +43,7 @@ export const Header: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-40 bg-[#F4F7F9]/90 backdrop-blur-md border-b border-slate-200/80 transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className={CONTAINER}>
         <div className="flex items-center justify-between h-20">
           
           {/* Brand Logo - Crisp Newsreader Serif */}

@@ -1,5 +1,6 @@
 import { KpiTile } from '@zohelo/design';
 import { localizedPath, type Locale } from '../i18n';
+import { CONTAINER } from '../components/container';
 
 /** One headline KPI on the home page's today strip; latestTile() output maps onto these fields. */
 export type TodayTile = {
@@ -19,7 +20,7 @@ const provisionalNote: Record<Locale, string> = { pl: 'dane wstępne', en: 'prov
 export function TodayStrip({ tiles, locale }: { tiles: TodayTile[]; locale: Locale }) {
   if (tiles.length === 0) return null;
   return (
-    <section aria-labelledby="today-strip" className="mx-auto max-w-6xl px-4 py-8">
+    <section aria-labelledby="today-strip" className={`${CONTAINER} py-8`}>
       <h2 id="today-strip" className="mb-4 font-display text-[length:var(--z-size-xl)] text-text">
         {heading[locale]}
       </h2>

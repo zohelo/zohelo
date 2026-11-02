@@ -6,6 +6,7 @@ import { latestTile, type LatestTile } from '../indicators/tile';
 import { NO_LATEST, publishedDir, readCatalog, readKpiLatest } from '../published';
 import { pageMeta } from '../seo';
 import { pages } from '../site.config';
+import { CONTAINER } from '../components/container';
 
 const page = pages.find((p) => p.path === '/indicators')!;
 
@@ -38,7 +39,7 @@ export default function Indicators() {
   const { groups } = useLoaderData<typeof loader>();
   const locale = useLocale();
   return (
-    <main className="mx-auto max-w-5xl px-4 py-12 text-text">
+    <main className={`${CONTAINER} py-12 text-text`}>
       <h1 className="font-display text-[length:var(--z-size-display)] font-semibold">{page.title[locale]}</h1>
       {groups.map((group) => (
         <section key={group.domain_key} className="mt-10">
