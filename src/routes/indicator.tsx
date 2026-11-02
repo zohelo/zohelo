@@ -96,7 +96,7 @@ export default function Indicator() {
         <section aria-labelledby="series-chart" className="mt-10">
           <h2 id="series-chart" className="font-ui text-[length:var(--z-size-lg)] font-semibold">{takeaway}</h2>
           <div className="mt-4">
-            {mounted ? <SeriesChart points={series.points} unit={series.unit} label={takeaway} locale={locale} /> : null}
+            {mounted ? <SeriesChart points={series.points} unit={series.unit} frequency={series.frequency} label={takeaway} locale={locale} /> : null}
             <SeriesTable points={series.points} unit={series.unit} caption={takeaway} locale={locale} />
           </div>
         </section>
