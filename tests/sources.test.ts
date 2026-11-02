@@ -24,7 +24,7 @@ describe('sourceRows', () => {
   test('KPIs fed by each source', () => {
     expect(row('pl', 'gus_bdl').kpis.map((k) => k.kpi_key)).toEqual(['population']);
     expect(row('en', 'nbp').kpis).toEqual([{ kpi_key: 'fx_rate', name: expect.any(String), href: '/en/indicators/fx_rate' }]);
-    expect(row('pl', 'eurostat').kpis).toHaveLength(4);
+    expect(row('pl', 'eurostat').kpis).toHaveLength(3);
     expect(row('pl', 'eurostat').licence?.name).toBe('Creative Commons Attribution 4.0');
   });
 
