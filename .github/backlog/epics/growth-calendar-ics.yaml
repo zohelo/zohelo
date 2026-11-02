@@ -71,9 +71,35 @@ deliverables:
   - com/growth/calendar-ics/feed
   done_when:
   - webcal://zohelo.com/calendar.ics link on home and each indicator page, PL/EN labels
-  todo:
-  - Place SubscribeCalendar in the indicator page sidebar (/indicators/:kpi, Task kpi-route) once that page exists.
   tasks:
+  - key: com/growth/calendar-ics/links/kpi-subscribe
+    type: Task
+    title: Add the calendar subscribe links to each indicator page
+    effort: S
+    state: open
+    contract: false
+    context: 'SubscribeCalendar (src/components/SubscribeCalendar.tsx) shows the webcal:// and .ics links to /calendar.ics;
+      today only the home what-changed block uses it. The Deliverable''s done_when also needs it on every /indicators/:kpi page
+      (src/routes/indicator.tsx). Target: the links appear under the SourceFooter on every indicator page in PL and EN.'
+    files:
+    - edit: src/routes/indicator.tsx
+    steps:
+    - 'src/routes/indicator.tsx: import { SubscribeCalendar } from ''../components/SubscribeCalendar''. In the component, directly
+      after the <div className="mt-10"> that holds <SourceFooter .../>, add <div className="mt-4"><SubscribeCalendar locale={locale}
+      /></div>.'
+    acceptance:
+    - Every pre-rendered /indicators/<kpi> page contains the webcal://zohelo.com/calendar.ics link, in PL and EN
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/indicatorRoute.test.ts tests/subscribeCalendar.test.tsx
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -c 'webcal://zohelo.com/calendar.ics' build/client/indicators/unemployment_rate/index.html
+      expect: build exits 0; 1
+    - run: grep -c 'Subscribe to the release calendar' build/client/en/indicators/unemployment_rate/index.html
+      expect: '1'
+    out_of_scope:
+    - SubscribeCalendar itself and its labels
+    - A sidebar layout for the indicator page
+    - The calendar feed contents
   - key: com/growth/calendar-ics/links/subscribe
     type: Task
     title: Add the SubscribeCalendar link component
