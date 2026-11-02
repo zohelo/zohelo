@@ -25,10 +25,15 @@ describe('fetchPublished without credentials', () => {
       'catalog/catalog.json',
       'feed/changes.json',
       'geo/voivodeship.geojson',
+      'kpi/fx_rate/series.parquet',
       'kpi/gdp_current_prices/latest.json',
+      'kpi/gdp_current_prices/series.parquet',
       'kpi/inflation/latest.json',
+      'kpi/inflation/series.parquet',
       'kpi/population/latest.json',
+      'kpi/population/series.parquet',
       'kpi/unemployment_rate/latest.json',
+      'kpi/unemployment_rate/series.parquet',
       'manifest.json',
     ]);
     expect(existsSync(join(out, 'catalog', 'catalog.json'))).toBe(true);
@@ -38,7 +43,7 @@ describe('fetchPublished without credentials', () => {
   test('a partial key counts as missing', async () => {
     const out = tempOut();
     const written = await fetchPublished(out, { STORAGE_ENDPOINT_URL: 'https://example.invalid' }, { require: false });
-    expect(written).toHaveLength(9);
+    expect(written).toHaveLength(14);
   });
 
   test('with require it rejects', async () => {
