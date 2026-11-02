@@ -1,0 +1,40 @@
+key: com/portfolio/growth
+area: com/portfolio
+title: zohelo growth and commercialisation · discovery
+phase: 2
+priority: P3
+why: >-
+  The com/growth Epics make visitors come back, but nothing yet brings the first visit (search, social sharing) and
+  nothing pays for the platform. A brief sets out what the team can build inside the repos and which channels and
+  revenue models need the owner's decision.
+outcome: >-
+  The owner has decided, from docs/portfolio/zohelo-growth.md, which channels, search work and revenue models zohelo
+  pursues, and the approved parts are Epics in the existing repos.
+in_scope:
+- The brief docs/portfolio/zohelo-growth.md
+- Consultation of the Domain expert (release cards, search demand) and the Architect (Dataset markup, card rendering,
+  keyed API cost)
+- One owner:decision issue when the brief is complete
+out_of_scope:
+- Any account, post, advertising, payment or mail outside the repos (owner actions)
+- Product code beyond the existing com/growth Epics before the owner approves
+done_when:
+- The brief has the Domain expert's and the Architect's answers recorded in its "Consultation" section
+- An owner:decision issue for the brief is closed with the owner's answer
+deliverables:
+- key: com/portfolio/growth/brief
+  title: Growth and commercialisation brief complete
+  done_when:
+  - docs/portfolio/zohelo-growth.md has every section of docs/team.md (Product Owner step 5) and both consultations
+  todo:
+  - Domain expert review of the release-card selection, the one-line reading template and search demand per domain
+  - Architect review of Dataset markup from catalog.json, card rendering in Actions and a keyed API on Workers
+- key: com/portfolio/growth/decision
+  title: Owner decision on growth and commercialisation
+  depends_on:
+  - com/portfolio/growth/brief
+  done_when:
+  - owner:decision issue answered; on approval, the approved Epics exist in the repos
+  todo:
+  - Open the owner:decision issue (assigned to rutkala) with the brief's "What the owner must decide" list, when
+    fewer than 3 owner items are open
