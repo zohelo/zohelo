@@ -1,3 +1,4 @@
+import { formatDate } from '@zohelo/design';
 import { localizedPath, type Locale } from '../i18n';
 import type { ChangeItem, Source } from '../published';
 
@@ -24,8 +25,9 @@ export function ChangesList({ items, sources, locale, limit }: ChangesListProps)
         const title = locale === 'pl' ? item.title_pl : item.title_en;
         return (
           <li key={`${item.at}-${i}`} className="py-3">
+            {/* The date in the page language ('1 sty 2026'); the attribute keeps ISO (zohelo#404). */}
             <time dateTime={item.at} className="font-ui text-[length:var(--z-size-xs)] text-text-muted">
-              {item.at.slice(0, 10)}
+              {formatDate(item.at, locale)}
             </time>{' '}
             {item.kpi_keys.length > 0 ? (
               <a href={localizedPath(`/indicators/${item.kpi_keys[0]}`, locale)}>{title}</a>

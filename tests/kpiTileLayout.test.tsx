@@ -7,7 +7,7 @@ describe('KpiTile layout (#357)', () => {
     const html = renderToStaticMarkup(<KpiTile label="Population" value={36620000} unit="persons" period="2025" locale="en" />);
     expect(html).toContain('flex-wrap');
     expect(html).toContain('whitespace-nowrap');
-    expect(html).toContain('>36.6 million<');
+    expect(html).toContain('>36.6m<');
     expect(html).toContain('title="36,620,000 persons"');
   });
 
@@ -28,7 +28,7 @@ describe('KpiTile layout (#357)', () => {
     const en = renderToStaticMarkup(<KpiTile label="GDP" value={845000} unit="million EUR" period="2024" locale="en" />);
     expect(pl).toContain('>845 mld<');
     expect(pl).toContain('>EUR<');
-    expect(en).toContain('>845 billion<');
+    expect(en).toContain('>845bn<');
     expect(en).toContain('>EUR<');
   });
 
@@ -54,7 +54,7 @@ describe('KpiTile change text (#388)', () => {
     const pl = renderToStaticMarkup(<KpiTile label="PKB" value={845000} unit="mln EUR" delta={95000} period="2024" locale="pl" />);
     expect(pl).toContain('+95 mld EUR');
     const en = renderToStaticMarkup(<KpiTile label="Population" value={37490000} unit="persons" delta={-150000} period="2024" locale="en" comparison="vs 2023" />);
-    expect(en).toContain('\u2212150 thousand persons');
+    expect(en).toContain('\u2212150k persons');
     expect(en).toContain('vs 2023');
   });
 });

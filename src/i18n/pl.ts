@@ -14,7 +14,7 @@ export const pl = {
     navHeading: 'Nawigacja',
     foundedBy: 'Założyciel:',
     founder: 'Radosław Utkała',
-    sources: 'Źródła danych: Główny Urząd Statystyczny (GUS), NBP, RIO',
+    sources: 'Źródła danych:',
   },
   products: {
     heading: 'Produkty',

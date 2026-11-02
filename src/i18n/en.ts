@@ -16,7 +16,7 @@ export const en: Dict = {
     navHeading: 'Navigation Hub',
     foundedBy: 'Founded by',
     founder: 'Radosław Utkała',
-    sources: 'Data Sources: Central Statistical Office (GUS), NBP, RIO',
+    sources: 'Data sources:',
   },
   products: {
     heading: 'Products',
