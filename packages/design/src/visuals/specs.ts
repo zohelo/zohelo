@@ -80,7 +80,8 @@ export function lineSpec(rows: object[], o: LineOptions): VisualizationSpec {
         { field: o.series, type: "nominal", title: labels[o.locale ?? "en"].series },
         // The period in the axis form of the series' frequency ('2025', 'wrz 2026'), not the fallback day date.
         { field: o.x, type: "temporal", title: labels[o.locale ?? "en"].period, ...(o.xFormat ? { format: o.xFormat } : {}) },
-        { field: o.y, type: "quantitative", title: o.yTitle, format: TOOLTIP_FORMAT },
+        // The value in the series' precision, as the axis and the data table (zohelo#414); trimmed only when unknown.
+        { field: o.y, type: "quantitative", title: o.yTitle, format: o.yDecimals === undefined ? TOOLTIP_FORMAT : `,.${o.yDecimals}f` },
       ],
     },
   } as VisualizationSpec;

@@ -142,6 +142,15 @@ describe("lineSpec axes (zohelo#389)", () => {
     const unknown = lineSpec(rows, { x: "date", y: "value", series: "series", yTitle: "%" }) as any;
     expect(unknown.encoding.tooltip[1].format).toBeUndefined();
   });
+
+  test("the tooltip value keeps the series' decimals, trimmed only when the precision is unknown (zohelo#414)", () => {
+    const oneDecimal = lineSpec(rows, { x: "date", y: "value", series: "series", yTitle: "%", yDecimals: 1 }) as any;
+    expect(oneDecimal.encoding.tooltip[2].format).toBe(",.1f");
+    const integers = lineSpec(rows, { x: "date", y: "value", series: "series", yTitle: "os.", yDecimals: 0 }) as any;
+    expect(integers.encoding.tooltip[2].format).toBe(",.0f");
+    const unknown = lineSpec(rows, { x: "date", y: "value", series: "series", yTitle: "%" }) as any;
+    expect(unknown.encoding.tooltip[2].format).toBe(TOOLTIP_FORMAT);
+  });
 });
 
 describe("tooltip titles and dates per page language (zohelo#399)", () => {
