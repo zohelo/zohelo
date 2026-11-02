@@ -1,0 +1,230 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "width": 440,
+  "height": 200,
+  "padding": {
+    "left": 0,
+    "right": 0,
+    "top": 8,
+    "bottom": 0
+  },
+  "data": {
+    "values": [
+      {
+        "s": "Mazowieckie",
+        "role": "accent",
+        "si": 0,
+        "t": "2023",
+        "v": 5.5,
+        "ill": false,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "Mazowieckie",
+        "role": "accent",
+        "si": 0,
+        "t": "2024",
+        "v": 5.51,
+        "ill": false,
+        "joint": false,
+        "prelim": false,
+        "last": true
+      },
+      {
+        "s": "Małopolskie",
+        "role": "context",
+        "si": 1,
+        "t": "2023",
+        "v": 3.44,
+        "ill": false,
+        "joint": false,
+        "prelim": false,
+        "last": false
+      },
+      {
+        "s": "Małopolskie",
+        "role": "context",
+        "si": 1,
+        "t": "2024",
+        "v": 3.43,
+        "ill": false,
+        "joint": false,
+        "prelim": false,
+        "last": true
+      }
+    ]
+  },
+  "config": {
+    "font": "Plus Jakarta Sans",
+    "view": {
+      "stroke": null
+    },
+    "axis": {
+      "labelFont": "Inter Variable, Plus Jakarta Sans, sans-serif"
+    }
+  },
+  "encoding": {
+    "x": {
+      "field": "t",
+      "type": "temporal",
+      "title": null,
+      "axis": {
+        "format": "%Y",
+        "labelColor": "#5D636B",
+        "tickColor": "#E8ECEF",
+        "domainColor": "#5D636B",
+        "tickCount": {
+          "interval": "year",
+          "step": 1
+        },
+        "labelFlush": true,
+        "grid": false,
+        "labelFontSize": 12
+      }
+    },
+    "y": {
+      "field": "v",
+      "type": "quantitative",
+      "title": null,
+      "scale": {
+        "zero": true,
+        "nice": true
+      },
+      "axis": {
+        "format": ".1f",
+        "labelColor": "#5D636B",
+        "gridColor": "#E8ECEF",
+        "domain": false,
+        "ticks": false,
+        "tickCount": 5,
+        "labelPadding": 6,
+        "labelFontSize": 12,
+        "labelExpr": "datum.label + ' mln'"
+      }
+    },
+    "color": {
+      "field": "role",
+      "type": "nominal",
+      "scale": {
+        "domain": [
+          "accent",
+          "context"
+        ],
+        "range": [
+          "#2C6E76",
+          "#868D95"
+        ]
+      },
+      "legend": null
+    }
+  },
+  "layer": [
+    {
+      "transform": [
+        {
+          "filter": "datum.ill || datum.joint"
+        }
+      ],
+      "mark": {
+        "type": "line",
+        "strokeWidth": 1.5,
+        "strokeDash": [
+          3,
+          3
+        ],
+        "opacity": 0.7
+      },
+      "encoding": {
+        "detail": {
+          "field": "s"
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "!datum.ill"
+        }
+      ],
+      "mark": {
+        "type": "line",
+        "strokeWidth": 2.25,
+        "interpolate": "linear"
+      },
+      "encoding": {
+        "detail": {
+          "field": "s"
+        },
+        "strokeWidth": {
+          "condition": {
+            "test": "datum.role === 'context'",
+            "value": 1.75
+          },
+          "value": 2.5
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.last"
+        }
+      ],
+      "mark": {
+        "type": "point",
+        "filled": false,
+        "size": 46,
+        "opacity": 1,
+        "strokeWidth": 2
+      },
+      "encoding": {
+        "fill": {
+          "condition": [
+            {
+              "test": "datum.prelim",
+              "value": "white"
+            },
+            {
+              "test": "datum.role === 'accent'",
+              "value": "#2C6E76"
+            }
+          ],
+          "value": "#868D95"
+        }
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.last"
+        },
+        {
+          "calculate": "datum.s + '  ' + format(datum.v, '.1f') + ' mln'",
+          "as": "lab"
+        }
+      ],
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "dx": 8,
+        "fontSize": 13,
+        "fontWeight": 600,
+        "font": "Plus Jakarta Sans"
+      },
+      "encoding": {
+        "text": {
+          "field": "lab"
+        },
+        "color": {
+          "condition": {
+            "test": "datum.role === 'accent'",
+            "value": "#2C6E76"
+          },
+          "value": "#5D636B"
+        }
+      }
+    }
+  ]
+}
