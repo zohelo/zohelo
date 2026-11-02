@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { numberLocale, timeLocale, TIME_FORMAT, TOOLTIP_FORMAT, VALUE_FORMAT } from "./locale";
 import { config } from "./specs";
-import { barSpec, choroplethSpec, lineSpec, rankingSpec, smallMultiplesSpec, type ChoroplethOptions } from "./specs";
+import { barSpec, choroplethSpec, fixedFormat, lineSpec, rankingSpec, smallMultiplesSpec, type ChoroplethOptions } from "./specs";
 
 const geojson = JSON.parse(
   readFileSync(join(import.meta.dir, "../../../../fixtures/published/geo/voivodeship.geojson"), "utf8"),
@@ -144,12 +144,25 @@ describe("lineSpec axes (zohelo#389)", () => {
   });
 
   test("the tooltip value keeps the series' decimals, trimmed only when the precision is unknown (zohelo#414)", () => {
+    const valueTip = (spec: any) => spec.encoding.tooltip.find((t: any) => t.field === "value");
     const oneDecimal = lineSpec(rows, { x: "date", y: "value", series: "series", yTitle: "%", yDecimals: 1 }) as any;
-    expect(oneDecimal.encoding.tooltip[2].format).toBe(",.1f");
+    expect(valueTip(oneDecimal).format).toBe(",.1f");
+    expect(oneDecimal.encoding.y.axis.format).toBe(",.1f");
     const integers = lineSpec(rows, { x: "date", y: "value", series: "series", yTitle: "os.", yDecimals: 0 }) as any;
-    expect(integers.encoding.tooltip[2].format).toBe(",.0f");
+    expect(valueTip(integers).format).toBe(",.0f");
     const unknown = lineSpec(rows, { x: "date", y: "value", series: "series", yTitle: "%" }) as any;
-    expect(unknown.encoding.tooltip[2].format).toBe(TOOLTIP_FORMAT);
+    expect(valueTip(unknown).format).toBe(TOOLTIP_FORMAT);
+  });
+
+  test("an invalid yDecimals falls back to the trimmed formats on axis and tooltip instead of a broken chart", () => {
+    for (const bad of [-1, 1.5, Number.NaN, 21]) {
+      const spec = lineSpec(rows, { x: "date", y: "value", series: "series", yTitle: "%", yDecimals: bad }) as any;
+      expect(spec.encoding.y.axis.format).toBe(VALUE_FORMAT);
+      expect(spec.encoding.y.axis.tickMinStep).toBeUndefined();
+      expect(spec.encoding.tooltip.find((t: any) => t.field === "value").format).toBe(TOOLTIP_FORMAT);
+    }
+    expect(fixedFormat(2)).toBe(",.2f");
+    expect(fixedFormat(undefined)).toBeUndefined();
   });
 });
 
