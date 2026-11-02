@@ -17,10 +17,10 @@ export const Header: React.FC<HeaderProps> = ({
   const { pathname } = useLocation();
 
   const navItems = [
-    { label: t.nav.dashboards, target: 'compass' },
-    { label: t.nav.products, target: 'products' },
-    { label: t.nav.vault, target: 'vault' },
-    { label: t.nav.consulting, target: 'consulting' },
+    { label: t.nav.indicators, path: '/indicators' },
+    { label: t.nav.regions, path: '/regions' },
+    { label: t.nav.changes, path: '/changes' },
+    { label: t.nav.sources, path: '/sources' },
   ];
 
   const languageToggle = (
@@ -40,11 +40,6 @@ export const Header: React.FC<HeaderProps> = ({
       ))}
     </nav>
   );
-
-  const handleNavClick = (target: string) => {
-    onNavigate(target);
-    setMobileMenuOpen(false);
-  };
 
   return (
     <header className="sticky top-0 z-40 bg-[#F4F7F9]/90 backdrop-blur-md border-b border-slate-200/80 transition-all">
@@ -69,14 +64,15 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Desktop Navigation Links matching Mockup (Research, Dashboards, Products, About...) */}
           <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
-              <button
-                key={item.label}
-                onClick={() => handleNavClick(item.target)}
+              <a
+                key={item.path}
+                href={localizedPath(item.path, locale)}
+                aria-current={pathname === localizedPath(item.path, locale) ? 'page' : undefined}
                 className="text-sm font-medium text-slate-700 hover:text-[#3B8B94] transition-colors py-1 relative group"
               >
                 {item.label}
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#3B8B94] transition-all duration-200 group-hover:w-full" />
-              </button>
+              </a>
             ))}
           </nav>
 
@@ -105,13 +101,14 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="md:hidden border-b border-slate-200 bg-white px-4 pt-3 pb-6 space-y-3 shadow-lg animate-in slide-in-from-top-2">
           <div className="grid grid-cols-2 gap-2 pb-3 border-b border-slate-100">
             {navItems.map((item) => (
-              <button
-                key={item.label}
-                onClick={() => handleNavClick(item.target)}
+              <a
+                key={item.path}
+                href={localizedPath(item.path, locale)}
+                aria-current={pathname === localizedPath(item.path, locale) ? 'page' : undefined}
                 className="text-left px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-[#3B8B94] rounded-md"
               >
                 {item.label}
-              </button>
+              </a>
             ))}
           </div>
         </div>
