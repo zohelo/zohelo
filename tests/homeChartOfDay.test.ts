@@ -15,11 +15,23 @@ describe('homeChartOfDay', () => {
         { name_pl: k.name_pl, name_en: k.name_en },
       ]),
     );
-    const result = homeChartOfDay(dir, catalog, 'pl')!;
+    const now = new Date('2026-11-03T00:00:00Z');
+    const result = homeChartOfDay(dir, catalog, 'pl', now)!;
     expect(result).not.toBeNull();
-    expect(result.pick.kpi_key).toBe(chartOfDay(files, names)!.kpi_key);
+    expect(result.pick.kpi_key).toBe(chartOfDay(files, names, now)!.kpi_key);
     expect(result.sourceName.length).toBeGreaterThan(0);
     expect(result.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  test('fixtures on 3 Nov 2026: monthly inflation 2026-09 beats annual unemployment 2025 (#410)', () => {
+    const result = homeChartOfDay(dir, catalog, 'pl', new Date('2026-11-03T00:00:00Z'))!;
+    expect(result.pick.kpi_key).toBe('inflation');
+    expect(result.pick.period).toBe('2026-09');
+    expect(result.pick.source_key).toBe('eurostat');
+  });
+
+  test('nothing fresh gives null (the block is not rendered)', () => {
+    expect(homeChartOfDay(dir, catalog, 'pl', new Date('2030-01-01T00:00:00Z'))).toBeNull();
   });
 
   test('English: the source name_en', () => {
