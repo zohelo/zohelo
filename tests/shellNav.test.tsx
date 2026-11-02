@@ -45,4 +45,15 @@ describe('shell navigation', () => {
     expect(html).toContain('POLSKA W DANYCH');
     expect(html).not.toContain('Jarvis');
   });
+
+  test('Footer names the catalogue sources after a link to /sources (#footer-sources)', () => {
+    const html = renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/']}>
+        <Footer sources={['Eurostat', 'Narodowy Bank Polski']} />
+      </MemoryRouter>,
+    );
+    expect(html).toContain('Eurostat, Narodowy Bank Polski');
+    expect(html).toMatch(/<a href="\/sources" class="underline[^"]*">Źródła danych:<\/a>/);
+    expect(html).not.toContain('RIO');
+  });
 });
