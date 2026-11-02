@@ -112,17 +112,16 @@ deliverables:
     title: Replace the fake contact form with a real contact link
     effort: S
     state: open
-    context: HeroConsultingSection has a form whose submit only shows a toast; nothing is sent. Until a form relay
-      exists, the honest version is a mailto link and LinkedIn link.
+    context: HeroConsultingSection had a form whose submit only showed a toast; nothing was sent. Task
+      no-fake-form removes it; until a form relay exists, the honest contact path is a mailto link and a LinkedIn link.
     owner_action: Reply with the public contact e-mail address and LinkedIn URL to show on zohelo.com.
     files:
     - edit: src/components/HeroConsultingSection.tsx
     - edit: src/content/consultantData.ts
-    - edit: src/App.tsx
     steps:
-    - Remove the form, its state and handleSubmit; remove the onSubmitSuccess prop and its use in App.tsx.
     - Add contact { email, linkedin } to src/content/consultantData.ts with the values the owner replied; render
-      two buttons 'Napisz e-mail' / 'Write an e-mail' (mailto:) and 'LinkedIn'.
+      two links 'Napisz e-mail' / 'Write an e-mail' (mailto:) and 'LinkedIn' at the end of the consulting block's
+      left column.
     acceptance:
     - No <form> in HeroConsultingSection; both links use the owner-provided values
     verify:
@@ -132,6 +131,7 @@ deliverables:
     - Server-side form handling
     depends_on:
     - com/site/real-content/claims/content-dir
+    - com/site/real-content/claims/no-fake-form
     notes:
     - Label owner:action is added by the backlog sync only when depends_on is done (max 3 open, D8).
   - key: com/site/real-content/claims/chronicles
@@ -230,6 +230,41 @@ deliverables:
       expect: exit 0
     out_of_scope:
     - Changing file contents
+  - key: com/site/real-content/claims/no-fake-form
+    type: Bug
+    title: Remove the consulting form that pretends to send a message
+    effort: S
+    state: open
+    contract: false
+    context: >-
+      The home page's consulting block (src/components/HeroConsultingSection.tsx, right column) has a form for name,
+      e-mail, company and message. Submitting it sends nothing, then shows "Consultation Request Sent … Radosław Utkała
+      has received your inquiry and will reach out", and App.tsx shows a toast "Consultation request transmitted". That
+      is a false claim on the live site and it collects personal data into nothing. Removing the form does not need the
+      owner; the real contact links come with zohelo#129 (owner action), which then only adds them.
+    files:
+    - edit: src/components/HeroConsultingSection.tsx
+    - edit: src/App.tsx
+    steps:
+    - >-
+      HeroConsultingSection.tsx: delete the whole right column, from the comment '{/* RIGHT COLUMN (Cols 8-12): Contact
+      Form matching Mockup */}' through the closing </div> of <div className="lg:col-span-5 …">; delete formData,
+      isSubmitting, isSubmitted, handleSubmit, the onSubmitSuccess prop and the props interface (the component takes no
+      props); change the left column class 'lg:col-span-7' to 'lg:col-span-12'; remove the now unused lucide imports Send,
+      CheckCircle2, Mail, Building, MessageSquare, Clock and ArrowRight (keep User and Award).
+    - >-
+      App.tsx: render <HeroConsultingSection /> without props; delete toastMessage, showToast and the toast markup;
+      handleSelectProduct keeps only handleNavigate('consulting'); remove the CheckCircle2 import.
+    acceptance:
+    - No <form>, no 'Consultation', no 'received your inquiry', no 'transmitted' anywhere in src/
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && grep -rlE '<form|received your inquiry|transmitted|Consultation Request' src/ | wc -l
+      expect: exit 0; '0'
+    out_of_scope:
+    - The contact links (zohelo#129) and the /about page (zohelo#134)
+    - The profile text of the consulting block
+    notes:
+    - zohelo#400 and zohelo#401 (open) touch App.tsx and HeroConsultingSection.tsx; update the branch from main before review.
 - key: com/site/real-content/legal
   title: Legal pages
   depends_on:
