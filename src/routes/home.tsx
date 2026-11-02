@@ -1,11 +1,14 @@
+import { useEffect, useState } from 'react';
 import { useLoaderData } from 'react-router';
 import App from '../App';
+import { MapChoropleth } from '../components/MapChoropleth.client';
 import { homeChartOfDay } from '../growth/homeChartOfDay';
 import { localeOf, useLocale, type Locale } from '../i18n';
 import { homeTiles } from '../indicators/home';
-import { publishedDir, readCatalog, readChanges, readGeo, readKpiLatest, type Catalog } from '../published';
+import { publishedDir, readCatalog, readChanges, readGeo, readKpiLatest, type Catalog, type GeoCollection } from '../published';
 import type { SpotlightData, SpotRow } from '../regions/HomeSpotlight';
 import { regionalKpis } from '../regions/kpiOptions';
+import type { MapRow } from '../regions/mapSpec';
 import { regionName, terytOf } from '../regions/profile';
 import { rankRegions } from '../regions/ranking';
 import { spotlight } from '../regions/spotlight';
@@ -21,11 +24,13 @@ export async function loader({ request }: { request: Request }) {
   const dir = publishedDir();
   const catalog = readCatalog(dir);
   const tiles = homeTiles(catalog, (k) => readKpiLatest(dir, k), locale);
+  const result = homeSpotlight(dir, catalog, locale);
   return {
     tiles,
     items: readItems(dir),
     sources: catalog.sources,
-    spotlight: homeSpotlight(dir, catalog, locale),
+    spotlight: result?.data ?? null,
+    spotlightMap: result?.map ?? null,
     chartOfDay: homeChartOfDay(dir, catalog, locale),
   };
 }
@@ -40,8 +45,10 @@ function readItems(dir: string) {
   }
 }
 
-/** The unemployment_rate spotlight, or null when the KPI has no voivodeship ranking. */
-function homeSpotlight(dir: string, catalog: Catalog, locale: Locale): SpotlightData | null {
+type HomeSpotlightResult = { data: SpotlightData; map: { geo: GeoCollection; rows: MapRow[] } };
+
+/** The unemployment_rate spotlight and its map, or null when the KPI has no voivodeship ranking. */
+function homeSpotlight(dir: string, catalog: Catalog, locale: Locale): HomeSpotlightResult | null {
   const option = regionalKpis(catalog, locale).find((o) => o.kpi_key === 'unemployment_rate');
   if (!option) return null;
   const ranking = rankRegions(readKpiLatest(dir, 'unemployment_rate'));
@@ -53,7 +60,10 @@ function homeSpotlight(dir: string, catalog: Catalog, locale: Locale): Spotlight
       return teryt ? [{ teryt, name: regionName(geo, teryt, locale), value: r.value, rank: r.rank }] : [];
     });
   const { top, bottom } = spotlight(ranking);
-  return { kpi_key: option.kpi_key, name: option.name, unit: option.unit, period: ranking.period, top: rows(top), bottom: rows(bottom) };
+  return {
+    data: { kpi_key: option.kpi_key, name: option.name, unit: option.unit, period: ranking.period, top: rows(top), bottom: rows(bottom) },
+    map: { geo, rows: ranking.regions },
+  };
 }
 
 export function meta({ location }: { location: { pathname: string } }) {
@@ -62,8 +72,15 @@ export function meta({ location }: { location: { pathname: string } }) {
 }
 
 export default function Home() {
-  const { tiles, items, sources, spotlight, chartOfDay } = useLoaderData<typeof loader>();
+  const { tiles, items, sources, spotlight, spotlightMap, chartOfDay } = useLoaderData<typeof loader>();
   const locale = useLocale();
+  // The map is client-only (D25): rendered after hydration, like on /regions.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const map =
+    mounted && spotlight && spotlightMap ? (
+      <MapChoropleth geo={spotlightMap.geo} rows={spotlightMap.rows} valueTitle={spotlight.unit} locale={locale} label={spotlight.name} />
+    ) : null;
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
@@ -74,7 +91,15 @@ export default function Home() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <App tiles={tiles} items={items} sources={sources} spotlight={spotlight} chartOfDay={chartOfDay} locale={locale} />
+      <App
+        tiles={tiles}
+        items={items}
+        sources={sources}
+        spotlight={spotlight}
+        spotlightMap={map}
+        chartOfDay={chartOfDay}
+        locale={locale}
+      />
     </>
   );
 }

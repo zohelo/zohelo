@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, type ReactNode } from 'react';
 import { Header } from './components/Header';
 import { ProductsSection } from './components/ProductsSection';
 import { HeroConsultingSection } from './components/HeroConsultingSection';
@@ -18,6 +18,7 @@ export default function App({
   items,
   sources,
   spotlight,
+  spotlightMap,
   chartOfDay,
   locale,
 }: {
@@ -25,6 +26,7 @@ export default function App({
   items: ChangeItem[];
   sources: Source[];
   spotlight: SpotlightData | null;
+  spotlightMap: ReactNode;
   chartOfDay: HomeChartOfDay | null;
   locale: Locale;
 }) {
@@ -68,7 +70,9 @@ export default function App({
         <TodayStrip tiles={tiles} locale={locale} />
         <HomeChanges items={items} sources={sources} locale={locale} />
 
-        <HomeSpotlight data={spotlight} locale={locale} />
+        <HomeSpotlight data={spotlight} locale={locale}>
+          {spotlightMap}
+        </HomeSpotlight>
         {chartOfDay ? (
           <section aria-label={locale === 'pl' ? 'Wykres dnia' : 'Chart of the day'} className="mx-auto max-w-6xl px-4 py-8">
             <ChartOfDayBlock pick={chartOfDay.pick} sourceName={chartOfDay.sourceName} date={chartOfDay.date} locale={locale} />
