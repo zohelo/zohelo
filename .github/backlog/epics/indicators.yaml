@@ -89,8 +89,9 @@ deliverables:
   done_when:
   - /indicators and /indicators/<kpi_key> pre-rendered for the 20 KPIs listed in site.config
   todo:
-  - 'On /indicators/:kpi: line Chart from kpi/<key>/series.parquet (needs a Parquet reader at build), definition
-    (catalog.json has no definition field yet), CSV download link to the published extract.'
+  - 'On /indicators/:kpi: line Chart from readKpiSeries() (Task series-reader) once the Designer''s chart style exists
+    (O17), definition (catalog.json has no definition field yet), link to downloads/<kpi_key>.csv (Task
+    com/site/data-pages/data/downloads).'
   tasks:
   - key: com/site/indicators/pages/groups
     type: Task
@@ -368,6 +369,255 @@ deliverables:
     out_of_scope:
     - fixture files
     - TodayStrip and the routes (they use latestTile and need no change)
+  - key: com/site/indicators/pages/series-fixtures
+    type: Task
+    title: Add series.parquet fixtures for the published KPIs
+    effort: S
+    state: open
+    contract: false
+    context: The indicator chart, the chart of the day, the NBP rates block and the /data downloads need kpi/<kpi_key>/series.parquet
+      (zohelo-data docs/published.md), which gold.publish writes for every published KPI, fx_rate included. fixtures/published
+      has no series file, so nothing that reads one can be tested. This Task adds a generator script and its five synthetic
+      files (values illustrative, D26); the reader is Task series-reader.
+    files:
+    - create: scripts/series-fixture.ts
+    - create: fixtures/published/kpi/population/series.parquet
+    - create: fixtures/published/kpi/gdp_current_prices/series.parquet
+    - create: fixtures/published/kpi/inflation/series.parquet
+    - create: fixtures/published/kpi/unemployment_rate/series.parquet
+    - create: fixtures/published/kpi/fx_rate/series.parquet
+    - edit: package.json
+    - edit: bun.lock
+    - edit: tests/fetchPublished.test.ts
+    steps:
+    - '`bun add -d hyparquet-writer@^0.18.0` (devDependency; package.json and bun.lock change).'
+    - scripts/series-fixture.ts exactly as .github/backlog/assets/series-parquet.md, section 'scripts/series-fixture.ts'.
+    - 'Run `bun scripts/series-fixture.ts`: five ''series-fixture: <n> rows written to ...'' lines; commit the five files.'
+    - 'tests/fetchPublished.test.ts, test ''copies the fixture files and the fixture marker'': add the five paths kpi/<kpi_key>/series.parquet
+      to the expected list in sorted order (kpi/fx_rate/series.parquet directly after geo/voivodeship.geojson, every other one
+      directly after its latest.json); test ''a partial key counts as missing'': toHaveLength(9) becomes toHaveLength(14).'
+    acceptance:
+    - Five series.parquet files exist under fixtures/published/kpi/ (2 to 6 rows each)
+    - Running the script again leaves git status clean (byte-identical output)
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test
+      expect: exit 0; 0 fail
+    - run: bun scripts/series-fixture.ts && git status --porcelain fixtures
+      expect: five 'series-fixture:' lines; git prints nothing
+    out_of_scope:
+    - A reader for the files (Task series-reader); scripts/fetch-published.ts
+    - latest.json and catalog.json fixtures
+  - key: com/site/indicators/pages/series-reader
+    type: Task
+    title: Add the series.parquet reader (readKpiSeries)
+    effort: S
+    state: open
+    contract: false
+    context: src/published.ts reads the published JSON files; nothing reads kpi/<kpi_key>/series.parquet, the full history of
+      a KPI that the indicator chart, the chart of the day, the rates block and the /data downloads need. gold.publish writes
+      it with zstd; the fixtures (Task series-fixtures) use snappy. hyparquet (pure JavaScript) with hyparquet-compressors reads
+      both. The reader runs only in loaders and build scripts (node:fs), never in the browser.
+    files:
+    - edit: package.json
+    - edit: bun.lock
+    - edit: src/published.ts
+    - create: tests/series.test.ts
+    steps:
+    - '`bun add hyparquet@^1.32.0 hyparquet-compressors@^1.1.3` (dependencies).'
+    - 'src/published.ts: imports, type SeriesRow and readKpiSeries() exactly as .github/backlog/assets/series-parquet.md, section
+      ''src/published.ts additions'' (the three numbered placements).'
+    - tests/series.test.ts exactly as the same file, section 'tests/series.test.ts'.
+    acceptance:
+    - readKpiSeries returns typed rows with period_start as YYYY-MM-DD and the dim_* columns in dims
+    - 'A missing file throws ''published file missing: <path>''; a non-Parquet file or rows of another KPI throw ''published
+      file invalid: <path>'''
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/series.test.ts
+      expect: exit 0; 4 pass, 0 fail
+    - run: bun run build
+      expect: exit 0
+    out_of_scope:
+    - Using the reader in a route or script
+    - Fetching series files in scripts/fetch-published.ts (Task series-fetch)
+    depends_on:
+    - com/site/indicators/pages/series-fixtures
+  - key: com/site/indicators/pages/series-fetch
+    type: Task
+    title: Download each published KPI's series.parquet in fetch-published
+    effort: S
+    state: open
+    contract: false
+    context: 'scripts/fetch-published.ts copies 06_published/v1 into .published/ before the build: catalog, every required latest.json
+      and geo/voivodeship.geojson, then optional files (fx_rate latest.json, feed/changes.json, feed/calendar.ics), each logged
+      as ''missing, skipped'' when absent. gold.publish also writes kpi/<kpi_key>/series.parquet for every published KPI (fx_rate
+      included); the deploy build does not fetch it yet. The files stay optional: no page needs them yet.'
+    files:
+    - edit: scripts/fetch-published.ts
+    - edit: tests/fetchPublished.test.ts
+    steps:
+    - 'fetch-published.ts: export function seriesPaths(catalog: Catalog): string[] returning `kpi/${kpi_key}/series.parquet`
+      for every catalog KPI with status ''published'', in catalog order (add `type Catalog` to the import from ''../src/published'').'
+    - In fetchPublished() change the optional loop to `for (const path of [...extra, ...seriesPaths(catalog), ...optional])`;
+      the download and the skipped log stay as they are.
+    - 'Header comment: add that series.parquet files are fetched when present.'
+    - 'tests/fetchPublished.test.ts: new describe(''seriesPaths'') on readCatalog(''fixtures/published''): it equals [''kpi/population/series.parquet'',
+      ''kpi/gdp_current_prices/series.parquet'', ''kpi/inflation/series.parquet'', ''kpi/unemployment_rate/series.parquet'',
+      ''kpi/fx_rate/series.parquet'']; in a structuredClone with inflation status ''draft'' the inflation path is gone.'
+    acceptance:
+    - With the read key, every published KPI's series.parquet is downloaded when it exists and logged as skipped otherwise;
+      a missing series file never fails the build
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/fetchPublished.test.ts
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - Making series files required; reading them (Task series-reader)
+    - The no-credentials branch (it copies fixtures/published whole)
+  - key: com/site/indicators/pages/population-gus-fixture
+    type: Task
+    title: Make the zohelo population fixtures GUS-only
+    effort: S
+    state: open
+    contract: false
+    context: 'population is the GUS national-definition KPI only (zohelo-data Bug #2209); Eurostat and World Bank populations
+      move to another KPI. zohelo-data Task #2286 changes its fixture copies: kpi/population/latest.json gets a gus_bdl PL row
+      (2024, 37490000; previous 2023, 37640000) instead of the eurostat row, and the catalog.json population entry gets source_keys
+      [''gus_bdl'']. zohelo''s copies in fixtures/published/ (identical to zohelo-data''s today) must follow, or pages and tests
+      keep the old mix.'
+    files:
+    - edit: fixtures/published/kpi/population/latest.json
+    - edit: fixtures/published/catalog/catalog.json
+    - edit: tests/kpiSources.test.ts
+    - edit: tests/datasetJsonLd.test.ts
+    - edit: tests/sources.test.ts
+    steps:
+    - 'Copy both files from zohelo-data main: `for p in kpi/population/latest.json catalog/catalog.json; do gh api "repos/zohelo/zohelo-data/contents/warehouse/published/fixtures/$p?ref=main"
+      -H "Accept: application/vnd.github.raw" > fixtures/published/$p; done`; name the commit (`gh api repos/zohelo/zohelo-data/commits/main
+      --jq .sha`) in the PR body.'
+    - 'tests/kpiSources.test.ts: test ''population in English with two licences'' becomes ''population in English: GUS only'',
+      expecting names [''Statistics Poland – Local Data Bank''] and footerProps licence ''GUS terms of use (illustrative)''.'
+    - 'tests/datasetJsonLd.test.ts: test ''no license when the sources differ in licence'' uses { ...kpi(''unemployment_rate''),
+      source_keys: [''eurostat'', ''gus_bdl''] } instead of kpi(''population'').'
+    - 'tests/sources.test.ts: row(''pl'', ''eurostat'').kpis toHaveLength(4) becomes toHaveLength(3).'
+    acceptance:
+    - No 'eurostat' or 'world_bank_wdi' in fixtures/published/kpi/population/latest.json or in the population entry of catalog.json
+    - Both files are byte-identical to zohelo-data main at the commit named in the PR
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test
+      expect: exit 0; 0 fail
+    - run: grep -c eurostat fixtures/published/kpi/population/latest.json
+      expect: '0'
+    out_of_scope:
+    - zohelo-data and zohelo-bi copies; series.parquet fixtures (Task series-fixtures writes population as gus_bdl already)
+    - Code under src/
+    depends_on:
+    - data/published/published-v1/contract/population-gus-fixture
+    notes:
+    - If catalog.json on zohelo-data main differs from the zohelo copy in more than the population source_keys, comment on this
+      issue with the diff and stop.
+  - key: com/site/indicators/pages/meta-description
+    type: Task
+    title: Write a real meta description for each indicator page
+    effort: S
+    state: open
+    contract: false
+    context: Every /indicators/<kpi_key> page has the description '<name> — zohelo' (src/routes/indicator.tsx meta()), which
+      tells a search result nothing; the loader already has the latest value, unit, period and source names. Nothing visible
+      changes.
+    files:
+    - create: src/indicators/description.ts
+    - create: tests/indicatorDescription.test.ts
+    - edit: src/routes/indicator.tsx
+    - edit: tests/indicatorRoute.test.ts
+    steps:
+    - 'description.ts: export function indicatorDescription(name: string, tile: { value: number | null; unit: string; period:
+      string }, sourceNames: string[], locale: Locale): string (formatNumber from ''@zohelo/design'', type Locale from ''../i18n'').
+      head = value not null and period not '''' ? `${name}: ${formatNumber(value, locale)} ${unit} (${period}).` : pl `${name}:
+      najnowsze dane i źródła.` / en `${name}: latest data and sources.`. With sourceNames, append ` Źródła: <names joined '',
+      ''>.` (pl) or ` Sources: ...` (en).'
+    - 'indicator.tsx loader: both returns add description = indicatorDescription(name, tile, sources.sources.map((s) => s.name),
+      locale); in the latest.json branch first store latestTile(...) in const tile. meta(): the data type gains description:
+      string; description = data?.description ?? `${name} — zohelo`.'
+    - 'tests/indicatorDescription.test.ts (bun:test): (''Stopa bezrobocia (BAEL)'', { value: 3.2, unit: ''%'', period: ''2025''
+      }, [''Eurostat'', ''Bank Światowy – WDI''], ''pl'') gives ''Stopa bezrobocia (BAEL): 3,2 % (2025). Źródła: Eurostat, Bank
+      Światowy – WDI.''; the same in en with [''Eurostat''] gives ''... 3.2 % (2025). Sources: Eurostat.''; (''X'', { value:
+      null, unit: ''PLN'', period: '''' }, [], ''pl'') gives ''X: najnowsze dane i źródła.''.'
+    - 'tests/indicatorRoute.test.ts: the unemployment_rate test also expects data.description to equal the pl string above.'
+    acceptance:
+    - description and og:description of every indicator page carry the new text, in PL and EN
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/indicatorDescription.test.ts tests/indicatorRoute.test.ts
+      expect: exit 0; 0 fail
+    - run: 'bun run build && grep -o ''content="Stopa bezrobocia (BAEL): 3,2 % (2025). Źródła: Eurostat, Bank Światowy – WDI."''
+        build/client/indicators/unemployment_rate/index.html | wc -l'
+      expect: build exits 0; 2 (description and og:description)
+    out_of_scope:
+    - Titles, JSON-LD and page content
+    - Meta of other routes
+  - key: com/site/indicators/pages/breadcrumb-jsonld
+    type: Task
+    title: Add BreadcrumbList JSON-LD to the indicator pages
+    effort: S
+    state: open
+    contract: false
+    context: 'Indicator pages carry Dataset JSON-LD (datasetJsonLd in src/seo.ts) but no breadcrumb, so search results show
+      the bare URL instead of ''zohelo › Wskaźniki › <KPI>''. Target: a second application/ld+json script with a schema.org
+      BreadcrumbList (site name → the /indicators page title → the KPI name) using the absolute trailing-slash URLs of absoluteUrl().
+      Nothing visible changes.'
+    files:
+    - edit: src/seo.ts
+    - edit: src/routes/indicator.tsx
+    - edit: tests/seo.test.ts
+    steps:
+    - 'seo.ts: export function breadcrumbJsonLd(items: { name: string; path: string }[], locale: Locale): Record<string, unknown>
+      returning { ''@context'': ''https://schema.org'', ''@type'': ''BreadcrumbList'', itemListElement: items.map((item, i)
+      => ({ ''@type'': ''ListItem'', position: i + 1, name: item.name, item: absoluteUrl(item.path, locale) })) }.'
+    - 'indicator.tsx loader, after jsonLd: breadcrumb = breadcrumbJsonLd([{ name: site.name, path: ''/'' }, { name: pages.find((p)
+      => p.path === ''/indicators'')!.title[locale], path: ''/indicators'' }, { name, path: `/indicators/${kpi.kpi_key}` }],
+      locale) (import { pages, site } from ''../site.config''); return it in both branches. Component: directly after the Dataset
+      <script>, <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />.'
+    - 'tests/seo.test.ts, describe(''breadcrumbJsonLd''): en items [{ name: ''zohelo'', path: ''/'' }, { name: ''Indicators'',
+      path: ''/indicators'' }] give itemListElement[0] { ''@type'': ''ListItem'', position: 1, name: ''zohelo'', item: ''https://zohelo.com/en/''
+      } and itemListElement[1].item ''https://zohelo.com/en/indicators/''; in pl itemListElement[0].item is ''https://zohelo.com/'';
+      [] gives itemListElement [].'
+    acceptance:
+    - Every indicator page has exactly one Dataset and one BreadcrumbList script, in PL and EN
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/seo.test.ts tests/indicatorRoute.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -o '"@type":"BreadcrumbList"' build/client/en/indicators/unemployment_rate/index.html | wc
+        -l && grep -o '"item":"https://zohelo.com/en/indicators/unemployment_rate/"' build/client/en/indicators/unemployment_rate/index.html
+        | wc -l
+      expect: build exits 0; 1; 1
+    out_of_scope:
+    - Region and other pages
+    - A visible breadcrumb trail
+  - key: com/site/indicators/pages/sitemap-lastmod
+    type: Task
+    title: Add lastmod to the indicator pages in the sitemap
+    effort: S
+    state: open
+    contract: false
+    context: 'scripts/sitemap.ts writes one <url> per page and language (56 with the fixtures) without <lastmod>, so crawlers
+      cannot tell which indicator pages changed. Each catalog KPI has loaded_at, when its data last loaded. Target: the indicator
+      page entries carry <lastmod>YYYY-MM-DD</lastmod> (the first 10 characters of loaded_at); other pages get none (the site
+      has no date for them).'
+    files:
+    - edit: scripts/sitemap.ts
+    steps:
+    - 'paths becomes { path: string; lastmod?: string }[]: pages → { path: p.path }; published KPIs → { path: `/indicators/${k.kpi_key}`,
+      lastmod: k.loaded_at.slice(0, 10) }; voivodeships → { path: `/regions/${t}` }.'
+    - 'entries: map over ({ path, lastmod }); directly after the <loc> line add `    <lastmod>${lastmod}</lastmod>` (4 spaces,
+      like <loc>) only when lastmod is set.'
+    - 'Header comment: indicator pages carry lastmod from the catalog loaded_at.'
+    acceptance:
+    - With the fixtures sitemap.xml still has 56 <url> entries and exactly the 10 indicator entries have lastmod
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun run build && grep -c '<lastmod>2026-01-01</lastmod>' build/client/sitemap.xml
+        && grep -c '<url>' build/client/sitemap.xml
+      expect: exit 0; 10; 56
+    out_of_scope:
+    - changefreq and priority; lastmod for other pages
+    - robots.txt
 - key: com/site/indicators/home
   title: Today strip and real metrics on home
   depends_on:
@@ -377,7 +627,8 @@ deliverables:
   todo:
   - Replace PulseSection with a rates block (NBP EUR/PLN, USD/PLN, CHF/PLN with table number and date, reference rate;
     no WIBOR; Domain expert finance proposal 1 on zohelo-data#2074) from published KPIs. fx_rate has no latest.json
-    under D26, so the block needs a series.parquet reader. The today strip grows from
+    under D26, so the block reads fx_rate series.parquet with readKpiSeries() (Task
+    com/site/indicators/pages/series-reader) and waits for the Designer's page spec (O17). The today strip grows from
     HOME_KPIS to the six KPIs of the Epic's done_when as they are published.
   tasks:
   - key: com/site/indicators/home/pulse-removal
