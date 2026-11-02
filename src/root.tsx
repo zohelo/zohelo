@@ -1,6 +1,8 @@
 import '@zohelo/design/fonts.css';
 import './index.css';
 import type { ReactNode } from 'react';
+import { Footer } from './components/Footer';
+import { Header } from './components/Header';
 import { SampleDataBanner } from './components/SampleDataBanner';
 import { useLocale } from './i18n';
 import { isFixtureLayer, publishedDir } from './published';
@@ -31,9 +33,12 @@ export function Layout({ children }: { children: ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="bg-[#F8FAFC] text-[#24292E] font-sans antialiased selection:bg-[#3B8B94]/20 selection:text-[#18484F]">
+      <body className="min-h-screen flex flex-col bg-[#F8FAFC] text-[#24292E] font-sans antialiased selection:bg-[#3B8B94]/20 selection:text-[#18484F]">
         {sample && <SampleDataBanner locale={locale} />}
-        {children}
+        {/* The shell (header with navigation and language switch, footer) on every route, once (#385). */}
+        <Header />
+        <div className="flex-1 flex flex-col">{children}</div>
+        <Footer />
         <ScrollRestoration />
         <Scripts />
       </body>

@@ -3,18 +3,17 @@ import { Database, Menu, X } from 'lucide-react';
 import { useLocation } from 'react-router';
 import { localizedPath, useLocale, useT } from '../i18n';
 
-interface HeaderProps {
-  activeSection: string;
-  onNavigate: (sectionId: string) => void;
-}
-
-export const Header: React.FC<HeaderProps> = ({
-  onNavigate
-}) => {
+/** The site header, rendered once per page from root.tsx on every route (#385). */
+export const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const t = useT();
   const locale = useLocale();
   const { pathname } = useLocation();
+  // The active item is the page or any page under it (/indicators/inflation marks "Wskaźniki").
+  const current = (path: string) => {
+    const href = localizedPath(path, locale);
+    return pathname === href || pathname.startsWith(`${href}/`) ? 'page' : undefined;
+  };
 
   const navItems = [
     { label: t.nav.indicators, path: '/indicators' },
@@ -48,8 +47,9 @@ export const Header: React.FC<HeaderProps> = ({
           
           {/* Brand Logo - Crisp Newsreader Serif */}
           <div className="flex items-center space-x-3">
-            <button
-              onClick={() => onNavigate('top')}
+            <a
+              href={localizedPath('/', locale)}
+              aria-label={t.common.site}
               className="group flex items-baseline space-x-2 text-left focus:outline-none"
             >
               <span className="font-serif-heading text-3xl sm:text-4xl font-bold tracking-tight text-[#24292E] group-hover:text-[#3B8B94] transition-colors">
@@ -58,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="hidden sm:inline-block text-[11px] font-mono-code font-semibold tracking-wider text-[#3B8B94] bg-[#3B8B94]/10 px-2 py-0.5 rounded">
                 {t.nav.badge}
               </span>
-            </button>
+            </a>
           </div>
 
           {/* Desktop Navigation Links matching Mockup (Research, Dashboards, Products, About...) */}
@@ -67,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({
               <a
                 key={item.path}
                 href={localizedPath(item.path, locale)}
-                aria-current={pathname === localizedPath(item.path, locale) ? 'page' : undefined}
+                aria-current={current(item.path)}
                 className="text-sm font-medium text-slate-700 hover:text-[#3B8B94] transition-colors py-1 relative group"
               >
                 {item.label}
@@ -104,7 +104,7 @@ export const Header: React.FC<HeaderProps> = ({
               <a
                 key={item.path}
                 href={localizedPath(item.path, locale)}
-                aria-current={pathname === localizedPath(item.path, locale) ? 'page' : undefined}
+                aria-current={current(item.path)}
                 className="text-left px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-[#3B8B94] rounded-md"
               >
                 {item.label}
