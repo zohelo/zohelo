@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { localizedPath, type Locale } from '../i18n';
 import { regionPath } from './profile';
+import { CONTAINER } from '../components/container';
 
 // The home regional spotlight: the highest and lowest voivodeships of one KPI, linking to their profiles.
 
@@ -41,7 +42,7 @@ export function HomeSpotlight({
     </ol>
   );
   return (
-    <section aria-labelledby="spotlight" className="mx-auto max-w-6xl px-4 py-8">
+    <section aria-labelledby="spotlight" className={`${CONTAINER} py-8`}>
       <h2 id="spotlight" className="mb-4 font-display text-[length:var(--z-size-xl)] text-text">
         {`${t.heading}: ${data.name} (${data.period})`}
       </h2>

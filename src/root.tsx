@@ -16,6 +16,7 @@ import {
   useRouteError,
   useRouteLoaderData,
 } from 'react-router';
+import { CONTAINER } from './components/container';
 
 // Runs at build only (ssr: false): a build from fixtures/published marks every page as sample data.
 export async function loader() {
@@ -37,7 +38,8 @@ export function Layout({ children }: { children: ReactNode }) {
         {sample && <SampleDataBanner locale={locale} />}
         {/* The shell (header with navigation and language switch, footer) on every route, once (#385). */}
         <Header />
-        <div className="flex-1 flex flex-col">{children}</div>
+        {/* A block, not a flex container: a flex column would shrink-wrap the routes' `mx-auto` <main>. */}
+        <div className="flex-1">{children}</div>
         <Footer />
         <ScrollRestoration />
         <Scripts />
@@ -58,7 +60,7 @@ export function ErrorBoundary() {
       ? error.message
       : 'Unknown error';
   return (
-    <main className="max-w-3xl mx-auto px-4 py-16">
+    <main className={`${CONTAINER} py-16`}>
       <h1 className="text-2xl font-semibold">Something went wrong</h1>
       <p className="mt-2 text-slate-600">{message}</p>
       <a className="mt-4 inline-block text-[#2C6E76] underline" href="/">

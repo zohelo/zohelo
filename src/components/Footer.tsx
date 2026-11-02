@@ -1,5 +1,6 @@
 import React from 'react';
 import { localizedPath, useLocale, useT } from '../i18n';
+import { CONTAINER } from './container';
 
 const links = [
   { key: 'indicators', path: '/indicators' },
@@ -13,7 +14,7 @@ export const Footer: React.FC = () => {
   const locale = useLocale();
   return (
     <footer className="w-full bg-[#1E252B] text-slate-300 border-t border-slate-800 text-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className={`${CONTAINER} py-12`}>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pb-10 border-b border-slate-800">
           
           {/* Brand Col (Cols 1-5) */}

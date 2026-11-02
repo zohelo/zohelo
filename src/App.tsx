@@ -10,6 +10,7 @@ import type { ChangeItem, Source } from './published';
 import { HomeSpotlight, type SpotlightData } from './regions/HomeSpotlight';
 import { ChartOfDayBlock } from './growth/ChartOfDayBlock';
 import type { HomeChartOfDay } from './growth/homeChartOfDay';
+import { CONTAINER } from './components/container';
 
 export default function App({
   tiles,
@@ -50,9 +51,9 @@ export default function App({
   };
 
   return (
-    <div className="flex-1 bg-[#F3F6F8] text-[#24292E] flex flex-col selection:bg-[#3B8B94]/20 selection:text-[#18484F]">
+    <div className="flex-1 flex flex-col">
       
-      {/* The header and footer come from root.tsx (#385). */}
+      {/* The header, footer and page background come from root.tsx (#385, #386). */}
       {/* Main 8-Section Sequential Flow as mandated by PRD & Mockup */}
       <main className="flex-1">
         
@@ -63,7 +64,7 @@ export default function App({
           {spotlightMap}
         </HomeSpotlight>
         {chartOfDay ? (
-          <section aria-label={locale === 'pl' ? 'Wykres dnia' : 'Chart of the day'} className="mx-auto max-w-6xl px-4 py-8">
+          <section aria-label={locale === 'pl' ? 'Wykres dnia' : 'Chart of the day'} className={`${CONTAINER} py-8`}>
             <ChartOfDayBlock pick={chartOfDay.pick} sourceName={chartOfDay.sourceName} date={chartOfDay.date} locale={locale} />
           </section>
         ) : null}
