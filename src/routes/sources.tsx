@@ -1,3 +1,4 @@
+import { formatDate } from '@zohelo/design';
 import { Fragment } from 'react';
 import { useLoaderData } from 'react-router';
 import { localeOf, useLocale, type Locale } from '../i18n';
@@ -60,7 +61,7 @@ export default function Sources() {
                     '–'
                   )}
                 </td>
-                <td className={`${td} z-figures`}>{row.last_loaded ? row.last_loaded.slice(0, 10) : '–'}</td>
+                <td className={td}>{row.last_loaded ? formatDate(row.last_loaded, locale) : '–'}</td>
                 <td className={td}>
                   {row.kpis.length === 0
                     ? '–'

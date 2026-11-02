@@ -24,6 +24,51 @@ export function formatNumber(value: number | null | undefined, locale: Locale, o
   return formatter(locale, options.decimals).format(value).replace(/[  ]/g, ' ').replace('−', '-');
 }
 
+const MINUS = '\u2212';
+
+/** Units whose changes are percentage points, not relative: '%', 'p.p.', index points. */
+export function isRateUnit(unit: string): boolean {
+  const u = unit.trim().toLowerCase();
+  return u === '%' || u === 'p.p.' || u === 'pp' || u === 'pkt' || u === 'pkt.' || u === 'index' || u.startsWith('% ');
+}
+
+const pointsUnit: Record<Locale, string> = { pl: 'p.p.', en: 'pp' };
+
+/**
+ * A change of a KPI with its unit (number rules, zohelo#388): for a rate the change in percentage points
+ * ('−0,1 p.p.' / '−0.1 pp'), for a level in the unit, compact from 100 000 ('+95 mld EUR'); the minus is the
+ * typographic minus. `unit` is the value's unit as shown ('%', 'mln EUR', 'os.').
+ */
+export function formatChange(
+  value: number | null | undefined,
+  unit: string,
+  locale: Locale,
+  options: FormatOptions = {},
+): { text: string; direction: Direction } {
+  const d = formatDelta(value, locale, options);
+  if (d.text === DASH) return d;
+  const sign = d.text.startsWith('-') ? MINUS : d.text.startsWith('+') ? '+' : '';
+  if (isRateUnit(unit)) return { text: `${sign}${d.text.replace(/^[-+]/, '')} ${pointsUnit[locale]}`, direction: d.direction };
+  const c = formatCompact(value, unit, locale);
+  const number = c.text.startsWith('-') ? c.text.slice(1) : c.text;
+  return { text: `${sign}${number}${c.unit ? ` ${c.unit}` : ''}`, direction: d.direction };
+}
+
+/**
+ * A date per locale, never an ISO string: '2026-01-01T00:00:00Z' or '2026-01-01' → '1 sty 2026' (pl) /
+ * '1 Jan 2026' (en). Anything that is not a calendar date (a period '2026-09', '2025', '') comes back as is.
+ */
+export function formatDate(value: string, locale: Locale): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  if (!m) return value;
+  const date = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])));
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat(locale === 'pl' ? 'pl-PL' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
+    .format(date)
+    .replace(/[\u00a0\u202f]/g, ' ')
+    .replace(/\.$/, '');
+}
+
 /** A change with its sign and direction: 1.5 → { text: '+1,5', direction: 'up' }. */
 export function formatDelta(
   value: number | null | undefined,

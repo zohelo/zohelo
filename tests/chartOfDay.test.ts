@@ -85,3 +85,37 @@ describe('chartOfDay', () => {
     expect(input).toEqual(copy);
   });
 });
+
+describe('chartOfDay rates (#388)', () => {
+  const withUnits: KpiNames = {
+    unemployment_rate: { ...names.unemployment_rate, unit_pl: '%', unit_en: '%' },
+    gdp: { name_pl: 'PKB w cenach bieżących', name_en: 'GDP at current prices', unit_pl: 'mln EUR', unit_en: 'mln EUR' },
+  };
+
+  test('a rate is described by its change in percentage points, with the unit', () => {
+    const c = chartOfDay([unemployment()], withUnits)!;
+    expect(c.rate).toBe(true);
+    expect(c.change).toBeCloseTo(0.3, 10);
+    expect(c.change_pct).toBeCloseTo(((3.2 - 2.9) / 2.9) * 100, 10);
+    expect(c.headline_pl).toBe('Stopa bezrobocia (BAEL): wzrost o 0,3 p.p. do 3,2 % (2025)');
+    expect(c.headline_en).toBe('Unemployment rate (LFS): up 0.3 pp to 3.2 % (2025)');
+    const down = chartOfDay([unemployment([row({ value: 2.8, previous_value: 2.9 })])], withUnits)!;
+    expect(down.headline_pl).toBe('Stopa bezrobocia (BAEL): spadek o 0,1 p.p. do 2,8 % (2025)');
+    expect(down.headline_en).toBe('Unemployment rate (LFS): down 0.1 pp to 2.8 % (2025)');
+  });
+
+  test('a rate is also recognised from the row unit_key when no unit symbol is known', () => {
+    const c = chartOfDay([unemployment([row({ unit_key: 'pct_labour_force' })])], names)!;
+    expect(c.rate).toBe(true);
+    expect(c.headline_pl).toBe('Stopa bezrobocia (BAEL): wzrost o 0,3 p.p. do 3,2 (2025)');
+  });
+
+  test('a level keeps the from–to headline with its unit', () => {
+    const gdp: LatestFile = { kpi_key: 'gdp', values: [row({ period: '2024', value: 845000, previous_value: 750000 })] };
+    const c = chartOfDay([gdp], withUnits)!;
+    expect(c.rate).toBe(false);
+    expect(c.change).toBe(95000);
+    expect(c.headline_pl).toBe('PKB w cenach bieżących: wzrost z 750 000 do 845 000 mln EUR (2024)');
+    expect(c.headline_en).toBe('GDP at current prices: up from 750,000 to 845,000 mln EUR (2024)');
+  });
+});

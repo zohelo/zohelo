@@ -3,6 +3,7 @@
 // src/routes and the client imports only its type.
 import type { Locale } from '../i18n';
 import { readKpiLatest, requiredLatest, type Catalog } from '../published';
+import { unitLabel } from '../indicators/unitLabel';
 import { chartOfDay, type ChartOfDay } from './chartOfDay';
 
 export type HomeChartOfDay = {
@@ -21,7 +22,7 @@ export function homeChartOfDay(
   const names = Object.fromEntries(
     catalog.kpis.map((k) => [
       k.kpi_key,
-      { name_pl: k.name_pl, name_en: k.name_en },
+      { name_pl: k.name_pl, name_en: k.name_en, unit_pl: unitLabel(catalog.units, k.unit_key, 'pl'), unit_en: unitLabel(catalog.units, k.unit_key, 'en') },
     ]),
   );
   const pick = chartOfDay(files, names);

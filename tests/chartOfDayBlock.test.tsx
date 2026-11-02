@@ -34,7 +34,7 @@ describe('ChartOfDayBlock', () => {
     expect(html).toContain('+10,3 %');
     expect(html).toContain('href="/indicators/unemployment_rate"');
     expect(html).toContain('Zobacz wskaźnik');
-    expect(text(html)).toContain('Źródło: Eurostat, dane z 2026-01-01');
+    expect(text(html)).toContain('Źródło: Eurostat, dane z 1 sty 2026');
   });
 
   test('English block', () => {
@@ -43,6 +43,20 @@ describe('ChartOfDayBlock', () => {
     expect(html).toContain('Unemployment rate (LFS): up from 2.9 to 3.2 (2025)');
     expect(html).toContain('+10.3 %');
     expect(html).toContain('href="/en/indicators/unemployment_rate"');
+  });
+
+  test('a rate shows its change in percentage points, a level the relative change (#388)', () => {
+    const rate = renderToStaticMarkup(
+      <ChartOfDayBlock pick={{ ...pick, rate: true, change: 0.3 }} sourceName="Eurostat" date="2026-01-01" locale="pl" />,
+    );
+    expect(rate).toContain('+0,3 p.p.');
+    expect(rate).not.toContain('+10,3 %');
+    expect(rate).toContain('vs poprzedni okres');
+    const level = renderToStaticMarkup(
+      <ChartOfDayBlock pick={{ ...pick, rate: false, change: -1, change_pct: -12.66 }} sourceName="GUS" date="2026-01-01" locale="en" />,
+    );
+    expect(level).toContain('\u221212.7 %');
+    expect(level).toContain('vs previous period');
   });
 
   test('renders the chart passed as children', () => {
