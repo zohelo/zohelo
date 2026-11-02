@@ -24,6 +24,12 @@ describe('/regions/:teryt loader', () => {
     expect([population.rank, population.of]).toEqual([2, 2]);
   });
 
+  test('12 lists its neighbours with names', async () => {
+    const data = await load('/regions/12', '12');
+    expect(data.neighbours.map((n) => n.teryt)).toEqual(['18', '24', '26']);
+    for (const n of data.neighbours) expect(n.name.length).toBeGreaterThan(0);
+  });
+
   test('12 in English', async () => {
     expect((await load('/en/regions/12', '12')).name).toBe('Lesser Poland');
   });

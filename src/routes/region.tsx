@@ -3,7 +3,14 @@ import { useLoaderData } from 'react-router';
 import { localeOf, localizedPath, useLocale, type Locale } from '../i18n';
 import { publishedDir, readCatalog, readGeo, readKpiLatest } from '../published';
 import { regionalKpis } from '../regions/kpiOptions';
-import { geographyKeyOf, regionName, regionProfile, VOIVODESHIP_TERYT } from '../regions/profile';
+import {
+  geographyKeyOf,
+  neighbours,
+  regionName,
+  regionPath,
+  regionProfile,
+  VOIVODESHIP_TERYT,
+} from '../regions/profile';
 import { rankRegions, type RegionRanking } from '../regions/ranking';
 import { pageMeta } from '../seo';
 
@@ -23,7 +30,13 @@ export async function loader({ params, request }: { params: { teryt?: string }; 
     const option = options.find((o) => o.kpi_key === row.kpi_key)!;
     return { ...row, name: option.name, unit: option.unit };
   });
-  return { teryt, name: regionName(readGeo(dir, 'voivodeship'), teryt, locale), rows };
+  const geo = readGeo(dir, 'voivodeship');
+  return {
+    teryt,
+    name: regionName(geo, teryt, locale),
+    rows,
+    neighbours: neighbours(teryt).map((code) => ({ teryt: code, name: regionName(geo, code, locale) })),
+  };
 }
 
 const texts = {
@@ -33,6 +46,7 @@ const texts = {
     none: 'Brak danych regionalnych.',
     rank: (rank: number, of: number) => `${rank}. miejsce z ${of}`,
     national: ' · Polska: ',
+    neighbours: 'Sąsiednie województwa',
   },
   en: {
     description: (name: string) => `${name}: indicators compared with Poland and the rank among the 16 voivodeships.`,
@@ -40,6 +54,7 @@ const texts = {
     none: 'No regional data.',
     rank: (rank: number, of: number) => `rank ${rank} of ${of}`,
     national: ' · Poland: ',
+    neighbours: 'Neighbouring voivodeships',
   },
 };
 
@@ -57,7 +72,7 @@ export function meta({ data, location }: { data?: { teryt: string; name: string 
 }
 
 export default function Region() {
-  const { name, rows } = useLoaderData<typeof loader>();
+  const { name, rows, neighbours } = useLoaderData<typeof loader>();
   const locale = useLocale();
   const t = texts[locale];
   const format = new Intl.NumberFormat(numberLocale[locale]);
@@ -89,6 +104,16 @@ export default function Region() {
           ))}
         </div>
       )}
+      <h2 className="mt-10 font-ui text-[length:var(--z-size-lg)] font-semibold">{t.neighbours}</h2>
+      <ul>
+        {neighbours.map((n) => (
+          <li key={n.teryt}>
+            <a href={regionPath(n.teryt, locale)} className="font-ui text-brand-teal underline">
+              {n.name}
+            </a>
+          </li>
+        ))}
+      </ul>
     </main>
   );
 }
