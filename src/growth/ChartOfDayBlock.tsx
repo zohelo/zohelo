@@ -1,4 +1,4 @@
-import { Card, formatDelta, SourceFooter } from '@zohelo/design';
+import { Card, formatChange, formatDelta, SourceFooter } from '@zohelo/design';
 import type { ReactNode } from 'react';
 import { localizedPath, type Locale } from '../i18n';
 import type { ChartOfDay } from './chartOfDay';
@@ -14,14 +14,21 @@ export type ChartOfDayBlockProps = {
   children?: ReactNode;
 };
 
+const previousPeriod: Record<Locale, string> = { pl: 'vs poprzedni okres', en: 'vs previous period' };
+
 export function ChartOfDayBlock({ pick, sourceName, date, locale, children }: ChartOfDayBlockProps) {
-  const d = formatDelta(pick.change_pct, locale, { decimals: 1 });
+  // A rate changes in percentage points, a level relatively (zohelo#388).
+  const change = pick.rate
+    ? formatChange(pick.change, '%', locale, { decimals: 1 }).text
+    : `${formatDelta(pick.change_pct, locale, { decimals: 1 }).text.replace(/^-/, '\u2212')} %`;
   return (
     <Card title={locale === 'pl' ? 'Wykres dnia' : 'Chart of the day'}>
       <p className="font-display text-[length:var(--z-size-xl)] text-text">
         {locale === 'pl' ? pick.headline_pl : pick.headline_en}
       </p>
-      <p className="z-figures mt-1 text-text-muted">{`${d.text} %`}</p>
+      <p className="z-figures mt-1 text-text-muted">
+        {change} <span className="font-ui text-text-faint">{previousPeriod[locale]}</span>
+      </p>
       {children ? <div className="mt-4">{children}</div> : null}
       <SourceFooter sources={[{ name: sourceName }]} date={date} locale={locale} />
       <a

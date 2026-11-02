@@ -1,9 +1,9 @@
-import type { Locale } from '../format';
+import { formatDate, type Locale } from '../format';
 
 export type Source = { name: string; code?: string; url?: string };
 export type SourceFooterProps = {
   sources: Source[];
-  /** The data date, e.g. '2026-10-01'. */
+  /** The data date ('2026-10-01' or an ISO timestamp, shown per locale: '1 paź 2026'), or a period as is. */
   date: string;
   licence?: string;
   locale: Locale;
@@ -24,7 +24,7 @@ function sourceText({ name, code }: Source) {
  */
 export function sourceLine({ sources, date, licence, locale }: SourceFooterProps): string {
   const l = label[locale];
-  const parts = [`${l.source} ${sources.map(sourceText).join(' · ')}, ${l.data} ${date}`];
+  const parts = [`${l.source} ${sources.map(sourceText).join(' · ')}, ${l.data} ${formatDate(date, locale)}`];
   if (licence) parts.push(licence);
   parts.push('zohelo');
   return parts.join(' · ');
@@ -49,7 +49,7 @@ export function SourceFooter({ sources, date, licence, locale }: SourceFooterPro
         </span>
       ))}
       {`, ${l.data} `}
-      <span className="z-figures">{date}</span>
+      <span className="z-figures">{formatDate(date, locale)}</span>
       {licence ? ` · ${licence}` : null}
       {' · zohelo'}
     </p>

@@ -1,4 +1,4 @@
-import { formatCompact, formatDelta, formatNumber, type Direction, type Locale } from '../format';
+import { formatChange, formatCompact, formatNumber, type Direction, type Locale } from '../format';
 
 export type KpiTileProps = {
   label: string;
@@ -13,7 +13,11 @@ export type KpiTileProps = {
   decimals?: number;
   /** Levels in compact notation ('37,5 mln os.'); the exact value stays in the title. Default true. */
   compact?: boolean;
+  /** What the change compares with, shown after it; default 'vs poprzedni okres' / 'vs previous period'. */
+  comparison?: string;
 };
+
+const previousPeriod: Record<Locale, string> = { pl: 'vs poprzedni okres', en: 'vs previous period' };
 
 const RATE_UNITS = new Set(['%', 'p.p.', 'pp', 'pkt', 'pkt.', 'index']);
 
@@ -38,8 +42,9 @@ function deltaColour(direction: Direction, good?: 'up' | 'down') {
 }
 
 /** One headline figure with its unit, period and change; direction is told by arrow and text, never colour alone. */
-export function KpiTile({ label, value, unit, delta, period, locale, href, goodDirection, decimals, compact = true }: KpiTileProps) {
-  const d = delta === undefined ? null : formatDelta(delta, locale, { decimals });
+export function KpiTile({ label, value, unit, delta, period, locale, href, goodDirection, decimals, compact = true, comparison }: KpiTileProps) {
+  // The change carries its unit (zohelo#388): percentage points for a rate, the unit for a level.
+  const d = delta === undefined ? null : formatChange(delta, unit, locale, { decimals });
   // Every tile has one value size: long levels are written compactly ('37,5 mln') instead of stepping
   // down a size (zohelo#387, replaces the #357 rule); the exact value is the title.
   const v = tileValue(value, unit, locale, compact, decimals);
@@ -54,6 +59,8 @@ export function KpiTile({ label, value, unit, delta, period, locale, href, goodD
         <div className={`z-figures mt-1 text-[length:var(--z-size-sm)] ${deltaColour(d.direction, goodDirection)}`}>
           {arrow[d.direction] ? <span aria-hidden="true">{arrow[d.direction]} </span> : null}
           {d.text} <span className="font-ui">({words[locale][d.direction]})</span>
+          {/* The comparison on its own line, so the change never wraps with a rag (design review of #401). */}
+          <span className="block font-ui text-text-faint">{comparison ?? previousPeriod[locale]}</span>
         </div>
       ) : null}
       <div className="mt-2 font-ui text-[length:var(--z-size-xs)] text-text-faint">{period}</div>
