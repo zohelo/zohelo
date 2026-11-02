@@ -3,6 +3,8 @@
 // of the layer (.published/ in the build, fixtures/published in tests).
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { parquetReadObjects } from 'hyparquet';
+import { compressors } from 'hyparquet-compressors';
 
 export type KpiDimension = { dimension_key: string; member_count: number; levels: string[] };
 
@@ -70,6 +72,23 @@ export type LatestValue = {
 };
 
 export type KpiLatest = { kpi_key: string; unit_key: string; generated_at: string; values: LatestValue[] };
+
+/** One row of kpi/<kpi_key>/series.parquet; `dims` holds the dim_<dimension_key> columns ('_T' = total). */
+export type SeriesRow = {
+  kpi_key: string;
+  source_key: string;
+  measure_key: string;
+  geography_key: string;
+  geography_level: string;
+  period: string;
+  // first day of the period, 'YYYY-MM-DD'
+  period_start: string;
+  frequency: string;
+  value: number;
+  unit_key: string;
+  flags: string;
+  dims: Record<string, string>;
+};
 
 export type ChangeItem = {
   at: string;
@@ -149,4 +168,40 @@ export function readGeo(dir: string, level: string): GeoCollection {
   const data = readJson(path) as GeoCollection;
   if (!Array.isArray(data?.features)) throw invalid(path);
   return data;
+}
+
+const SERIES_COLUMNS = ['kpi_key', 'source_key', 'measure_key', 'geography_key', 'geography_level', 'period', 'period_start', 'frequency', 'value', 'unit_key', 'flags'] as const;
+
+/** Rows of kpi/<kpiKey>/series.parquet (zstd as gold.publish writes it, or snappy as the fixtures). */
+export async function readKpiSeries(dir: string, kpiKey: string): Promise<SeriesRow[]> {
+  const path = join(dir, 'kpi', kpiKey, 'series.parquet');
+  if (!existsSync(path)) throw new Error(`published file missing: ${path}`);
+  const bytes = readFileSync(path);
+  const file = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+  let records: Record<string, unknown>[];
+  try {
+    records = await parquetReadObjects({ file, compressors });
+  } catch {
+    throw invalid(path);
+  }
+  return records.map((r) => {
+    if (r.kpi_key !== kpiKey || SERIES_COLUMNS.some((c) => r[c] === undefined || r[c] === null)) throw invalid(path);
+    const start = r.period_start instanceof Date ? r.period_start.toISOString().slice(0, 10) : String(r.period_start);
+    const dims: Record<string, string> = {};
+    for (const [key, value] of Object.entries(r)) if (key.startsWith('dim_')) dims[key.slice(4)] = String(value);
+    return {
+      kpi_key: kpiKey,
+      source_key: String(r.source_key),
+      measure_key: String(r.measure_key),
+      geography_key: String(r.geography_key),
+      geography_level: String(r.geography_level),
+      period: String(r.period),
+      period_start: start,
+      frequency: String(r.frequency),
+      value: Number(r.value),
+      unit_key: String(r.unit_key),
+      flags: String(r.flags),
+      dims,
+    };
+  });
 }
