@@ -15,18 +15,22 @@ import { TodayStrip, type TodayTile } from './indicators/TodayStrip';
 import { HomeChanges } from './growth/HomeChanges';
 import type { ChangeItem, Source } from './published';
 import { HomeSpotlight, type SpotlightData } from './regions/HomeSpotlight';
+import { ChartOfDayBlock } from './growth/ChartOfDayBlock';
+import type { HomeChartOfDay } from './growth/homeChartOfDay';
 
 export default function App({
   tiles,
   items,
   sources,
   spotlight,
+  chartOfDay,
   locale,
 }: {
   tiles: TodayTile[];
   items: ChangeItem[];
   sources: Source[];
   spotlight: SpotlightData | null;
+  chartOfDay: HomeChartOfDay | null;
   locale: Locale;
 }) {
   const [activeSection, setActiveSection] = useState('top');
@@ -87,6 +91,11 @@ export default function App({
         <HomeChanges items={items} sources={sources} locale={locale} />
 
         <HomeSpotlight data={spotlight} locale={locale} />
+        {chartOfDay ? (
+          <section aria-label={locale === 'pl' ? 'Wykres dnia' : 'Chart of the day'} className="mx-auto max-w-6xl px-4 py-8">
+            <ChartOfDayBlock pick={chartOfDay.pick} sourceName={chartOfDay.sourceName} date={chartOfDay.date} locale={locale} />
+          </section>
+        ) : null}
 
         {/* 6. The Vault / The Datasets: CSV, Parquet, Power BI, PDF Lakehouse Assets */}
         <VaultSection
