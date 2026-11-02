@@ -2,7 +2,7 @@ import { formatDate } from '@zohelo/design';
 import { Fragment } from 'react';
 import { useLoaderData } from 'react-router';
 import { localeOf, useLocale, type Locale } from '../i18n';
-import { sourceRows } from '../dataPages/sources';
+import { sourceRows, type SourceRow } from '../dataPages/sources';
 import { publishedDir, readCatalog } from '../published';
 import { pageMeta } from '../seo';
 import { pages } from '../site.config';
@@ -26,16 +26,62 @@ export function meta({ location }: { location: { pathname: string } }) {
   return pageMeta({ path: page.path, locale, title: page.title[locale], description: page.description[locale] });
 }
 
+function Licence({ row }: { row: SourceRow }) {
+  return row.licence ? (
+    <a href={row.licence.url} className="text-brand-teal underline">
+      {row.licence.name}
+    </a>
+  ) : (
+    '–'
+  );
+}
+
+function Indicators({ row }: { row: SourceRow }) {
+  return row.kpis.length === 0
+    ? '–'
+    : row.kpis.map((k, i) => (
+        <Fragment key={k.kpi_key}>
+          {i > 0 ? ', ' : null}
+          <a href={k.href} className="text-brand-teal underline">
+            {k.name}
+          </a>
+        </Fragment>
+      ));
+}
+
 export default function Sources() {
   const { rows } = useLoaderData<typeof loader>();
   const locale = useLocale();
   const t = dict[locale];
   const th = 'px-3 py-2 text-left font-ui font-semibold text-text-muted';
   const td = 'px-3 py-2 align-top';
+  const dt = 'font-ui text-text-muted';
   return (
     <main className={`${CONTAINER} py-16 text-text`}>
       <h1 className="font-display text-[length:var(--z-size-display)] font-semibold">{page.title[locale]}</h1>
-      <div className="mt-8 overflow-x-auto">
+      {/* Below md the five columns do not fit a phone (zohelo#404): one card per source instead of the table. */}
+      <ul className="mt-8 divide-y divide-border text-[length:var(--z-size-sm)] md:hidden">
+        {rows.map((row) => (
+          <li key={row.source_key} className="py-4">
+            <h2 className="font-semibold">{row.name}</h2>
+            <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+              <dt className={dt}>{t.register}</dt>
+              <dd className="text-text-muted">{row.register_id}</dd>
+              <dt className={dt}>{t.licence}</dt>
+              <dd>
+                <Licence row={row} />
+              </dd>
+              <dt className={dt}>{t.lastLoaded}</dt>
+              <dd className="whitespace-nowrap">{row.last_loaded ? formatDate(row.last_loaded, locale) : '–'}</dd>
+              <dt className={dt}>{t.indicators}</dt>
+              <dd>
+                <Indicators row={row} />
+              </dd>
+            </dl>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-8 hidden overflow-x-auto md:block">
         <table className="w-full border-collapse text-[length:var(--z-size-sm)]">
           <caption className="sr-only">{page.title[locale]}</caption>
           <thead className="border-b border-border">
@@ -53,26 +99,11 @@ export default function Sources() {
                 <th scope="row" className={`${td} text-left font-normal`}>{row.name}</th>
                 <td className={`${td} text-text-muted`}>{row.register_id}</td>
                 <td className={td}>
-                  {row.licence ? (
-                    <a href={row.licence.url} className="text-brand-teal underline">
-                      {row.licence.name}
-                    </a>
-                  ) : (
-                    '–'
-                  )}
+                  <Licence row={row} />
                 </td>
-                <td className={td}>{row.last_loaded ? formatDate(row.last_loaded, locale) : '–'}</td>
+                <td className={`${td} whitespace-nowrap`}>{row.last_loaded ? formatDate(row.last_loaded, locale) : '–'}</td>
                 <td className={td}>
-                  {row.kpis.length === 0
-                    ? '–'
-                    : row.kpis.map((k, i) => (
-                        <Fragment key={k.kpi_key}>
-                          {i > 0 ? ', ' : null}
-                          <a href={k.href} className="text-brand-teal underline">
-                            {k.name}
-                          </a>
-                        </Fragment>
-                      ))}
+                  <Indicators row={row} />
                 </td>
               </tr>
             ))}
