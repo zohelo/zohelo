@@ -26,7 +26,7 @@ describe('datasetJsonLd', () => {
   });
 
   test('no license when the sources differ in licence', () => {
-    expect('license' in datasetJsonLd(kpi('population'), catalog, 'pl')).toBe(false);
+    expect('license' in datasetJsonLd({ ...kpi('unemployment_rate'), source_keys: ['eurostat', 'gus_bdl'] }, catalog, 'pl')).toBe(false);
   });
 
   test('unknown source keys are skipped', () => {
