@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import { useLoaderData } from 'react-router';
 import App from '../App';
 import { MapChoropleth } from '../components/MapChoropleth.client';
+import { SeriesChart } from '../components/SeriesChart.client';
 import { homeChartOfDay } from '../growth/homeChartOfDay';
 import { localeOf, useLocale, type Locale } from '../i18n';
 import { homeTiles } from '../indicators/home';
+import { readHeadlineSeries } from '../indicators/readHeadline';
+import { SeriesTable } from '../indicators/SeriesTable';
 import { publishedDir, readCatalog, readChanges, readGeo, readKpiLatest, type Catalog, type GeoCollection } from '../published';
 import type { SpotlightData, SpotRow } from '../regions/HomeSpotlight';
 import { regionalKpis } from '../regions/kpiOptions';
@@ -25,13 +28,19 @@ export async function loader({ request }: { request: Request }) {
   const catalog = readCatalog(dir);
   const tiles = homeTiles(catalog, (k) => readKpiLatest(dir, k), locale);
   const result = homeSpotlight(dir, catalog, locale);
+  const chartOfDay = homeChartOfDay(dir, catalog, locale);
+  // The picked KPI's headline series for the chart (#389); null when the KPI has no series.parquet.
+  const chartSeries = chartOfDay
+    ? await readHeadlineSeries(dir, chartOfDay.pick.kpi_key, chartOfDay.pick.source_key, catalog.units, locale)
+    : null;
   return {
     tiles,
     items: readItems(dir),
     sources: catalog.sources,
     spotlight: result?.data ?? null,
     spotlightMap: result?.map ?? null,
-    chartOfDay: homeChartOfDay(dir, catalog, locale),
+    chartOfDay,
+    chartSeries,
   };
 }
 
@@ -72,7 +81,7 @@ export function meta({ location }: { location: { pathname: string } }) {
 }
 
 export default function Home() {
-  const { tiles, items, sources, spotlight, spotlightMap, chartOfDay } = useLoaderData<typeof loader>();
+  const { tiles, items, sources, spotlight, spotlightMap, chartOfDay, chartSeries } = useLoaderData<typeof loader>();
   const locale = useLocale();
   // The map is client-only (D25): rendered after hydration, like on /regions.
   const [mounted, setMounted] = useState(false);
@@ -80,6 +89,15 @@ export default function Home() {
   const map =
     mounted && spotlight && spotlightMap ? (
       <MapChoropleth geo={spotlightMap.geo} rows={spotlightMap.rows} valueTitle={spotlight.unit} locale={locale} label={spotlight.name} />
+    ) : null;
+  // The chart of the day: the headline is the chart's title and aria-label; the table is the accessible alternative.
+  const headline = chartOfDay ? (locale === 'pl' ? chartOfDay.pick.headline_pl : chartOfDay.pick.headline_en) : '';
+  const chart =
+    chartOfDay && chartSeries ? (
+      <>
+        {mounted ? <SeriesChart points={chartSeries.points} unit={chartSeries.unit} frequency={chartSeries.frequency} label={headline} locale={locale} /> : null}
+        <SeriesTable points={chartSeries.points} unit={chartSeries.unit} caption={headline} locale={locale} />
+      </>
     ) : null;
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -98,6 +116,7 @@ export default function Home() {
         spotlight={spotlight}
         spotlightMap={map}
         chartOfDay={chartOfDay}
+        chartOfDayChart={chart}
         locale={locale}
       />
     </>

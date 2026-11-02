@@ -90,8 +90,7 @@ deliverables:
   - /indicators and /indicators/<kpi_key> pre-rendered for the 20 KPIs listed in site.config
   todo:
   - 'On /indicators/:kpi: line Chart from readKpiSeries() (Task series-reader) once the Designer''s chart style exists
-    (O17), definition (catalog.json has no definition field yet), link to downloads/<kpi_key>.csv (Task
-    com/site/data-pages/data/downloads).'
+    (O17), definition (catalog.json has no definition field yet).'
   tasks:
   - key: com/site/indicators/pages/groups
     type: Task
@@ -618,6 +617,39 @@ deliverables:
     out_of_scope:
     - changefreq and priority; lastmod for other pages
     - robots.txt
+  - key: com/site/indicators/pages/downloads-block
+    type: Task
+    title: Link the CSV and Parquet downloads and the citation on indicator pages
+    effort: S
+    state: open
+    contract: false
+    context: >-
+      Today /indicators/<kpi_key> shows the tile, the regional table and the source line, but not the files of that
+      KPI that the build already serves under /downloads/ (#382). A reader who wants the numbers has no way to get
+      them. Target: a small "Pobierz dane" / "Download the data" section under the source line, with the KPI's CSV and
+      Parquet links (from planKpiDownloads(), Task com/site/data-pages/data/plan) and its citation (citation(),
+      src/dataPages/citation.ts). The PR is `ui`: Designer review before the Architect.
+    files:
+    - edit: src/routes/indicator.tsx
+    - edit: tests/indicatorRoute.test.ts
+    steps:
+    - Follow every step of section 'Task com/site/indicators/pages/downloads-block' in .github/backlog/assets/data-downloads.md, in order.
+    acceptance:
+    - Every pre-rendered indicator page with a download file links its CSV and Parquet and shows the citation
+    - Designer `Design review:` approved on the PR head
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/indicatorRoute.test.ts
+      expect: exit 0; 0 fail
+    - run: bun run build && grep -c 'href="/downloads/inflation.csv"' build/client/indicators/inflation/index.html
+      expect: '1'
+    out_of_scope:
+    - The series chart (zohelo#389) and the indicator page template (design round 1)
+    depends_on:
+    - com/site/data-pages/data/plan
+    notes:
+    - zohelo#397 and zohelo#401 (open) edit src/routes/indicator.tsx; update the branch from main before review and keep
+      their chart and formatting changes.
+    - The /data link is dead until Task com/site/data-pages/data/page merges; deliver that Task first when both are picked.
 - key: com/site/indicators/home
   title: Today strip and real metrics on home
   depends_on:
