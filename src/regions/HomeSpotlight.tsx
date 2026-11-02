@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { localizedPath, type Locale } from '../i18n';
 import { regionPath } from './profile';
 
@@ -14,7 +15,15 @@ const texts = {
 
 const numberLocale: Record<Locale, string> = { pl: 'pl-PL', en: 'en-GB' };
 
-export function HomeSpotlight({ data, locale }: { data: SpotlightData | null; locale: Locale }) {
+export function HomeSpotlight({
+  data,
+  locale,
+  children,
+}: {
+  data: SpotlightData | null;
+  locale: Locale;
+  children?: ReactNode;
+}) {
   if (!data) return null;
   const t = texts[locale];
   const format = new Intl.NumberFormat(numberLocale[locale]);
@@ -48,6 +57,7 @@ export function HomeSpotlight({ data, locale }: { data: SpotlightData | null; lo
           </div>
         ) : null}
       </div>
+      {children !== null && children !== undefined ? <div className="mt-6 min-h-[300px]">{children}</div> : null}
       <p className="mt-4">
         <a href={localizedPath('/regions', locale)} className="text-brand-teal underline">
           {t.map}

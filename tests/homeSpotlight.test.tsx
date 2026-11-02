@@ -38,6 +38,22 @@ describe('HomeSpotlight', () => {
     expect(html).not.toContain('Najniżej');
   });
 
+  test('children render in the map slot', () => {
+    const html = renderToStaticMarkup(
+      <HomeSpotlight data={data} locale="pl">
+        <span>MAP</span>
+      </HomeSpotlight>,
+    );
+    expect(html).toContain('<span>MAP</span>');
+    expect(html).toContain('min-h-[300px]');
+  });
+
+  test('no children, no map slot', () => {
+    const html = renderToStaticMarkup(<HomeSpotlight data={data} locale="pl" />);
+    expect(html).not.toContain('<span>MAP</span>');
+    expect(html).not.toContain('min-h-[300px]');
+  });
+
   test('null renders nothing', () => {
     expect(renderToStaticMarkup(<HomeSpotlight data={null} locale="pl" />)).toBe('');
   });
