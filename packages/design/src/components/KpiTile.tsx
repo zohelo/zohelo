@@ -59,7 +59,8 @@ export function KpiTile({ label, value, unit, delta, period, locale, href, goodD
         <div className={`z-figures mt-1 text-[length:var(--z-size-sm)] ${deltaColour(d.direction, goodDirection)}`}>
           {arrow[d.direction] ? <span aria-hidden="true">{arrow[d.direction]} </span> : null}
           {d.text} <span className="font-ui">({words[locale][d.direction]})</span>
-          <span className="font-ui text-text-faint"> {comparison ?? previousPeriod[locale]}</span>
+          {/* The comparison on its own line, so the change never wraps with a rag (design review of #401). */}
+          <span className="block font-ui text-text-faint">{comparison ?? previousPeriod[locale]}</span>
         </div>
       ) : null}
       <div className="mt-2 font-ui text-[length:var(--z-size-xs)] text-text-faint">{period}</div>

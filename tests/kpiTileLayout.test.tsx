@@ -43,7 +43,7 @@ describe('KpiTile change text (#388)', () => {
     const pl = renderToStaticMarkup(<KpiTile label="Inflacja" value={2.9} unit="%" delta={-0.1} decimals={1} period="2026-09" locale="pl" />);
     expect(pl).toContain('\u22120,1 p.p.');
     expect(pl).toContain('(spadek)');
-    expect(pl).toContain('vs poprzedni okres');
+    expect(pl).toMatch(/<span class="block [^"]*">vs poprzedni okres<\/span>/);
     expect(pl).not.toContain('-0,1 ');
     const en = renderToStaticMarkup(<KpiTile label="Unemployment" value={3.2} unit="%" delta={0.3} decimals={1} period="2025" locale="en" />);
     expect(en).toContain('+0.3 pp');
