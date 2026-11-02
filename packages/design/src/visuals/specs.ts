@@ -23,6 +23,12 @@ export type LineOptions = {
   series: string;
   yTitle: string;
   highlight?: string | null;
+  /** x ticks at the series frequency: one per `step` years/quarters/months (zohelo#389). Default: Vega's choice. */
+  xTicks?: { interval: "year" | "quarter" | "month" | "day"; step: number };
+  /** d3 time format of the x labels ('%Y', '%b %Y'). */
+  xFormat?: string;
+  /** Decimals of the source: y ticks in that precision (`.1f`, tickMinStep 0.1). Default: Vega's choice. */
+  yDecimals?: number;
 };
 
 const base = {
@@ -37,10 +43,25 @@ export function lineSpec(rows: object[], o: LineOptions): VisualizationSpec {
     ...base,
     height: 300,
     data: { values: rows },
-    mark: { type: "line", point: rows.length <= 60, strokeWidth: 2, interpolate: "monotone" },
+    // Points are observations; the line between them is straight (literally true), never a smooth curve.
+    mark: { type: "line", point: rows.length <= 60, strokeWidth: 2, interpolate: "linear" },
     encoding: {
-      x: { field: o.x, type: "temporal", title: null, axis: { tickCount: 7, labelOverlap: true, grid: false } },
-      y: { field: o.y, type: "quantitative", title: o.yTitle, scale: { zero: false }, axis: { format: "~s", tickCount: 5 } },
+      x: {
+        field: o.x,
+        type: "temporal",
+        title: null,
+        axis: { tickCount: o.xTicks ?? 7, labelOverlap: "parity", grid: false, ...(o.xFormat ? { format: o.xFormat } : {}) },
+      },
+      y: {
+        field: o.y,
+        type: "quantitative",
+        title: o.yTitle,
+        scale: { zero: false },
+        axis:
+          o.yDecimals === undefined
+            ? { format: "~s", tickCount: 5 }
+            : { format: `,.${o.yDecimals}f`, tickMinStep: 10 ** -o.yDecimals, tickCount: 5 },
+      },
       color: {
         field: o.series,
         type: "nominal",
