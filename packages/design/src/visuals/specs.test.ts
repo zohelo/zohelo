@@ -133,6 +133,15 @@ describe("lineSpec axes (zohelo#389)", () => {
     expect(spec.encoding.y.axis.format).toBe(",.1f");
     expect(spec.encoding.y.axis.tickMinStep).toBeCloseTo(0.1, 10);
   });
+
+  test("the tooltip period has the axis format of the frequency, else the fallback date (zohelo#407)", () => {
+    const annual = lineSpec(rows, { x: "date", y: "value", series: "series", yTitle: "%", xFormat: "%Y" }) as any;
+    expect(annual.encoding.tooltip[1]).toEqual({ field: "date", type: "temporal", title: "Period", format: "%Y" });
+    const monthly = lineSpec(rows, { x: "date", y: "value", series: "series", yTitle: "%", xFormat: "%b %Y", locale: "pl" }) as any;
+    expect(monthly.encoding.tooltip[1].format).toBe("%b %Y");
+    const unknown = lineSpec(rows, { x: "date", y: "value", series: "series", yTitle: "%" }) as any;
+    expect(unknown.encoding.tooltip[1].format).toBeUndefined();
+  });
 });
 
 describe("tooltip titles and dates per page language (zohelo#399)", () => {
