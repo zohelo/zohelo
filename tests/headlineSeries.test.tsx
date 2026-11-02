@@ -83,6 +83,24 @@ describe('tablePoints and SeriesTable', () => {
     expect(html).toContain('1 234,5');
     expect(html).not.toContain('Pierwsze i ostatnie');
   });
+
+  test('SeriesTable keeps the series precision in every row (#405)', () => {
+    const series: SeriesPoint[] = [
+      { date: '2026-06-01', period: '2026-06', value: 3.1 },
+      { date: '2026-07-01', period: '2026-07', value: 2.9 },
+      { date: '2026-08-01', period: '2026-08', value: 3 },
+    ];
+    const pl = renderToStaticMarkup(<SeriesTable points={series} unit="%" caption="Test" locale="pl" />);
+    expect(pl).toContain('>3,0<');
+    expect(pl).toContain('>2,9<');
+    expect(pl).not.toContain('>3<');
+    const en = renderToStaticMarkup(<SeriesTable points={series} unit="%" caption="Test" locale="en" />);
+    expect(en).toContain('>3.0<');
+    const integers = renderToStaticMarkup(
+      <SeriesTable points={[{ date: '2024-01-01', period: '2024', value: 37490000 }]} unit="os." caption="Test" locale="pl" />,
+    );
+    expect(integers).toContain('>37 490 000<');
+  });
 });
 
 describe('axis helpers (design review of #397)', () => {
