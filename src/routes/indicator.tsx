@@ -4,6 +4,7 @@ import { SubscribeCalendar } from '../components/SubscribeCalendar';
 import { localeOf, useLocale } from '../i18n';
 import { footerProps, kpiSources } from '../indicators/sources';
 import { latestTile, type LatestTile } from '../indicators/tile';
+import { unitLabel } from '../indicators/unitLabel';
 import { NO_LATEST, publishedDir, readCatalog, readGeo, readKpiLatest } from '../published';
 import { RankingTable } from '../regions/RankingTable';
 import { rankRegions } from '../regions/ranking';
@@ -23,7 +24,7 @@ export async function loader({ request, params }: { request: Request; params: { 
   const jsonLd = datasetJsonLd(kpi, catalog, locale);
 
   if (NO_LATEST.includes(kpi.kpi_key)) {
-    const unit = catalog.units.find((u) => u.unit_key === kpi.unit_key)?.symbol ?? kpi.unit_key;
+    const unit = unitLabel(catalog.units, kpi.unit_key, locale);
     const tile: LatestTile = { label: name, value: null, unit, delta: null, period: '', sourceKey: null, checkedAt: null, provisional: false };
     return { tile, sources, ranking: null, geo: null, jsonLd, name, lastPeriod: kpi.last_period };
   }

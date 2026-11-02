@@ -87,8 +87,9 @@ describe('latestTile', () => {
     expect(latestTile(kpi, file([row({})]), catalog.units, 'pl').unit).toBe('%');
   });
 
-  test('a unit_key missing from units is shown as the key', () => {
-    expect(latestTile(kpi, file([row({ unit_key: 'usd' })]), catalog.units, 'pl').unit).toBe('usd');
+  test('a unit_key missing from units is never shown as the key (#357)', () => {
+    expect(latestTile(kpi, file([row({ unit_key: 'usd' })]), catalog.units, 'pl').unit).toBe('USD');
+    expect(latestTile(kpi, file([row({ unit_key: 'mln_eur' })]), catalog.units, 'pl').unit).toBe('mln EUR');
   });
 
   test('pure', () => {

@@ -1,5 +1,6 @@
 import type { Locale } from '../i18n';
 import type { CatalogKpi, KpiLatest, Unit } from '../published';
+import { unitLabel } from './unitLabel';
 
 // The national (PL) value of a KPI as KpiTile props, from kpi/<kpi_key>/latest.json.
 // Pure; only types come from published.ts, which reads files with node:fs.
@@ -21,7 +22,7 @@ export type LatestTile = {
  */
 export function latestTile(kpi: CatalogKpi, latest: KpiLatest, units: Unit[], locale: Locale): LatestTile {
   const label = locale === 'pl' ? kpi.name_pl : kpi.name_en;
-  const symbolOf = (unitKey: string) => units.find((u) => u.unit_key === unitKey)?.symbol ?? unitKey;
+  const symbolOf = (unitKey: string) => unitLabel(units, unitKey, locale);
   const rows = latest.values.filter((v) => v.geography_key === 'PL');
   if (rows.length === 0) {
     return { label, value: null, unit: symbolOf(kpi.unit_key), delta: null, period: kpi.last_period, sourceKey: null, checkedAt: null, provisional: false };
