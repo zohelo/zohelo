@@ -1,5 +1,13 @@
 import { describe, expect, test } from 'bun:test';
-import { geographyKeyOf, regionPath, regionProfile, terytOf, VOIVODESHIP_TERYT } from '../src/regions/profile';
+import {
+  geographyKeyOf,
+  neighbours,
+  regionPath,
+  regionProfile,
+  terytOf,
+  VOIVODESHIP_NEIGHBOURS,
+  VOIVODESHIP_TERYT,
+} from '../src/regions/profile';
 import { rankRegions, type RegionalLatest, type RegionRanking } from '../src/regions/ranking';
 
 type Row = RegionalLatest['values'][number];
@@ -55,5 +63,26 @@ describe('regionProfile', () => {
     const before = structuredClone(input);
     regionProfile('TERC:12', input);
     expect(input).toEqual(before);
+  });
+});
+
+describe('neighbours', () => {
+  test('the table has exactly the 16 voivodeships', () => {
+    expect(Object.keys(VOIVODESHIP_NEIGHBOURS).sort()).toEqual([...VOIVODESHIP_TERYT].sort());
+  });
+
+  test('every pair is symmetric and no code lists itself', () => {
+    for (const a of VOIVODESHIP_TERYT) {
+      expect(neighbours(a)).not.toContain(a);
+      for (const b of VOIVODESHIP_TERYT) {
+        expect(neighbours(b).includes(a)).toBe(neighbours(a).includes(b));
+      }
+    }
+  });
+
+  test('12, 30 and an unknown code', () => {
+    expect(neighbours('12')).toEqual(['18', '24', '26']);
+    expect(neighbours('30')).toHaveLength(7);
+    expect(neighbours('99')).toEqual([]);
   });
 });
