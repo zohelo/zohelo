@@ -279,9 +279,6 @@ deliverables:
   - com/site/regions/map
   done_when:
   - /regions/<teryt> for all 16 TERYT codes with KPIs vs Poland and rank
-  todo:
-  - Neighbours list from geometry adjacency computed at build; links from the /regions map (a click on a region) to
-    the profiles.
   tasks:
   - key: com/site/regions/profiles/model
     type: Task
@@ -431,6 +428,86 @@ deliverables:
     out_of_scope:
     - Links from the map (MapChoropleth) and the neighbours list
     - A new @zohelo/design release
+    depends_on:
+    - com/site/regions/profiles/profile-route
+  - key: com/site/regions/profiles/map-links
+    type: Task
+    title: Open the voivodeship profile from a click on the /regions map
+    effort: S
+    state: open
+    contract: false
+    context: 'The /regions map (MapChoropleth, spec from mapSpec() in src/regions/mapSpec.ts, built on choroplethSpec()
+      of @zohelo/design) colours the voivodeships, but a click does nothing, so readers cannot reach the /regions/<teryt>
+      profiles from it. Vega-Lite opens a link for a mark that has an `href` encoding. Every feature of
+      geo/voivodeship.geojson has properties.geography_key ''TERC:<teryt>'' (for example ''TERC:12''); the profile
+      paths are ''/regions/<teryt>'' in Polish and ''/en/regions/<teryt>'' in English (regionPath() in src/regions/profile.ts).'
+    files:
+    - edit: src/regions/mapSpec.ts
+    - edit: tests/mapSpec.test.ts
+    steps:
+    - 'mapSpec(): keep the choroplethSpec(...) call as `s` and return a copy of it with three changes. (1) transform:
+      [...s.transform, { calculate: EXPR, as: ''href'' }], where EXPR is the string "''/regions/'' + substring(datum.properties.geography_key,
+      5)" for locale pl and "''/en/regions/'' + substring(datum.properties.geography_key, 5)" for locale en. (2) mark:
+      { ...s.mark, cursor: ''pointer'' }. (3) encoding: { ...s.encoding, href: { field: ''href'', type: ''nominal'' } }.
+      Type the result like choroplethSpec''s return value (cast through a local `Record<string, any>` copy). Header
+      comment: add that a click on a region opens its profile.'
+    - 'tests/mapSpec.test.ts, new test ''a click opens the profile'': spec(''pl'').encoding.href.field is ''href'';
+      spec(''pl'').mark.cursor is ''pointer''; the last transform of spec(''pl'') equals { calculate: "''/regions/'' +
+      substring(datum.properties.geography_key, 5)", as: ''href'' } and of spec(''en'') { calculate: "''/en/regions/''
+      + substring(datum.properties.geography_key, 5)", as: ''href'' }; the existing tests stay unchanged and pass (the
+      lookup stays the first transform).'
+    acceptance:
+    - Every rule above is covered by a test; the existing mapSpec tests pass unchanged
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/mapSpec.test.ts && bun run build
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - choroplethSpec() in packages/design (unchanged; no design release)
+    - The home spotlight map, and keyboard access to the map (the ranking table links are the keyboard route, Task
+      ranking-links)
+    - Whether the link opens in the same tab or a new one (Vega's default is fine)
+    depends_on:
+    - com/site/regions/profiles/profile-route
+  - key: com/site/regions/profiles/neighbours
+    type: Task
+    title: List the neighbouring voivodeships on each profile page
+    effort: S
+    state: open
+    contract: false
+    context: 'A /regions/<teryt> profile (src/routes/region.tsx) does not link to the regions around it. Borders do not
+      change, so the neighbours are a fixed table, not computed from the simplified geometry. regionName() and
+      regionPath() are in src/regions/profile.ts.'
+    files:
+    - edit: src/regions/profile.ts
+    - edit: src/routes/region.tsx
+    - edit: tests/profile.test.ts
+    - edit: tests/regionRoute.test.ts
+    steps:
+    - 'profile.ts: export const VOIVODESHIP_NEIGHBOURS: Record<string, readonly string[]> exactly as the table of
+      .github/backlog/assets/region-neighbours.md (two-digit string codes, lists in table order). Comment above it:
+      land borders between voivodeships; fixed, not computed from geometry.'
+    - 'profile.ts: export function neighbours(teryt: string): string[] returns a copy of VOIVODESHIP_NEIGHBOURS[teryt],
+      or [] for an unknown code.'
+    - 'routes/region.tsx loader: read readGeo(dir, ''voivodeship'') once into `geo`, use it for `name`, and also return
+      neighbours: neighbours(teryt).map((code) => ({ teryt: code, name: regionName(geo, code, locale) })).'
+    - 'routes/region.tsx page: below the KPI grid (also when rows is empty), an h2 (classes of the h2 in routes/indicator.tsx
+      plus mt-10) with texts.neighbours (pl ''Sąsiednie województwa'', en ''Neighbouring voivodeships'') and a ul with
+      one li per neighbour: <a href={regionPath(n.teryt, locale)} className="font-ui text-brand-teal underline">{n.name}</a>.'
+    - 'tests/profile.test.ts: VOIVODESHIP_NEIGHBOURS has exactly the 16 VOIVODESHIP_TERYT keys; every pair is symmetric
+      (b in neighbours(a) exactly when a in neighbours(b)); no code lists itself; neighbours(''12'') is [''18'', ''24'',
+      ''26'']; neighbours(''30'') has 7 entries; neighbours(''99'') is [].'
+    - 'tests/regionRoute.test.ts: the 12 loader in Polish returns neighbours with teryt [''18'', ''24'', ''26''], each
+      with a non-empty name (VOIVODESHIP_NAMES is the fallback when the fixture geo has no feature).'
+    acceptance:
+    - Every rule above is covered by a test; each profile page links to its neighbours in its language
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test tests/profile.test.ts tests/regionRoute.test.ts &&
+        bun run build && grep -c 'href="/regions/24"' build/client/regions/12/index.html && grep -c 'href="/en/regions/18"'
+        build/client/en/regions/12/index.html
+      expect: exit 0; 0 fail; both greps print at least 1
+    out_of_scope:
+    - Neighbouring countries and sea borders
+    - KPI values of the neighbours
     depends_on:
     - com/site/regions/profiles/profile-route
 - key: com/site/regions/home
