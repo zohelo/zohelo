@@ -95,7 +95,7 @@ export default function Home() {
   const chart =
     chartOfDay && chartSeries ? (
       <>
-        {mounted ? <SeriesChart points={chartSeries.points} unit={chartSeries.unit} label={headline} locale={locale} /> : null}
+        {mounted ? <SeriesChart points={chartSeries.points} unit={chartSeries.unit} frequency={chartSeries.frequency} label={headline} locale={locale} /> : null}
         <SeriesTable points={chartSeries.points} unit={chartSeries.unit} caption={headline} locale={locale} />
       </>
     ) : null;

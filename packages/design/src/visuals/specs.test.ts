@@ -113,3 +113,21 @@ describe("number and time formats (zohelo#384)", () => {
     expect(timeLocale.en.shortMonths[6]).toBe("Jul");
   });
 });
+
+describe("lineSpec axes (zohelo#389)", () => {
+  const rows = [{ date: "2023-01-01", value: 2.8, series: "PL" }, { date: "2024-01-01", value: 2.9, series: "PL" }];
+
+  test("the line is linear between observations", () => {
+    const spec = lineSpec(rows, { x: "date", y: "value", series: "series", yTitle: "%" }) as any;
+    expect(spec.mark.interpolate).toBe("linear");
+    expect(spec.encoding.x.axis.labelOverlap).toBe("parity");
+  });
+
+  test("ticks and precision follow the options", () => {
+    const spec = lineSpec(rows, { x: "date", y: "value", series: "series", yTitle: "%", xTicks: { interval: "year", step: 1 }, xFormat: "%Y", yDecimals: 1 }) as any;
+    expect(spec.encoding.x.axis.tickCount).toEqual({ interval: "year", step: 1 });
+    expect(spec.encoding.x.axis.format).toBe("%Y");
+    expect(spec.encoding.y.axis.format).toBe(",.1f");
+    expect(spec.encoding.y.axis.tickMinStep).toBeCloseTo(0.1, 10);
+  });
+});

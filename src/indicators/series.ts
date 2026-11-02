@@ -55,3 +55,28 @@ export function tablePoints(points: SeriesPoint[], max = 24): { rows: SeriesPoin
   const half = Math.floor(max / 2);
   return { rows: [...points.slice(0, half), ...points.slice(-half)], truncated: true };
 }
+
+/** The decimals the source publishes (the most among the points, at most 4): the y-axis precision. */
+export function seriesDecimals(points: SeriesPoint[]): number {
+  let max = 0;
+  for (const p of points) {
+    const text = String(p.value);
+    if (text.includes('e')) continue;
+    const i = text.indexOf('.');
+    if (i >= 0) max = Math.max(max, text.length - i - 1);
+  }
+  return Math.min(max, 4);
+}
+
+export type TickInterval = 'year' | 'quarter' | 'month' | 'day';
+
+/**
+ * x ticks for a series of `frequency` ('A', 'Q', 'M', 'D'/'W') over `points`: the interval of the frequency,
+ * stepping so that at most `maxLabels` labels show (3–4 at 390 px, 7–8 at 1440 px), and the label format.
+ */
+export function xTicks(frequency: string, points: SeriesPoint[], maxLabels: number): { interval: TickInterval; step: number; format: string } {
+  const interval: TickInterval = frequency === 'A' ? 'year' : frequency === 'Q' ? 'quarter' : frequency === 'M' ? 'month' : 'day';
+  const format = interval === 'year' ? '%Y' : interval === 'day' ? '%d %b %Y' : '%b %Y';
+  const n = Math.max(points.length, 1);
+  return { interval, step: Math.max(1, Math.ceil(n / Math.max(maxLabels, 1))), format };
+}
