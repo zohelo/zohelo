@@ -5,6 +5,7 @@ import { sourceRows } from '../dataPages/sources';
 import { publishedDir, readCatalog } from '../published';
 import { pageMeta } from '../seo';
 import { pages } from '../site.config';
+import { CONTAINER } from '../components/container';
 
 const page = pages.find((p) => p.path === '/sources')!;
 
@@ -31,7 +32,7 @@ export default function Sources() {
   const th = 'px-3 py-2 text-left font-ui font-semibold text-text-muted';
   const td = 'px-3 py-2 align-top';
   return (
-    <main className="mx-auto max-w-5xl px-4 py-16 text-text">
+    <main className={`${CONTAINER} py-16 text-text`}>
       <h1 className="font-display text-[length:var(--z-size-display)] font-semibold">{page.title[locale]}</h1>
       <div className="mt-8 overflow-x-auto">
         <table className="w-full border-collapse text-[length:var(--z-size-sm)]">

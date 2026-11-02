@@ -8,7 +8,7 @@ describe('shell navigation', () => {
   test('Header links to the four pages in English and marks the current one', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter initialEntries={['/en/regions']}>
-        <Header activeSection="top" onNavigate={() => {}} />
+        <Header />
       </MemoryRouter>,
     );
     expect(html).toContain('href="/en/indicators"');
@@ -16,6 +16,23 @@ describe('shell navigation', () => {
     expect(html).toContain('href="/en/sources"');
     expect(html).toContain('POLAND IN DATA');
     expect(html).toMatch(/<a href="\/en\/regions" aria-current="page"/);
+  });
+
+  test('Header brand links to the home page of the current language (#385)', () => {
+    const en = renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/en/indicators/inflation']}>
+        <Header />
+      </MemoryRouter>,
+    );
+    expect(en).toMatch(/<a href="\/en" aria-label="[^"]+"/);
+    const pl = renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/indicators/inflation']}>
+        <Header />
+      </MemoryRouter>,
+    );
+    expect(pl).toMatch(/<a href="\/" aria-label="[^"]+"/);
+    expect(pl).toMatch(/<a href="\/indicators" aria-current="page"/);
+    expect(pl).not.toMatch(/<a href="\/regions" aria-current="page"/);
   });
 
   test('Footer links to the pages in Polish without the old credit', () => {

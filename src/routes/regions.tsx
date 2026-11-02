@@ -8,6 +8,7 @@ import { RankingTable } from '../regions/RankingTable';
 import { rankRegions } from '../regions/ranking';
 import { pageMeta } from '../seo';
 import { pages } from '../site.config';
+import { CONTAINER } from '../components/container';
 
 const page = pages.find((p) => p.path === '/regions')!;
 
@@ -47,7 +48,7 @@ export default function Regions() {
   const kpi = kpis.find((k) => k.kpi_key === selected);
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-12 text-text">
+    <main className={`${CONTAINER} py-12 text-text`}>
       <h1 className="font-display text-[length:var(--z-size-display)] font-semibold">{page.title[locale]}</h1>
       {kpi ? (
         <>

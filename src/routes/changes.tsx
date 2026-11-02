@@ -4,6 +4,7 @@ import { localeOf, localizedPath, useLocale } from '../i18n';
 import { publishedDir, readCatalog, readChanges } from '../published';
 import { pageMeta } from '../seo';
 import { pages } from '../site.config';
+import { CONTAINER } from '../components/container';
 
 const page = pages.find((p) => p.path === '/changes')!;
 
@@ -29,15 +30,18 @@ export default function Changes() {
   const { items, sources } = useLoaderData<typeof loader>();
   const locale = useLocale();
   return (
-    <main className="mx-auto max-w-3xl px-4 py-12">
-      <h1 className="font-display text-[length:var(--z-size-display)] font-semibold text-text">{page.title[locale]}</h1>
-      <p className="mt-2 font-ui text-[length:var(--z-size-sm)]">
-        <a href={localizedPath('/rss.xml', locale)} className="text-brand-teal underline">
-          RSS
-        </a>
-      </p>
-      <div className="mt-6">
-        <ChangesList items={items} sources={sources} locale={locale} />
+    <main className={`${CONTAINER} py-12`}>
+      {/* Text page: the measure is limited inside the page container (#386). */}
+      <div className="max-w-3xl">
+        <h1 className="font-display text-[length:var(--z-size-display)] font-semibold text-text">{page.title[locale]}</h1>
+        <p className="mt-2 font-ui text-[length:var(--z-size-sm)]">
+          <a href={localizedPath('/rss.xml', locale)} className="text-brand-teal underline">
+            RSS
+          </a>
+        </p>
+        <div className="mt-6">
+          <ChangesList items={items} sources={sources} locale={locale} />
+        </div>
       </div>
     </main>
   );

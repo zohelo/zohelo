@@ -5,6 +5,7 @@ import { SampleChart } from '../components/SampleChart.client';
 import { localeOf, useLocale } from '../i18n';
 import { pageMeta } from '../seo';
 import { pages } from '../site.config';
+import { CONTAINER } from '../components/container';
 
 // A visual test page of the design system: every token and every component with sample props.
 // Not linked from the navigation.
@@ -74,7 +75,7 @@ export default function Design() {
   };
 
   return (
-    <main className="mx-auto max-w-[var(--z-layout-content-max)] bg-bg px-4 py-12 text-text">
+    <main className={`${CONTAINER} py-12 text-text`}>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-display text-[length:var(--z-size-display)] font-semibold">zohelo design</h1>
         <button

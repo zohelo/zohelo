@@ -182,3 +182,45 @@ Each direction keeps the brand (zohelo, teal, "Polska w danych / Poland in data"
 
 Filed as Bugs (shared rules): the failing `text-faint` token (zohelo#332, Developer 4) and the BI mobile overflow and tab
 semantics (zohelo-bi#276, Developer 3). The home page's old sections are covered by zohelo#330.
+
+## 7. What got worse on zohelo.com since the beginning, and why
+
+Owner, 2 Nov 15:55: "zohelo.com has become even worse compared to the beginning." Checked on 2 Nov (S3) by building two
+versions locally and screenshotting them at 1440 and 390 px, PL and EN: **before** = `2354e2e` (27 Oct, the first
+Cloudflare Pages deploy after the Finnhub removal: the August one-page site with the ticker, metric cards, map,
+chronicles, vault, products, consulting, footer) and **after** = `main` at `33c25b2` (2 Nov, built from
+`fixtures/published`, so the ranking has one region and the map is a fixture square; those two are not regressions).
+Routes after: `/`, `/indicators`, `/indicators/inflation`, `/regions`, `/regions/14`, `/sources`, each in PL and EN.
+
+The short version: the site traded a dense, coherent (if fake) one-page dashboard for a set of thin pages that lost the
+shell, the charts and the visual rhythm, and nothing was put in the place of what was removed. The removals were right
+(no invented markets, no fake files, no false claims — §3.1, zohelo#330); the gap is that each removal and each new
+route was a separate Task with no page-level owner, so the whole was never looked at. The design process (O17) exists
+to fix exactly that; the items below that do not depend on its outcome are Bugs for Developer 4 now.
+
+Ranked by user impact (1 = worst). "Bug" = filed in zohelo, label `dev:4` and `sprint`; "design" = waits for the
+decision of review round 1.
+
+| # | What got worse | Before (2354e2e) | After (main) | Cause | Action |
+|---|---|---|---|---|---|
+| 1 | **Every page except home has no header, navigation, language switch or footer.** `/indicators/inflation` is the title, one tile and a source line, with no way to any other page but the browser's Back button. | one page, always with the header (nav, hamburger at 390 px) and footer | shell only on `/` | #159 kept `Header`/`Footer` in `App.tsx` (home only); #279, #280, #281, #285, #299, #263 added bare routes; `root.tsx` `Layout` renders only the banner | Bug zohelo#385 |
+| 2 | **No chart anywhere.** "Wykres dnia" is a text card; the indicator page has no series chart; the only graphic is the map. | three sparklines, a bar chart, a choropleth on one screen | zero charts (map excepted) | #207/#328 render the headline and pass no chart; #285 built the indicator page without one; D25 (client-only charts) was read as "later" | Bug zohelo#389 (default line spec now; chart style is a design decision) |
+| 3 | **The home page no longer says what zohelo is.** It opens with four small tiles, then a two-line feed, a one-row ranking with a large map, a text card, six "Koncepcja" cards and an English consulting block with a contact form. No hero, no sentence, no image; the 5-second test (§5 criterion c) fails. | a loud (fake) dashboard that at least looked like a data product | a list of fragments | #353, #354, #257 removed sections without a replacement (research §3.1 warned of it); #165 made the products a "concept" roadmap | design (home page spec after round 1); the consulting block: #129, #134 |
+| 4 | **Visual rhythm is gone: five content widths, three backgrounds.** Left edges at x = 75, 112, 160, 224, 288 depending on the section and page; home on `#F3F6F8`, other pages on `#F8FAFC`, header on `#F4F7F9`. | one `max-w-7xl` container, one background | every section its own | #297, #300, #304, #328, #279, #285, #280, #281, #299 each chose a container | Bug zohelo#386 |
+| 5 | **The tiles are weaker than the old metric cards.** Four tiles fill 740 of 1120 px (`lg:grid-cols-6`); the population tile shows its value in the small size ("37 490 000 os."), the others in the large; no sparkline; the delta has no unit. | three cards, equal weight, sparkline, "EU average" comparison | four unequal tiles, two thirds of the row | #297 (grid), #296/#362 (`KpiTile` shrinks long values instead of compact notation) | Bug zohelo#387 (grid, compact values); sparklines: design |
+| 6 | **Numbers break the number rules (§4).** "▼ -0,1 (spadek)" for a rate (no p.p., no comparison named); chart of the day "+10,3 %" for 2,9 → 3,2 (relative change of a rate); source lines print "dane z 2026-01-01T00:00:00Z"; `/sources` prints "2026-01-01" in a monospace font. | "+3.2 %", "5.1 %", no raw timestamps | ambiguous deltas, raw timestamps | #296 (delta = value − previous, no unit), #181/#207 (`change_pct` relative for every KPI), #285 (ISO string into `SourceFooter`) | Bug zohelo#388 |
+| 7 | **The products section contradicts the site.** "Wskaźniki", "Regiony", "Dane i API" are badged "Koncepcja" and are not links, while the header links to the live `/indicators`, `/regions`, `/sources`. | fake "Commercial Edition" cards with a "Launch Preview" action (worse claims, but actionable) | honest badges, stale and dead | #165 set every status to `concept`; the pages shipped later without updating it | Bug zohelo#390 |
+| 8 | **Raw dataset keys in a monospace font face the reader**: "Eurostat · une_rt_a", "Narodowy Bank Polski · fx_a" in the change feed, register ids on `/sources`. | the old site also used mono badges, as decoration | keys where a reader expects a name | #300 (`HomeChanges`), #281 | design (feed item spec: source name, dataset name, key in `title`) |
+| 9 | **Mobile lost the menu on every page but home** (consequence of 1); the 390 px home itself is fine: 2 × 2 tiles, no overflow, 16 px gutters, hamburger present. | hamburger + search on the one page | hamburger on `/` only | as 1 | Bug zohelo#385 |
+| 10 | **The indicator page is still the stub of §3.4**: no definition, no "how to read", no table, no download, no share. | — (no indicator pages existed) | stub | #285 built the minimum; the rest waits for the page spec | design (indicator page spec, round 1), chart via zohelo#389 |
+
+What did **not** get worse: the home `h1` is still missing (§3.2, unchanged); `text-faint` now passes AA (#334); the fake
+market ticker, fake files and the invented bylines are gone (#354, #353, #257, #163, #222); the new pages have one `h1`,
+real `<table>` markup with a caption (#375), `aria-current` on the language links, a 404 page, sitemap, RSS and
+calendar; nothing overflows at 390 px (the old site was 426 px wide there).
+
+What the design decision must settle (round 1, zohelo#345 and the review issue): the home page composition (what the
+first screen says and shows), the indicator page template, the tile and chart style (sparklines or not, direct labels),
+the feed item, the shared shell with the product switcher (#105, #140). Until then Developer 4 fixes #385–#390, which
+restore the shell, the rhythm, the numbers and one chart with today's tokens; the decision restyles, it does not
+re-plumb.

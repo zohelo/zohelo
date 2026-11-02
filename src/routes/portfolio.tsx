@@ -4,6 +4,7 @@ import { localeOf, localizedPath, useLocale, type Locale } from '../i18n';
 import { loadStudies, STUDIES_DIR } from '../portfolio/studies';
 import { pageMeta } from '../seo';
 import { pages } from '../site.config';
+import { CONTAINER } from '../components/container';
 
 const page = pages.find((p) => p.path === '/portfolio')!;
 
@@ -55,30 +56,33 @@ export default function Portfolio() {
   const t = dict[locale];
   const { studies } = useLoaderData<typeof loader>();
   return (
-    <main className="mx-auto max-w-3xl px-4 py-16 text-text">
-      <h1 className="font-display text-[length:var(--z-size-display)] font-semibold">{t.heading}</h1>
-      {studies.length > 0 ? (
-        <div className="mt-8 grid gap-4">
-          {studies.map((study) => (
-            <Card key={study.slug} title={study.title}>
-              <p className="text-text-muted">{study.summary}</p>
-              <a href={localizedPath(`/portfolio/${study.slug}`, locale)} className="mt-3 inline-block text-brand-teal underline">
-                {t.read}
-              </a>
-            </Card>
-          ))}
+    <main className={`${CONTAINER} py-16 text-text`}>
+      {/* Text page: the measure is limited inside the page container (#386). */}
+      <div className="max-w-3xl">
+        <h1 className="font-display text-[length:var(--z-size-display)] font-semibold">{t.heading}</h1>
+        {studies.length > 0 ? (
+          <div className="mt-8 grid gap-4">
+            {studies.map((study) => (
+              <Card key={study.slug} title={study.title}>
+                <p className="text-text-muted">{study.summary}</p>
+                <a href={localizedPath(`/portfolio/${study.slug}`, locale)} className="mt-3 inline-block text-brand-teal underline">
+                  {t.read}
+                </a>
+              </Card>
+            ))}
+          </div>
+        ) : null}
+        <div className="mt-6">
+          <Callout tone="info">{t.status}</Callout>
         </div>
-      ) : null}
-      <div className="mt-6">
-        <Callout tone="info">{t.status}</Callout>
+        <p className="mt-6 leading-relaxed text-text-muted">{t.intro.join(' ')}</p>
+        <h2 className="mt-10 font-ui text-[length:var(--z-size-lg)] font-semibold">{t.themesHeading}</h2>
+        <ul className="mt-3 list-disc space-y-1 pl-6 text-text-muted">
+          {t.themes.map((theme) => (
+            <li key={theme}>{theme}</li>
+          ))}
+        </ul>
       </div>
-      <p className="mt-6 leading-relaxed text-text-muted">{t.intro.join(' ')}</p>
-      <h2 className="mt-10 font-ui text-[length:var(--z-size-lg)] font-semibold">{t.themesHeading}</h2>
-      <ul className="mt-3 list-disc space-y-1 pl-6 text-text-muted">
-        {t.themes.map((theme) => (
-          <li key={theme}>{theme}</li>
-        ))}
-      </ul>
     </main>
   );
 }
