@@ -56,11 +56,17 @@ export function tablePoints(points: SeriesPoint[], max = 24): { rows: SeriesPoin
   return { rows: [...points.slice(0, half), ...points.slice(-half)], truncated: true };
 }
 
-/** The decimals the source publishes (the most among the points, at most 4): the y-axis precision. */
+/**
+ * The decimals the source publishes (the most among the points, at most 4): the precision of the
+ * y-axis, the tooltip and the data table. A value is rounded to 4 decimals before its decimals are
+ * counted, so a float artefact of a derived value (0.1 + 0.2 = 0.30000000000000004) counts as one
+ * decimal, not four (Architect review of zohelo#408).
+ */
 export function seriesDecimals(points: SeriesPoint[]): number {
   let max = 0;
   for (const p of points) {
-    const text = String(p.value);
+    if (!Number.isFinite(p.value)) continue;
+    const text = String(Number(p.value.toFixed(4)));
     if (text.includes('e')) continue;
     const i = text.indexOf('.');
     if (i >= 0) max = Math.max(max, text.length - i - 1);

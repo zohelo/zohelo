@@ -112,6 +112,14 @@ describe('axis helpers (design review of #397)', () => {
     expect(seriesDecimals([pt('2023', 1.25), pt('2024', 1.3)])).toBe(2);
   });
 
+  test('a float artefact of a derived value does not raise the precision (zohelo#408 review)', () => {
+    expect(seriesDecimals([pt('2023', 0.1 + 0.2), pt('2024', 0.3)])).toBe(1);
+    expect(seriesDecimals([pt('2023', 1.1 * 3), pt('2024', 3.3)])).toBe(1);
+    expect(seriesDecimals([pt('2023', 2.00001), pt('2024', 2)])).toBe(0);
+    expect(seriesDecimals([pt('2023', 1.2345678)])).toBe(4);
+    expect(seriesDecimals([pt('2023', Number.NaN), pt('2024', 2.5)])).toBe(1);
+  });
+
   test('x ticks: one per year for an annual series, months for a monthly one, stepping to the label budget', () => {
     expect(xTicks('A', [pt('2023', 1), pt('2024', 1), pt('2025', 1)], 8)).toEqual({ interval: 'year', step: 1, format: '%Y' });
     expect(xTicks('M', [pt('2026-07', 1), pt('2026-08', 1), pt('2026-09', 1)], 4)).toEqual({ interval: 'month', step: 1, format: '%b %Y' });
