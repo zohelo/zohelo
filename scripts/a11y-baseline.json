@@ -1,0 +1,202 @@
+{
+  "known": [
+    {
+      "page": "/",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#435"
+    },
+    {
+      "page": "/",
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#435"
+    },
+    {
+      "page": "/",
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#435"
+    },
+    {
+      "page": "/changes",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#436"
+    },
+    {
+      "page": "/changes",
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#436"
+    },
+    {
+      "page": "/changes",
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#436"
+    },
+    {
+      "page": "/design",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#437"
+    },
+    {
+      "page": "/design",
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#437"
+    },
+    {
+      "page": "/design",
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#437"
+    },
+    {
+      "page": "/en",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#438"
+    },
+    {
+      "page": "/en",
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#438"
+    },
+    {
+      "page": "/en",
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#438"
+    },
+    {
+      "page": "/en/indicators/inflation",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#439"
+    },
+    {
+      "page": "/en/indicators/inflation",
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#439"
+    },
+    {
+      "page": "/en/indicators/inflation",
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#439"
+    },
+    {
+      "page": "/indicators",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#440"
+    },
+    {
+      "page": "/indicators",
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#440"
+    },
+    {
+      "page": "/indicators",
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#440"
+    },
+    {
+      "page": "/indicators/inflation",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#441"
+    },
+    {
+      "page": "/indicators/inflation",
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#441"
+    },
+    {
+      "page": "/indicators/inflation",
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#441"
+    },
+    {
+      "page": "/portfolio",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#442"
+    },
+    {
+      "page": "/portfolio",
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#442"
+    },
+    {
+      "page": "/portfolio",
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#442"
+    },
+    {
+      "page": "/regions",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#443"
+    },
+    {
+      "page": "/regions",
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#443"
+    },
+    {
+      "page": "/regions",
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#443"
+    },
+    {
+      "page": "/regions/14",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#444"
+    },
+    {
+      "page": "/regions/14",
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#444"
+    },
+    {
+      "page": "/regions/14",
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#444"
+    },
+    {
+      "page": "/sources",
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#445"
+    },
+    {
+      "page": "/sources",
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#445"
+    },
+    {
+      "page": "/sources",
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#445"
+    }
+  ]
+}
