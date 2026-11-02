@@ -77,3 +77,12 @@ export function datasetJsonLd(kpi: CatalogKpi, catalog: Catalog, locale: Locale)
   if (licence) jsonLd.license = licence.url;
   return jsonLd;
 }
+
+/** schema.org BreadcrumbList for search results: each item's absolute, trailing-slash URL in the page language. */
+export function breadcrumbJsonLd(items: { name: string; path: string }[], locale: Locale): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, i) => ({ '@type': 'ListItem', position: i + 1, name: item.name, item: absoluteUrl(item.path, locale) })),
+  };
+}
