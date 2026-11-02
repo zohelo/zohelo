@@ -8,7 +8,14 @@ import { pages, site } from '../src/site.config';
 type Lang = 'pl' | 'en';
 const out = join(import.meta.dir, '..', 'build', 'client');
 
-const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// XML text and attribute escape (the URLs also go into href="…").
+const escape = (s: string) =>
+  s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
 // The same URL as the pages' canonical and hreflang tags (src/seo.ts).
 const url = (path: string, lang: Lang) => escape(absoluteUrl(path, lang));
 
