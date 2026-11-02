@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router';
 import { localeOf } from '../i18n';
 import { pageMeta } from '../seo';
+import { CONTAINER } from '../components/container';
 
 export function meta({ location }: { location: { pathname: string } }) {
   const locale = localeOf(location.pathname);
@@ -20,7 +21,7 @@ export default function NotFound() {
   const { pathname } = useLocation();
   const en = pathname === '/en' || pathname.startsWith('/en/');
   return (
-    <main className="max-w-3xl mx-auto px-4 py-24 text-center">
+    <main className={`${CONTAINER} py-24 text-center`}>
       <p className="font-mono-code text-sm text-slate-500">404</p>
       <h1 className="mt-2 text-3xl font-semibold">{en ? 'Page not found' : 'Nie ma takiej strony'}</h1>
       <p className="mt-4 text-slate-600">

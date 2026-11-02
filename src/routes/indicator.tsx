@@ -4,7 +4,7 @@ import { useLoaderData } from 'react-router';
 import { SeriesChart } from '../components/SeriesChart.client';
 import { SubscribeCalendar } from '../components/SubscribeCalendar';
 import { localeOf, useLocale } from '../i18n';
-import { indicatorDescription } from '../indicators/description';
+import { indicatorDescription, indicatorTakeaway } from '../indicators/description';
 import { readHeadlineSeries } from '../indicators/readHeadline';
 import { SeriesTable } from '../indicators/SeriesTable';
 import { footerProps, kpiSources } from '../indicators/sources';
@@ -15,6 +15,7 @@ import { RankingTable } from '../regions/RankingTable';
 import { rankRegions } from '../regions/ranking';
 import { breadcrumbJsonLd, datasetJsonLd, pageMeta } from '../seo';
 import { pages, site } from '../site.config';
+import { CONTAINER } from '../components/container';
 
 // One page per published KPI, built at build time only (ssr: false). KPIs in NO_LATEST have no
 // latest.json by contract (D26): a tile without value, no regional table; any other missing
@@ -78,19 +79,19 @@ export function meta({
 }
 
 export default function Indicator() {
-  const { tile, sources, series, ranking, geo, jsonLd, breadcrumb, name, lastPeriod, description } = useLoaderData<typeof loader>();
+  const { tile, sources, series, ranking, geo, jsonLd, breadcrumb, name, lastPeriod } = useLoaderData<typeof loader>();
   const locale = useLocale();
   // The chart is client-only (D25): rendered after hydration; the table is in the pre-rendered page.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const takeaway = description.split('. ')[0].replace(/\.$/, '');
+  const takeaway = indicatorTakeaway(name, tile, locale);
   return (
-    <main className="mx-auto max-w-4xl px-4 py-12 text-text">
+    <main className={`${CONTAINER} py-12 text-text`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <h1 className="font-display text-[length:var(--z-size-display)] font-semibold">{name}</h1>
       <div className="mt-6 max-w-sm">
-        <KpiTile label={tile.label} value={tile.value} unit={tile.unit} delta={tile.delta ?? undefined} period={tile.period} locale={locale} />
+        <KpiTile label={tile.label} value={tile.value} unit={tile.unit} delta={tile.delta ?? undefined} period={tile.period} locale={locale} compact={false} />
       </div>
       {series ? (
         <section aria-labelledby="series-chart" className="mt-10">

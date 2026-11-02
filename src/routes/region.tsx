@@ -13,6 +13,7 @@ import {
 } from '../regions/profile';
 import { rankRegions, type RegionRanking } from '../regions/ranking';
 import { pageMeta } from '../seo';
+import { CONTAINER } from '../components/container';
 
 // One profile page per voivodeship, built at build time only (ssr: false): every regional KPI with
 // the region's value, its rank among the voivodeships and the national value.
@@ -77,7 +78,7 @@ export default function Region() {
   const t = texts[locale];
   const format = new Intl.NumberFormat(numberLocale[locale]);
   return (
-    <main className="mx-auto max-w-5xl px-4 py-12 text-text">
+    <main className={`${CONTAINER} py-12 text-text`}>
       <h1 className="font-display text-[length:var(--z-size-display)] font-semibold">{name}</h1>
       <a href={localizedPath('/regions', locale)} className="mt-2 inline-block font-ui text-brand-teal underline">
         {t.all}

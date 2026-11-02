@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Send, CheckCircle2, User, Mail, Building, MessageSquare, Award, Clock, ArrowRight } from 'lucide-react';
 import { consultantProfile } from '../content/consultantData';
+import { CONTAINER } from './container';
 
 interface HeroConsultingSectionProps {
   onSubmitSuccess?: () => void;
@@ -32,7 +33,7 @@ export const HeroConsultingSection: React.FC<HeroConsultingSectionProps> = ({ on
 
   return (
     <section id="consulting" className="w-full pt-4 pb-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className={CONTAINER}>
         
         {/* Section Header matching Mockup: "THE HERO SECTION" */}
         <div className="flex items-center justify-between mb-4">
