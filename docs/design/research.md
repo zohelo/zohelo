@@ -18,6 +18,8 @@ not reachable from the session, so data-dependent screens show fixtures or empty
 | Public-sector analyst | BI | compare regions and sources over time, export to Excel | laptop, wide screen, PL | dense, keyboard-friendly matrix; stable links; units and breaks visible |
 | Business / bank analyst | zohelo.com + BI | context for decisions: wages, prices, housing, regions | laptop and phone, PL/EN | indicator pages, regional profiles, YoY/index transforms |
 | Researcher, student | BI, Data | long series, metadata, licence, citation | laptop, EN often | definitions, methodology, download, cite |
+| Release-day analyst (bank, ministry, economics desk) | zohelo.com + BI | "what is the new number, vs last month and last year, and when is the next one" — minutes after a GUS release | laptop, PL | reference period, release date and next release date on every indicator page; y/y and seasonally adjusted m/m side by side |
+| Regional / local-government officer | zohelo.com regions + BI | "how does my voivodeship or powiat compare with Poland and its neighbours" | laptop, PL | regional values that name their level, source and year (regional series often lag national ones) |
 | Curious citizen | zohelo.com | "what changed in Poland this week?" | phone first, PL | one story per screen, readable charts on 390 px, no jargon |
 | Owner, engineers, AI members | Data | where data is, is it fresh, how it was built | desktop | tables, lineage, runs, SQL |
 
@@ -111,12 +113,53 @@ Screenshots (1440 and 390 px, PL and EN) were taken of zohelo.com `/`, `/en/`, `
 7. **One system.** Tokens, header, footer, product switcher and chart style come from `@zohelo/design`; a product never
    defines its own colours.
 8. **Small pages.** Text and numbers render without JavaScript (pre-rendered); charts are loaded only where shown.
+9. **Sharing is a job.** Every chart and indicator page has a stable URL, a share image (Open Graph: takeaway plus
+   chart, with source and date) and copy-chart / copy-link / copy-citation actions. It is the main growth channel
+   (Area `com/growth`).
+
+### Number rules (Domain review, economy, 2 Nov)
+
+From the Domain expert's consultation on zohelo#333; they decide whether a professional trusts a page.
+
+1. **Name the transformation in the label**: `r/r` / `y/y`, `m/m`, "wyrównane sezonowo / seasonally adjusted", "ceny
+   stałe / constant prices", index base ("2021 = 100"). A bare "+4,6%" is ambiguous.
+2. **Rates change in percentage points**: "inflacja spadła o 0,3 p.p. do 2,9%", never "o 0,3%".
+3. **Takeaway titles are generated from data, literally true and non-causal.** Rules per domain (Domain expert):
+   thresholds for rose / fell / unchanged, which comparison applies (m/m, y/y, previous release), the period in the
+   sentence; "szybki szacunek / flash" when it is one; no "because" unless the source says it. Prototypes apply these
+   rules to fixture data and never invent a claim.
+4. **Reference period ≠ release date.** Show both ("wrzesień 2026 · opublikowano 15 paź 2026") and the next release;
+   freshness uses the source's release, not our load time.
+5. **Preliminary and revised values** are marked ("dane wstępne", hollow marker); a revision must not look like an error.
+6. **Same name, different definition** (CPI vs HICP, LFS vs registered unemployment, usual-residence vs national
+   population): when two sources share a chart, the legend names the definition, not only the source.
+7. **Precision** follows the source (rates to one decimal); differences are never computed from rounded values; PL uses
+   decimal comma and a non-breaking space as thousands separator.
+8. **Axes**: bars of levels start at zero; lines of rates may not, but draw zero when values cross it; colour for
+   growth only together with sign and words.
+9. **Compact notation only for levels** ("3,9 bln zł", "37,5 mln"); rates, p.p. and index values always in full. PL
+   scale words: mld = 10⁹, bln = 10¹² — use `Intl.NumberFormat` compact per locale, never translate "bn" as "bln"; the
+   full value stays in the tooltip and table.
+10. **Headline per indicator**: inflation = CPI y/y (GUS), HICP only in EU comparisons and labelled; GDP = real growth
+    y/y (quarterly also s.a. q/q), the current-price level is context; population = date and definition in the tile,
+    0,1 mln in tiles, exact count in the table.
+11. **"Jak czytać / How to read"**: the indicator page carries a short box drawn from zohelo-data
+    `docs/domains/<domain>.md` (methodology traps).
 
 ## 5. Brief for step 2 (prototype directions)
 
 Two or three directions, each a clickable HTML prototype in `design/prototypes/<direction>/` of this repo (never
-shipped), built with the published fixtures (`fixtures/published`) and the same screens: zohelo.com home and indicator
-page (`inflation`), a BI dashboard and the explorer, the Data catalogue and a table view, each at 1440 and 390 px.
+shipped), built with the published fixtures (`fixtures/published`), one Designer run per direction (the prototypes
+compare ideas; polish belongs in step 6). Screens, all at 1440 and 390 px in PL: zohelo.com home and indicator page
+(`inflation`, also in EN), the BI indicator page `/kpi/<kpi_key>` (zohelo-bi#278), a BI dashboard and the explorer, and
+the zohelo Data start page (an internal tool: no table view). Every screen carries the shared header with the product
+switcher (zohelo · zohelo BI · zohelo Data).
+
+**One indicator, two pages.** Each direction shows how zohelo.com `/indicators/<slug>` (public, editorial, SEO:
+takeaway, chart, plain definition, share) and BI `/kpi/<kpi_key>` (analyst reference: all sources, cuts, citation, open
+in explorer) split the work, the links both ways, and which page is canonical, so no two competing indicator pages are
+built.
+
 The directions must differ in their idea, not in colour only. Proposed axes:
 
 | Direction | Idea | Type | Density | Chart style |
@@ -125,7 +168,14 @@ The directions must differ in their idea, not in colour only. Proposed axes:
 | B · Instrument | a calm analytical instrument: numbers first, tiles and tables, sparklines | Plus Jakarta Sans / Inter tabular throughout, no serif | medium on .com, high in BI | small multiples, compact axes, monochrome teal ramp |
 | C · Atlas (optional) | Poland as the interface: the map and regions lead, indicators hang off places | sans with serif display | medium | choropleths and rankings first |
 
-Each direction keeps the brand (zohelo, teal, "Polska w danych / Poland in data") but may propose changes to the
+Scoring criteria for review round 1 (1–5 each, with reasons), besides those in `docs/team.md` per reviewer. Product
+Owner: (a) journalist test — on a 390 px phone the indicator page shows value, period and source without scrolling;
+(b) the three products read as one company; (c) the home page says what zohelo is within 5 seconds; (d) the brand
+carries the paid products to come (reports, BI tier). All reviewers: (e) sharing — stable URL, share image, copy actions.
+Domain expert: the number rules above. Direction fit noted by the Domain expert: B suits release-day and bank analysts,
+A journalists and citizens.
+
+Each direction keeps the brand (zohelo, teal, "Polska w danych / Poland in data"; products zohelo, zohelo BI, zohelo Data) but may propose changes to the
 `design-v1` choices (fonts, palette, `text-faint`), which are inputs, not fixed (O17 step 4).
 
 ## 6. Defects found during this research
