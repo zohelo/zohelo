@@ -1,9 +1,9 @@
 // The home page's chart of the day at build time: the pick over every required latest.json, with its
 // source name and file date. Server only (reads files through src/published.ts), so it lives outside
 // src/routes and the client imports only its type.
-import type { Locale } from "../i18n";
-import { readKpiLatest, requiredLatest, type Catalog } from "../published";
-import { chartOfDay, type ChartOfDay } from "./chartOfDay";
+import type { Locale } from '../i18n';
+import { readKpiLatest, requiredLatest, type Catalog } from '../published';
+import { chartOfDay, type ChartOfDay } from './chartOfDay';
 
 export type HomeChartOfDay = {
   pick: ChartOfDay;
@@ -28,7 +28,7 @@ export function homeChartOfDay(
   if (!pick) return null;
   const source = catalog.sources.find((s) => s.source_key === pick.source_key);
   const sourceName = source
-    ? locale === "pl"
+    ? locale === 'pl'
       ? source.name_pl
       : source.name_en
     : pick.source_key;
