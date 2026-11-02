@@ -1,6 +1,7 @@
 ## Unreleased
 
 - `./visuals` — `choroplethSpec` for region maps.
+- Tokens — `color.text-faint` (light) is `#686E76` instead of `#8A9099`, so small text passes WCAG AA (≥ 4.5:1) on `surface`, `bg` and `surface-2`.
 
 ## 1.0.0
 
