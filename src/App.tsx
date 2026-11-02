@@ -1,42 +1,50 @@
-import React, { useState } from 'react';
-import { Header } from './components/Header';
-import { PulseSection } from './components/PulseSection';
-import { VaultSection } from './components/VaultSection';
-import { ProductsSection } from './components/ProductsSection';
-import { HeroConsultingSection } from './components/HeroConsultingSection';
-import { Footer } from './components/Footer';
-import { DataVisualizationModal } from './components/DataVisualizationModal';
-import { DatasetPreviewModal } from './components/DatasetPreviewModal';
-import { CommandPalette } from './components/CommandPalette';
-import { VoivodeshipData, DatasetItem, ProductItem } from './types';
-import { CheckCircle2 } from 'lucide-react';
-import type { Locale } from './i18n';
-import { TodayStrip, type TodayTile } from './indicators/TodayStrip';
-import { HomeChanges } from './growth/HomeChanges';
-import type { ChangeItem, Source } from './published';
-import { HomeSpotlight, type SpotlightData } from './regions/HomeSpotlight';
+import React, { useState } from "react";
+import { Header } from "./components/Header";
+import { PulseSection } from "./components/PulseSection";
+import { VaultSection } from "./components/VaultSection";
+import { ProductsSection } from "./components/ProductsSection";
+import { HeroConsultingSection } from "./components/HeroConsultingSection";
+import { Footer } from "./components/Footer";
+import { DataVisualizationModal } from "./components/DataVisualizationModal";
+import { DatasetPreviewModal } from "./components/DatasetPreviewModal";
+import { CommandPalette } from "./components/CommandPalette";
+import { VoivodeshipData, DatasetItem, ProductItem } from "./types";
+import { CheckCircle2 } from "lucide-react";
+import type { Locale } from "./i18n";
+import { TodayStrip, type TodayTile } from "./indicators/TodayStrip";
+import { HomeChanges } from "./growth/HomeChanges";
+import type { ChangeItem, Source } from "./published";
+import { HomeSpotlight, type SpotlightData } from "./regions/HomeSpotlight";
+import { ChartOfDayBlock } from "./growth/ChartOfDayBlock";
+import type { HomeChartOfDay } from "./growth/homeChartOfDay";
 
 export default function App({
   tiles,
   items,
   sources,
   spotlight,
+  chartOfDay,
   locale,
 }: {
   tiles: TodayTile[];
   items: ChangeItem[];
   sources: Source[];
   spotlight: SpotlightData | null;
+  chartOfDay: HomeChartOfDay | null;
   locale: Locale;
 }) {
-  const [activeSection, setActiveSection] = useState('top');
-  
+  const [activeSection, setActiveSection] = useState("top");
+
   // Modals state
   const [isExploreModalOpen, setIsExploreModalOpen] = useState(false);
-  const [exploreRegion, setExploreRegion] = useState<VoivodeshipData | undefined>(undefined);
-  const [previewDataset, setPreviewDataset] = useState<DatasetItem | null>(null);
+  const [exploreRegion, setExploreRegion] = useState<
+    VoivodeshipData | undefined
+  >(undefined);
+  const [previewDataset, setPreviewDataset] = useState<DatasetItem | null>(
+    null,
+  );
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  
+
   // Toast notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -47,25 +55,24 @@ export default function App({
 
   const handleNavigate = (sectionId: string) => {
     setActiveSection(sectionId);
-    if (sectionId === 'top') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (sectionId === "top") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     const elem = document.getElementById(sectionId);
     if (elem) {
-      elem.scrollIntoView({ behavior: 'smooth' });
+      elem.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   const handleSelectProduct = (product: ProductItem) => {
     // Scroll to consulting section to book demo or open exploration
-    handleNavigate('consulting');
+    handleNavigate("consulting");
     showToast(`Selected "${product.name}". Consultation request ready below.`);
   };
 
   return (
     <div className="min-h-screen bg-[#F3F6F8] text-[#24292E] flex flex-col selection:bg-[#3B8B94]/20 selection:text-[#18484F]">
-      
       {/* 1. The Header matching Mockup */}
       <Header
         activeSection={activeSection}
@@ -75,7 +82,6 @@ export default function App({
 
       {/* Main 8-Section Sequential Flow as mandated by PRD & Mockup */}
       <main className="flex-1">
-        
         {/* 2. The Pulse: Live Ticker & Indicators */}
         <PulseSection
           onSelectIndicator={(ind) => {
@@ -87,6 +93,19 @@ export default function App({
         <HomeChanges items={items} sources={sources} locale={locale} />
 
         <HomeSpotlight data={spotlight} locale={locale} />
+        {chartOfDay ? (
+          <section
+            aria-label={locale === "pl" ? "Wykres dnia" : "Chart of the day"}
+            className="mx-auto max-w-6xl px-4 py-8"
+          >
+            <ChartOfDayBlock
+              pick={chartOfDay.pick}
+              sourceName={chartOfDay.sourceName}
+              date={chartOfDay.date}
+              locale={locale}
+            />
+          </section>
+        ) : null}
 
         {/* 6. The Vault / The Datasets: CSV, Parquet, Power BI, PDF Lakehouse Assets */}
         <VaultSection
@@ -94,24 +113,21 @@ export default function App({
         />
 
         {/* 7. The Products: Commercial Analytics Suites */}
-        <ProductsSection
-          onSelectProduct={handleSelectProduct}
-        />
+        <ProductsSection onSelectProduct={handleSelectProduct} />
 
         {/* 8. The Hero Section / The Gateway: B2B Consulting & Radosław Utkała Profile */}
         <HeroConsultingSection
           onSubmitSuccess={() => {
-            showToast('Consultation request transmitted to Radosław Utkała.');
+            showToast("Consultation request transmitted to Radosław Utkała.");
           }}
         />
-
       </main>
 
       {/* Footer */}
       <Footer onNavigate={handleNavigate} />
 
       {/* Interactive Modals */}
-      
+
       {/* 1. Regional Analytics Studio Deep Dive */}
       <DataVisualizationModal
         isOpen={isExploreModalOpen}
@@ -144,7 +160,6 @@ export default function App({
           <span>{toastMessage}</span>
         </div>
       )}
-
     </div>
   );
 }
