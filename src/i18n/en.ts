@@ -28,6 +28,7 @@ export const en: Dict = {
     language: 'Language',
     pl: 'PL',
     en: 'EN',
+    skip: 'Skip to content',
   },
   sample: {
     banner:
