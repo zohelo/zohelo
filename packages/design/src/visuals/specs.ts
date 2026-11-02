@@ -30,7 +30,7 @@ export type LineOptions = {
   highlight?: string | null;
   /** x ticks at the series frequency: one per `step` years/quarters/months (zohelo#389). Default: Vega's choice. */
   xTicks?: { interval: "year" | "quarter" | "month" | "day"; step: number };
-  /** d3 time format of the x labels ('%Y', '%b %Y'). */
+  /** d3 time format of the x labels ('%Y', '%b %Y'); the tooltip period uses it too (zohelo#407). */
   xFormat?: string;
   /** Decimals of the source: y ticks in that precision (`.1f`, tickMinStep 0.1). Default: Vega's choice. */
   yDecimals?: number;
@@ -78,7 +78,8 @@ export function lineSpec(rows: object[], o: LineOptions): VisualizationSpec {
         : { value: 1 },
       tooltip: [
         { field: o.series, type: "nominal", title: labels[o.locale ?? "en"].series },
-        { field: o.x, type: "temporal", title: labels[o.locale ?? "en"].period },
+        // The period in the axis form of the series' frequency ('2025', 'wrz 2026'), not the fallback day date.
+        { field: o.x, type: "temporal", title: labels[o.locale ?? "en"].period, ...(o.xFormat ? { format: o.xFormat } : {}) },
         { field: o.y, type: "quantitative", title: o.yTitle, format: TOOLTIP_FORMAT },
       ],
     },
