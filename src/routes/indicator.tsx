@@ -9,7 +9,8 @@ import { unitLabel } from '../indicators/unitLabel';
 import { NO_LATEST, publishedDir, readCatalog, readGeo, readKpiLatest } from '../published';
 import { RankingTable } from '../regions/RankingTable';
 import { rankRegions } from '../regions/ranking';
-import { datasetJsonLd, pageMeta } from '../seo';
+import { breadcrumbJsonLd, datasetJsonLd, pageMeta } from '../seo';
+import { pages, site } from '../site.config';
 
 // One page per published KPI, built at build time only (ssr: false). KPIs in NO_LATEST have no
 // latest.json by contract (D26): a tile without value, no regional table; any other missing
@@ -23,12 +24,20 @@ export async function loader({ request, params }: { request: Request; params: { 
   const name = locale === 'pl' ? kpi.name_pl : kpi.name_en;
   const sources = footerProps(kpiSources(catalog, kpi.kpi_key, locale));
   const jsonLd = datasetJsonLd(kpi, catalog, locale);
+  const breadcrumb = breadcrumbJsonLd(
+    [
+      { name: site.name, path: '/' },
+      { name: pages.find((p) => p.path === '/indicators')!.title[locale], path: '/indicators' },
+      { name, path: `/indicators/${kpi.kpi_key}` },
+    ],
+    locale,
+  );
 
   if (NO_LATEST.includes(kpi.kpi_key)) {
     const unit = unitLabel(catalog.units, kpi.unit_key, locale);
     const tile: LatestTile = { label: name, value: null, unit, delta: null, period: '', sourceKey: null, checkedAt: null, provisional: false };
     const description = indicatorDescription(name, tile, sources.sources.map((s) => s.name), locale);
-    return { tile, sources, ranking: null, geo: null, jsonLd, name, lastPeriod: kpi.last_period, description };
+    return { tile, sources, ranking: null, geo: null, jsonLd, breadcrumb, name, lastPeriod: kpi.last_period, description };
   }
 
   const latest = readKpiLatest(dir, kpi.kpi_key);
@@ -40,6 +49,7 @@ export async function loader({ request, params }: { request: Request; params: { 
     ranking,
     geo: ranking ? readGeo(dir, 'voivodeship') : null,
     jsonLd,
+    breadcrumb,
     name,
     lastPeriod: kpi.last_period,
     description: indicatorDescription(name, tile, sources.sources.map((s) => s.name), locale),
@@ -61,11 +71,12 @@ export function meta({
 }
 
 export default function Indicator() {
-  const { tile, sources, ranking, geo, jsonLd, name, lastPeriod } = useLoaderData<typeof loader>();
+  const { tile, sources, ranking, geo, jsonLd, breadcrumb, name, lastPeriod } = useLoaderData<typeof loader>();
   const locale = useLocale();
   return (
     <main className="mx-auto max-w-4xl px-4 py-12 text-text">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <h1 className="font-display text-[length:var(--z-size-display)] font-semibold">{name}</h1>
       <div className="mt-6 max-w-sm">
         <KpiTile label={tile.label} value={tile.value} unit={tile.unit} delta={tile.delta ?? undefined} period={tile.period} locale={locale} />
