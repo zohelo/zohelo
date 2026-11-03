@@ -32,7 +32,7 @@ export const Header: React.FC = () => {
             href={localizedPath(pathname, l)}
             hrefLang={l}
             aria-current={l === locale ? 'true' : undefined}
-            className={l === locale ? 'text-[#2C6E76]' : 'text-slate-500 hover:text-[#3B8B94]'}
+            className={`inline-flex min-h-6 min-w-6 items-center justify-center ${l === locale ? 'text-[#2C6E76]' : 'text-slate-500 hover:text-[#3B8B94]'}`}
           >
             {t.common[l]}
           </a>
