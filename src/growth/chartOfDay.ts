@@ -102,22 +102,51 @@ function latestNationalRow(file: LatestFile) {
   return rows[0];
 }
 
+/** Short month names, as `timeLocale.shortMonths` of `@zohelo/design/visuals` (the chart axes and tooltips). */
+export const SHORT_MONTHS = {
+  pl: ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'],
+  en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+} as const;
+const ROMAN = ['I', 'II', 'III', 'IV'];
+const NBSP = '\u00a0';
+
+/**
+ * The period in the axis form of its frequency, as the chart tooltip writes it (zohelo#407): '2025',
+ * 'III kw. 2026' / 'Q3 2026', 'wrz 2026' / 'Sep 2026', '1 wrz 2026' / '1 Sep 2026'. Unknown forms as given.
+ */
+export function periodLabel(period: string, lang: 'pl' | 'en'): string {
+  let m = /^(\d{4})-Q([1-4])$/.exec(period);
+  if (m) return lang === 'pl' ? `${ROMAN[Number(m[2]) - 1]} kw. ${m[1]}` : `Q${m[2]} ${m[1]}`;
+  m = /^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(period);
+  if (m && Number(m[2]) >= 1 && Number(m[2]) <= 12) {
+    const month = `${SHORT_MONTHS[lang][Number(m[2]) - 1]} ${m[1]}`;
+    return m[3] ? `${Number(m[3])} ${month}` : month;
+  }
+  return period;
+}
+
+/** '(wrz 2026, dane wstępne)' with no-break spaces, so the group never wraps inside (design review #450). */
+function periodGroup(period: string, lang: 'pl' | 'en', provisional: boolean): string {
+  const note = provisional ? (lang === 'pl' ? ', dane wstępne' : ', preliminary') : '';
+  return `(${periodLabel(period, lang)}${note})`.replace(/ /g, NBSP);
+}
+
 function headlines(name: KpiNames[string], row: Row, rate: boolean) {
   const unitPl = name.unit_pl ? ` ${name.unit_pl}` : '';
   const unitEn = name.unit_en ? ` ${name.unit_en}` : '';
   const valPl = `${formatNumber(row.value, 'pl')}${unitPl}`;
   const valEn = `${formatNumber(row.value, 'en')}${unitEn}`;
   const provisional = row.flags.includes('p');
-  const pPl = provisional ? `${row.period}, dane wstępne` : row.period;
-  const pEn = provisional ? `${row.period}, preliminary` : row.period;
+  const pPl = periodGroup(row.period, 'pl', provisional);
+  const pEn = periodGroup(row.period, 'en', provisional);
   const prev = row.previous_value;
   if (prev === undefined || prev === null)
-    return { headline_pl: `${name.name_pl}: ${valPl} (${pPl})`, headline_en: `${name.name_en}: ${valEn} (${pEn})` };
+    return { headline_pl: `${name.name_pl}: ${valPl} ${pPl}`, headline_en: `${name.name_en}: ${valEn} ${pEn}` };
   const change = row.value - prev;
   if (change === 0)
     return {
-      headline_pl: `${name.name_pl}: bez zmian, ${valPl} (${pPl})`,
-      headline_en: `${name.name_en}: unchanged at ${valEn} (${pEn})`,
+      headline_pl: `${name.name_pl}: bez zmian, ${valPl} ${pPl}`,
+      headline_en: `${name.name_en}: unchanged at ${valEn} ${pEn}`,
     };
   if (rate) {
     // A rate changes by points: 'wzrost o 0,3 p.p. do 3,2 %' (number rules, zohelo#388).
@@ -125,23 +154,23 @@ function headlines(name: KpiNames[string], row: Row, rate: boolean) {
     const [ppPl, ppEn] = [formatNumber(pp, 'pl'), formatNumber(pp, 'en')];
     return change > 0
       ? {
-          headline_pl: `${name.name_pl}: wzrost o ${ppPl} p.p. do ${valPl} (${pPl})`,
-          headline_en: `${name.name_en}: up ${ppEn} pp to ${valEn} (${pEn})`,
+          headline_pl: `${name.name_pl}: wzrost o ${ppPl} p.p. do ${valPl} ${pPl}`,
+          headline_en: `${name.name_en}: up ${ppEn} pp to ${valEn} ${pEn}`,
         }
       : {
-          headline_pl: `${name.name_pl}: spadek o ${ppPl} p.p. do ${valPl} (${pPl})`,
-          headline_en: `${name.name_en}: down ${ppEn} pp to ${valEn} (${pEn})`,
+          headline_pl: `${name.name_pl}: spadek o ${ppPl} p.p. do ${valPl} ${pPl}`,
+          headline_en: `${name.name_en}: down ${ppEn} pp to ${valEn} ${pEn}`,
         };
   }
   const [prevPl, prevEn] = [formatNumber(prev, 'pl'), formatNumber(prev, 'en')];
   return change > 0
     ? {
-        headline_pl: `${name.name_pl}: wzrost z ${prevPl} do ${valPl} (${pPl})`,
-        headline_en: `${name.name_en}: up from ${prevEn} to ${valEn} (${pEn})`,
+        headline_pl: `${name.name_pl}: wzrost z ${prevPl} do ${valPl} ${pPl}`,
+        headline_en: `${name.name_en}: up from ${prevEn} to ${valEn} ${pEn}`,
       }
     : {
-        headline_pl: `${name.name_pl}: spadek z ${prevPl} do ${valPl} (${pPl})`,
-        headline_en: `${name.name_en}: down from ${prevEn} to ${valEn} (${pEn})`,
+        headline_pl: `${name.name_pl}: spadek z ${prevPl} do ${valPl} ${pPl}`,
+        headline_en: `${name.name_en}: down from ${prevEn} to ${valEn} ${pEn}`,
       };
 }
 

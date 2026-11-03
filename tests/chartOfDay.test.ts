@@ -4,9 +4,12 @@ import {
   HEADLINE_ORDER,
   parseCalendar,
   periodEnd,
+  periodLabel,
+  SHORT_MONTHS,
   type KpiNames,
   type LatestFile,
 } from '../src/growth/chartOfDay';
+import { timeLocale } from '../packages/design/src/visuals/locale';
 
 const now = new Date('2026-11-03T00:00:00Z');
 const names: KpiNames = {
@@ -35,8 +38,8 @@ describe('chartOfDay picks the newest release, not the largest change (#410)', (
     const c = chartOfDay([unemployment(), inflation()], names, now)!;
     expect(c.kpi_key).toBe('inflation');
     expect(c.period).toBe('2026-09');
-    expect(c.headline_pl).toBe('Inflacja HICP: spadek z 3 do 2,9 (2026-09)');
-    expect(c.headline_en).toBe('HICP inflation: down from 3 to 2.9 (2026-09)');
+    expect(c.headline_pl).toBe('Inflacja HICP: spadek z 3 do 2,9 (wrz\u00a02026)');
+    expect(c.headline_en).toBe('HICP inflation: down from 3 to 2.9 (Sep\u00a02026)');
   });
 
   test('a provisional newest row is chosen and its headline says so', () => {
@@ -45,14 +48,14 @@ describe('chartOfDay picks the newest release, not the largest change (#410)', (
     expect(c.kpi_key).toBe('inflation');
     expect(c.period).toBe('2026-09');
     expect(c.provisional).toBe(true);
-    expect(c.headline_pl).toBe('Inflacja HICP: wzrost z 2,9 do 3,4 (2026-09, dane wstępne)');
-    expect(c.headline_en).toBe('HICP inflation: up from 2.9 to 3.4 (2026-09, preliminary)');
+    expect(c.headline_pl).toBe('Inflacja HICP: wzrost z 2,9 do 3,4 (wrz\u00a02026,\u00a0dane\u00a0wstępne)');
+    expect(c.headline_en).toBe('HICP inflation: up from 2.9 to 3.4 (Sep\u00a02026,\u00a0preliminary)');
   });
 
   test('a provisional flash without a previous value gives the value and the label', () => {
     const c = chartOfDay([inflation([row({ period: '2026-10', value: 3.1, previous_value: undefined, flags: ['p'] })])], names, now)!;
-    expect(c.headline_pl).toBe('Inflacja HICP: 3,1 (2026-10, dane wstępne)');
-    expect(c.headline_en).toBe('HICP inflation: 3.1 (2026-10, preliminary)');
+    expect(c.headline_pl).toBe('Inflacja HICP: 3,1 (paź\u00a02026,\u00a0dane\u00a0wstępne)');
+    expect(c.headline_en).toBe('HICP inflation: 3.1 (Oct\u00a02026,\u00a0preliminary)');
   });
 
   test('freshness: annual ≤ 18 months, quarterly ≤ 6, monthly ≤ 3 after the end of the period', () => {
@@ -190,6 +193,37 @@ describe('chartOfDay rates (#388)', () => {
     expect(c.change).toBe(95000);
     expect(c.headline_pl).toBe('PKB w cenach bieżących: wzrost z 750 000 do 845 000 mln EUR (2025)');
     expect(c.headline_en).toBe('GDP at current prices: up from 750,000 to 845,000 mln EUR (2025)');
+  });
+});
+
+describe('periodLabel: the axis form of the period (design review #450)', () => {
+  test('annual, quarterly, monthly and daily periods; unknown forms unchanged', () => {
+    expect(periodLabel('2025', 'pl')).toBe('2025');
+    expect(periodLabel('2026-Q3', 'pl')).toBe('III kw. 2026');
+    expect(periodLabel('2026-Q3', 'en')).toBe('Q3 2026');
+    expect(periodLabel('2026-09', 'pl')).toBe('wrz 2026');
+    expect(periodLabel('2026-09', 'en')).toBe('Sep 2026');
+    expect(periodLabel('2026-09-01', 'pl')).toBe('1 wrz 2026');
+    expect(periodLabel('2025-H1', 'en')).toBe('2025-H1');
+  });
+
+  test("month names are the chart locale's short months", () => {
+    expect([...SHORT_MONTHS.pl]).toEqual(timeLocale.pl.shortMonths);
+    expect([...SHORT_MONTHS.en]).toEqual(timeLocale.en.shortMonths);
+  });
+
+  test('a monthly headline keeps the period group on one line: no breaking space inside the parentheses', () => {
+    const c = chartOfDay([inflation()], names, now)!;
+    const group = /\(([^)]*)\)$/.exec(c.headline_en)![1];
+    expect(group).toBe('Sep\u00a02026');
+    expect(group).not.toContain(' ');
+  });
+
+  test('a provisional quarterly headline keeps the note in the same unbreakable group', () => {
+    const rows = [row({ period: '2026-Q3', value: 3.4, previous_value: 3.1, flags: ['p'] })];
+    const c = chartOfDay([unemployment(rows)], names, now)!;
+    expect(c.headline_pl.endsWith('(III\u00a0kw.\u00a02026,\u00a0dane\u00a0wstępne)')).toBe(true);
+    expect(c.headline_en.endsWith('(Q3\u00a02026,\u00a0preliminary)')).toBe(true);
   });
 });
 
