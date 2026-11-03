@@ -51,7 +51,7 @@ export const Header: React.FC = () => {
             <a
               href={localizedPath('/', locale)}
               aria-label={t.common.site}
-              className="group flex items-baseline space-x-2 text-left focus:outline-none"
+              className="group flex items-baseline space-x-2 text-left rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
             >
               <span className="font-serif-heading text-3xl sm:text-4xl font-bold tracking-tight text-[#24292E] group-hover:text-[#3B8B94] transition-colors">
                 {t.common.brand}
@@ -87,7 +87,7 @@ export const Header: React.FC = () => {
             <span className="sm:hidden">{languageToggle}</span>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-700 hover:bg-slate-200/60 focus:outline-none"
+              className="p-2 rounded-lg text-slate-700 hover:bg-slate-200/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               aria-label={t.nav.toggleNav}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
