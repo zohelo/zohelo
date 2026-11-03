@@ -1,6 +1,5 @@
 import React, { type ReactNode } from 'react';
 import { ProductsSection } from './components/ProductsSection';
-import { HeroConsultingSection } from './components/HeroConsultingSection';
 import type { Locale } from './i18n';
 import { TodayStrip, type TodayTile } from './indicators/TodayStrip';
 import { HomeChanges } from './growth/HomeChanges';
@@ -31,16 +30,6 @@ export default function App({
   chartOfDayChart?: ReactNode;
   locale: Locale;
 }) {
-  const handleNavigate = (sectionId: string) => {
-    const elem = document.getElementById(sectionId);
-    if (elem) {
-      elem.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  // A product card scrolls to the consulting section.
-  const handleSelectProduct = () => handleNavigate('consulting');
-
   return (
     <div className="flex-1 flex flex-col">
       
@@ -63,12 +52,7 @@ export default function App({
         ) : null}
 
         {/* 7. The Products: Commercial Analytics Suites */}
-        <ProductsSection
-          onSelectProduct={handleSelectProduct}
-        />
-
-        {/* 8. The Hero Section / The Gateway: B2B Consulting & Radosław Utkała Profile */}
-        <HeroConsultingSection />
+        <ProductsSection />
 
       </main>
 
