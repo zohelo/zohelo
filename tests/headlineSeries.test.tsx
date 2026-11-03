@@ -115,23 +115,50 @@ describe('tablePoints and SeriesTable', () => {
     expect(html).toContain('>3,0<');
     expect(html).not.toContain('>3<');
   });
+
+  test('World Bank WDI-like unrounded values are capped, not shown to 4 decimals (#408 domain review)', () => {
+    const rates: SeriesPoint[] = [
+      { date: '2022-01-01', period: '2022', value: 14.4290163 },
+      { date: '2023-01-01', period: '2023', value: 3.6625 },
+    ];
+    const pl = renderToStaticMarkup(<SeriesTable points={rates} unit="%" caption="Test" locale="pl" />);
+    expect(pl).toContain('>14,43<');
+    expect(pl).toContain('>3,66<');
+    expect(pl).not.toContain('14,4290');
+    const gdp = renderToStaticMarkup(
+      <SeriesTable points={[{ date: '2023-01-01', period: '2023', value: 811229294570.384 }]} unit="USD" caption="Test" locale="pl" />,
+    );
+    expect(gdp).toContain('>811 229 294 570<');
+    const fx = renderToStaticMarkup(
+      <SeriesTable points={[{ date: '2026-10-01', period: '2026-10-01', value: 4.27 }, { date: '2026-10-02', period: '2026-10-02', value: 4.2654 }]} unit="zł" caption="Test" locale="pl" />,
+    );
+    expect(fx).toContain('>4,2700<');
+  });
 });
 
 describe('axis helpers (design review of #397)', () => {
   const pt = (period: string, value: number): SeriesPoint => ({ date: `${period.slice(0, 4)}-${period.length > 4 ? period.slice(5, 7) : '01'}-01`, period, value });
 
   test('y precision follows the source', () => {
-    expect(seriesDecimals([pt('2023', 2.8), pt('2024', 2.9), pt('2025', 3.2)])).toBe(1);
-    expect(seriesDecimals([pt('2023', 750000), pt('2024', 845000)])).toBe(0);
-    expect(seriesDecimals([pt('2023', 1.25), pt('2024', 1.3)])).toBe(2);
+    expect(seriesDecimals([pt('2023', 2.8), pt('2024', 2.9), pt('2025', 3.2)], '%')).toBe(1);
+    expect(seriesDecimals([pt('2023', 750000), pt('2024', 845000)], 'os.')).toBe(0);
+    expect(seriesDecimals([pt('2023', 1.25), pt('2024', 1.3)], '%')).toBe(2);
   });
 
   test('a float artefact of a derived value does not raise the precision (zohelo#408 review)', () => {
-    expect(seriesDecimals([pt('2023', 0.1 + 0.2), pt('2024', 0.3)])).toBe(1);
-    expect(seriesDecimals([pt('2023', 1.1 * 3), pt('2024', 3.3)])).toBe(1);
-    expect(seriesDecimals([pt('2023', 2.00001), pt('2024', 2)])).toBe(0);
-    expect(seriesDecimals([pt('2023', 1.2345678)])).toBe(4);
-    expect(seriesDecimals([pt('2023', Number.NaN), pt('2024', 2.5)])).toBe(1);
+    expect(seriesDecimals([pt('2023', 0.1 + 0.2), pt('2024', 0.3)], '%')).toBe(1);
+    expect(seriesDecimals([pt('2023', 1.1 * 3), pt('2024', 3.3)], '%')).toBe(1);
+    expect(seriesDecimals([pt('2023', 2.00001), pt('2024', 2)], 'zł')).toBe(0);
+    expect(seriesDecimals([pt('2023', 1.2345678)], 'zł')).toBe(4);
+    expect(seriesDecimals([pt('2023', Number.NaN), pt('2024', 2.5)], '%')).toBe(1);
+  });
+
+  test('the precision cap: 2 for rates, 0 from 1 000 in other units, 4 for exchange rates (#408 domain review)', () => {
+    expect(seriesDecimals([pt('2023', 14.4290163), pt('2024', 3.6625)], '%')).toBe(2);
+    expect(seriesDecimals([pt('2023', 5.75), pt('2024', 6)], '%')).toBe(2);
+    expect(seriesDecimals([pt('2023', 811229294570.384)], 'USD')).toBe(0);
+    expect(seriesDecimals([pt('2023', 22057.0489), pt('2024', 999.5)], 'USD')).toBe(0);
+    expect(seriesDecimals([pt('2023', 4.27), pt('2024', 4.3125)], 'zł')).toBe(4);
   });
 
   test('x ticks: one per year for an annual series, months for a monthly one, stepping to the label budget', () => {

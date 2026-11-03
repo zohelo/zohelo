@@ -13,8 +13,9 @@ const text: Record<Locale, { toggle: string; period: string; value: string; trun
 export function SeriesTable({ points, unit, caption, locale }: { points: SeriesPoint[]; unit: string; caption: string; locale: Locale }) {
   const t = text[locale];
   const { rows, truncated } = tablePoints(points);
-  // Every row keeps the series' precision (the source's): a one-decimal rate reads 3,0, not 3 (#405).
-  const decimals = seriesDecimals(points);
+  // Every row keeps the series' precision (the source's, capped by unit): a one-decimal rate reads 3,0, not 3
+  // (#405); an unrounded WDI rate reads 14,43, not 14,4290 (#408 domain review).
+  const decimals = seriesDecimals(points, unit);
   return (
     <details className="mt-3 font-ui text-[length:var(--z-size-sm)] text-text">
       <summary className="cursor-pointer text-brand-teal underline">{t.toggle}</summary>
