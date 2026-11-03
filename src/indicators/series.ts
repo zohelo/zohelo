@@ -1,3 +1,4 @@
+import { isRateUnit } from '@zohelo/design';
 import type { SeriesRow } from '../published';
 
 // The headline series of a KPI for the line chart: the national (PL) total of one source and one
@@ -56,16 +57,31 @@ export function tablePoints(points: SeriesPoint[], max = 24): { rows: SeriesPoin
   return { rows: [...points.slice(0, half), ...points.slice(-half)], truncated: true };
 }
 
-/** The decimals the source publishes (the most among the points, at most 4): the y-axis precision. */
-export function seriesDecimals(points: SeriesPoint[]): number {
+/**
+ * The decimals the source publishes (the most among the points), capped by the content rule for
+ * precision (Domain review of zohelo#408): at most 2 for a rate unit ('%', 'p.p.'; `isRateUnit`),
+ * 0 when the series reaches 1 000 or more in any other unit (currency levels, persons), else at most 4
+ * (exchange rates in zł keep 4: 4,2700). The precision of the y-axis, the tooltip and the data table.
+ * World Bank WDI publishes unrounded doubles, so without the cap its rows read 14,4290 or
+ * 811 229 294 570,3840. A value is rounded to 4 decimals before its decimals are counted, so a float
+ * artefact of a derived value (0.1 + 0.2 = 0.30000000000000004) counts as one decimal, not four
+ * (Architect review of zohelo#408). `unit` is the unit as shown ('%', 'os.', 'zł', 'mln EUR').
+ */
+export type Decimals = 0 | 1 | 2 | 3 | 4;
+
+export function seriesDecimals(points: SeriesPoint[], unit: string): Decimals {
   let max = 0;
+  let largest = 0;
   for (const p of points) {
-    const text = String(p.value);
+    if (!Number.isFinite(p.value)) continue;
+    largest = Math.max(largest, Math.abs(p.value));
+    const text = String(Number(p.value.toFixed(4)));
     if (text.includes('e')) continue;
     const i = text.indexOf('.');
     if (i >= 0) max = Math.max(max, text.length - i - 1);
   }
-  return Math.min(max, 4);
+  const cap = isRateUnit(unit) ? 2 : largest >= 1000 ? 0 : 4;
+  return Math.min(max, cap) as Decimals;
 }
 
 export type TickInterval = 'year' | 'quarter' | 'month' | 'day';
