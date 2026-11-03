@@ -1,7 +1,7 @@
 name: Check
 
-# Pull-request gate for zohelo.com: install from the lockfile, type check (app + functions) and
-# build. No credentials; deploys stay in deploy.yml (push to main, manual preview runs).
+# Pull-request gate for zohelo.com: install from the lockfile, type check (app + functions), build
+# and axe-core accessibility on the built pages. No credentials; deploys stay in deploy.yml (push to main, manual preview runs).
 
 on:
   pull_request:
@@ -16,7 +16,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     permissions:
       contents: read
       issues: read
@@ -59,3 +59,17 @@ jobs:
         run: bun test
       - name: Build
         run: bun run build
+      - name: Browser for the accessibility check
+        # Playwright's Chromium at the version in bun.lock (zohelo-data#2499).
+        run: bunx playwright install --with-deps chromium
+      - name: Accessibility (axe-core, 1440 and 390 px)
+        # Fails on serious or critical violations not in scripts/a11y-baseline.json; counts by rule
+        # and page go to the job summary.
+        run: node scripts/a11y.mjs --root build/client --report a11y-report.json
+      - name: Accessibility report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: a11y-report
+          path: a11y-report.json
+          if-no-files-found: ignore
