@@ -7,15 +7,12 @@
       "impact": "serious",
       "bug": "zohelo#435",
       "targets": [
-        ".hover\\:text-white.underline[href$=\"sources\"]",
         ".inline-block",
         ".mb-4 > .text-slate-400.mt-0\\.5",
         ".mb-4.justify-between.items-center > .text-\\[\\#3B8B94\\].font-semibold.text-xs",
         ".mb-4.justify-between.items-center > div > .text-slate-400.mt-0\\.5",
-        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .hover\\:text-\\[\\#3B8B94\\][href=\"/en\"][hreflang=\"en\"]",
-        ".sm\\:flex-row > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"Język\"] > .hover\\:text-\\[\\#3B8B94\\][href=\"/en\"][hreflang=\"en\"]",
         ".sm\\:inline-block",
-        ".space-x-4.items-center.flex > span",
         ".text-brand-teal.underline[href$=\"changes\"]",
         ".text-brand-teal.underline[href$=\"regions\"]",
         ".text-center.cursor-pointer.flex-col:nth-child(4) > .sm\\:text-sm.font-extrabold.mt-3",
@@ -54,14 +51,11 @@
       "impact": "serious",
       "bug": "zohelo#435",
       "targets": [
-        ".hover\\:text-white.underline[href$=\"sources\"]",
         ".inline-block",
         ".mb-4 > .text-slate-400.mt-0\\.5",
         ".mb-4.justify-between.items-center > .text-\\[\\#3B8B94\\].font-semibold.text-xs",
         ".mb-4.justify-between.items-center > div > .text-slate-400.mt-0\\.5",
-        ".sm\\:flex-row > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .hover\\:text-\\[\\#3B8B94\\][href=\"/en\"][hreflang=\"en\"]",
-        ".space-x-4.items-center.flex > span",
+        ".sm\\:hidden > nav[aria-label=\"Język\"] > .hover\\:text-\\[\\#3B8B94\\][href=\"/en\"][hreflang=\"en\"]",
         ".text-brand-teal.underline[href$=\"changes\"]",
         ".text-brand-teal.underline[href$=\"regions\"]",
         ".text-center.cursor-pointer.flex-col:nth-child(4) > .sm\\:text-sm.font-extrabold.mt-3",
@@ -91,14 +85,11 @@
       "impact": "serious",
       "bug": "zohelo#435",
       "targets": [
-        ".hover\\:text-white.underline[href$=\"sources\"]",
         ".inline-block",
         ".mb-4 > .text-slate-400.mt-0\\.5",
         ".mb-4.justify-between.items-center > .text-\\[\\#3B8B94\\].font-semibold.text-xs",
         ".mb-4.justify-between.items-center > div > .text-slate-400.mt-0\\.5",
-        ".sm\\:flex-row > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .hover\\:text-\\[\\#3B8B94\\][href=\"/en\"][hreflang=\"en\"]",
-        ".space-x-4.items-center.flex > span",
+        ".sm\\:hidden > nav[aria-label=\"Język\"] > .text-slate-500[href=\"/en\"][hreflang=\"en\"]",
         ".text-brand-teal.underline[href$=\"changes\"]",
         ".text-brand-teal.underline[href$=\"regions\"]",
         ".text-center.cursor-pointer.flex-col:nth-child(4) > .sm\\:text-sm.font-extrabold.mt-3",
@@ -128,12 +119,9 @@
       "impact": "serious",
       "bug": "zohelo#436",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
+        ".sm\\:flex > nav[aria-label=\"Język\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
         ".sm\\:inline-block",
-        ".space-x-4 > span",
-        ".text-brand-teal",
-        ".underline.hover\\:text-white[href$=\"sources\"]"
+        ".text-brand-teal"
       ]
     },
     {
@@ -166,11 +154,8 @@
       "impact": "serious",
       "bug": "zohelo#436",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
-        ".space-x-4 > span",
-        ".text-brand-teal",
-        ".underline.hover\\:text-white[href$=\"sources\"]"
+        ".sm\\:hidden > nav[aria-label=\"Język\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
+        ".text-brand-teal"
       ]
     },
     {
@@ -193,11 +178,8 @@
       "impact": "serious",
       "bug": "zohelo#437",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[hreflang=\"en\"][href$=\"design\"]",
-        ".sm\\:inline-block",
-        ".space-x-4 > span",
-        ".underline"
+        ".sm\\:flex > nav[aria-label=\"Język\"] > .text-slate-500[hreflang=\"en\"][href$=\"design\"]",
+        ".sm\\:inline-block"
       ]
     },
     {
@@ -230,10 +212,7 @@
       "impact": "serious",
       "bug": "zohelo#437",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[hreflang=\"en\"][href$=\"design\"]",
-        ".space-x-4 > span",
-        ".underline"
+        ".sm\\:hidden > nav[aria-label=\"Język\"] > .text-slate-500[hreflang=\"en\"][href$=\"design\"]"
       ]
     },
     {
@@ -256,15 +235,12 @@
       "impact": "serious",
       "bug": "zohelo#438",
       "targets": [
-        ".hover\\:text-white.underline[href$=\"sources\"]",
         ".inline-block",
         ".mb-4 > .text-slate-400.mt-0\\.5",
         ".mb-4.justify-between.items-center > .text-\\[\\#3B8B94\\].font-semibold.text-xs",
         ".mb-4.justify-between.items-center > div > .text-slate-400.mt-0\\.5",
         ".sm\\:flex > nav[aria-label=\"Language\"] > .hover\\:text-\\[\\#3B8B94\\][href=\"/\"][hreflang=\"pl\"]",
-        ".sm\\:flex-row > div:nth-child(1)",
         ".sm\\:inline-block",
-        ".space-x-4.items-center.flex > span",
         ".text-brand-teal.underline[href$=\"changes\"]",
         ".text-brand-teal.underline[href$=\"regions\"]",
         ".text-center.cursor-pointer.flex-col:nth-child(4) > .sm\\:text-sm.font-extrabold.mt-3",
@@ -303,14 +279,11 @@
       "impact": "serious",
       "bug": "zohelo#438",
       "targets": [
-        ".hover\\:text-white.underline[href$=\"sources\"]",
         ".inline-block",
         ".mb-4 > .text-slate-400.mt-0\\.5",
         ".mb-4.justify-between.items-center > .text-\\[\\#3B8B94\\].font-semibold.text-xs",
         ".mb-4.justify-between.items-center > div > .text-slate-400.mt-0\\.5",
-        ".sm\\:flex-row > div:nth-child(1)",
         ".sm\\:hidden > nav[aria-label=\"Language\"] > .hover\\:text-\\[\\#3B8B94\\][href=\"/\"][hreflang=\"pl\"]",
-        ".space-x-4.items-center.flex > span",
         ".text-brand-teal.underline[href$=\"changes\"]",
         ".text-brand-teal.underline[href$=\"regions\"]",
         ".text-center.cursor-pointer.flex-col:nth-child(4) > .sm\\:text-sm.font-extrabold.mt-3",
@@ -340,14 +313,11 @@
       "impact": "serious",
       "bug": "zohelo#438",
       "targets": [
-        ".hover\\:text-white.underline[href$=\"sources\"]",
         ".inline-block",
         ".mb-4 > .text-slate-400.mt-0\\.5",
         ".mb-4.justify-between.items-center > .text-\\[\\#3B8B94\\].font-semibold.text-xs",
         ".mb-4.justify-between.items-center > div > .text-slate-400.mt-0\\.5",
-        ".sm\\:flex-row > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"Language\"] > .hover\\:text-\\[\\#3B8B94\\][href=\"/\"][hreflang=\"pl\"]",
-        ".space-x-4.items-center.flex > span",
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500[href=\"/\"][hreflang=\"pl\"]",
         ".text-brand-teal.underline[href$=\"changes\"]",
         ".text-brand-teal.underline[href$=\"regions\"]",
         ".text-center.cursor-pointer.flex-col:nth-child(4) > .sm\\:text-sm.font-extrabold.mt-3",
@@ -377,11 +347,8 @@
       "impact": "serious",
       "bug": "zohelo#457",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
         ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500[href=\"/404\"][hreflang=\"pl\"]",
-        ".sm\\:inline-block",
-        ".space-x-4 > span",
-        ".underline.hover\\:text-white[href$=\"sources\"]"
+        ".sm\\:inline-block"
       ]
     },
     {
@@ -414,10 +381,7 @@
       "impact": "serious",
       "bug": "zohelo#457",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500[href=\"/404\"][hreflang=\"pl\"]",
-        ".space-x-4 > span",
-        ".underline.hover\\:text-white[href$=\"sources\"]"
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500[href=\"/404\"][hreflang=\"pl\"]"
       ]
     },
     {
@@ -440,12 +404,9 @@
       "impact": "serious",
       "bug": "zohelo#436",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
         ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
         ".sm\\:inline-block",
-        ".space-x-4 > span",
-        ".text-brand-teal",
-        ".underline.hover\\:text-white[href$=\"sources\"]"
+        ".text-brand-teal"
       ]
     },
     {
@@ -478,11 +439,8 @@
       "impact": "serious",
       "bug": "zohelo#436",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
         ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
-        ".space-x-4 > span",
-        ".text-brand-teal",
-        ".underline.hover\\:text-white[href$=\"sources\"]"
+        ".text-brand-teal"
       ]
     },
     {
@@ -505,11 +463,8 @@
       "impact": "serious",
       "bug": "zohelo#437",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
         ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500[hreflang=\"pl\"][href$=\"design\"]",
-        ".sm\\:inline-block",
-        ".space-x-4 > span",
-        ".underline"
+        ".sm\\:inline-block"
       ]
     },
     {
@@ -542,10 +497,7 @@
       "impact": "serious",
       "bug": "zohelo#437",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500[hreflang=\"pl\"][href$=\"design\"]",
-        ".space-x-4 > span",
-        ".underline"
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500[hreflang=\"pl\"][href$=\"design\"]"
       ]
     },
     {
@@ -568,11 +520,8 @@
       "impact": "serious",
       "bug": "zohelo#440",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
         ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
-        ".sm\\:inline-block",
-        ".space-x-4 > span",
-        ".underline"
+        ".sm\\:inline-block"
       ]
     },
     {
@@ -605,10 +554,7 @@
       "impact": "serious",
       "bug": "zohelo#440",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
-        ".space-x-4 > span",
-        ".underline"
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]"
       ]
     },
     {
@@ -631,11 +577,8 @@
       "impact": "serious",
       "bug": "zohelo#439",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
         ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500[hreflang=\"pl\"][href$=\"inflation\"]",
         ".sm\\:inline-block",
-        ".space-x-4 > span",
-        ".underline.hover\\:text-white[href$=\"sources\"]",
         "summary"
       ]
     },
@@ -669,10 +612,7 @@
       "impact": "serious",
       "bug": "zohelo#439",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
         ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500[hreflang=\"pl\"][href$=\"inflation\"]",
-        ".space-x-4 > span",
-        ".underline.hover\\:text-white[href$=\"sources\"]",
         "summary"
       ]
     },
@@ -696,11 +636,8 @@
       "impact": "serious",
       "bug": "zohelo#442",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
         ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500[hreflang=\"pl\"][href$=\"portfolio\"]",
-        ".sm\\:inline-block",
-        ".space-x-4 > span",
-        ".underline"
+        ".sm\\:inline-block"
       ]
     },
     {
@@ -733,10 +670,7 @@
       "impact": "serious",
       "bug": "zohelo#442",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500[hreflang=\"pl\"][href$=\"portfolio\"]",
-        ".space-x-4 > span",
-        ".underline"
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500[hreflang=\"pl\"][href$=\"portfolio\"]"
       ]
     },
     {
@@ -759,12 +693,9 @@
       "impact": "serious",
       "bug": "zohelo#443",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
         ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
         ".sm\\:inline-block",
-        ".space-x-4 > span",
-        ".text-brand-teal",
-        ".underline.hover\\:text-white[href$=\"sources\"]"
+        ".text-brand-teal"
       ]
     },
     {
@@ -797,11 +728,8 @@
       "impact": "serious",
       "bug": "zohelo#443",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
         ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
-        ".space-x-4 > span",
-        ".text-brand-teal",
-        ".underline.hover\\:text-white[href$=\"sources\"]"
+        ".text-brand-teal"
       ]
     },
     {
@@ -824,12 +752,9 @@
       "impact": "serious",
       "bug": "zohelo#444",
       "targets": [
-        ".hover\\:text-white.underline[href$=\"sources\"]",
         ".inline-block",
-        ".pt-6 > div:nth-child(1)",
         ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500[href=\"/regions/14\"][hreflang=\"pl\"]",
         ".sm\\:inline-block",
-        ".space-x-4 > span",
         "a[href=\"/en/regions/04\"]",
         "a[href=\"/en/regions/06\"]",
         "a[href=\"/en/regions/10\"]",
@@ -868,11 +793,8 @@
       "impact": "serious",
       "bug": "zohelo#444",
       "targets": [
-        ".hover\\:text-white.underline[href$=\"sources\"]",
         ".inline-block",
-        ".pt-6 > div:nth-child(1)",
         ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500[href=\"/regions/14\"][hreflang=\"pl\"]",
-        ".space-x-4 > span",
         "a[href=\"/en/regions/04\"]",
         "a[href=\"/en/regions/06\"]",
         "a[href=\"/en/regions/10\"]",
@@ -901,11 +823,8 @@
       "impact": "serious",
       "bug": "zohelo#445",
       "targets": [
-        ".hover\\:text-white.underline[href$=\"sources\"]",
-        ".pt-6 > div:nth-child(1)",
         ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
         ".sm\\:inline-block",
-        ".space-x-4 > span",
         "td:nth-child(3) > .text-brand-teal.underline[href$=\"gus\"]",
         "td:nth-child(3) > .text-brand-teal.underline[href$=\"nbp\"]",
         "td:nth-child(5) > .text-brand-teal.underline[href$=\"fx_rate\"]",
@@ -950,8 +869,6 @@
       "impact": "serious",
       "bug": "zohelo#445",
       "targets": [
-        ".hover\\:text-white.underline[href$=\"sources\"]",
-        ".pt-6 > div:nth-child(1)",
         ".py-4:nth-child(1) > dl > dd:nth-child(4) > .text-brand-teal.underline",
         ".py-4:nth-child(1) > dl > dd:nth-child(8) > .text-brand-teal.underline:nth-child(1)",
         ".py-4:nth-child(1) > dl > dd:nth-child(8) > .text-brand-teal.underline:nth-child(3)",
@@ -961,7 +878,6 @@
         ".py-4:nth-child(4) > dl > dd:nth-child(8) > .text-brand-teal.underline:nth-child(3)",
         ".py-4:nth-child(4) > dl > dd:nth-child(8) > .text-brand-teal.underline[href$=\"inflation\"]",
         ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
-        ".space-x-4 > span",
         "dd:nth-child(4) > .text-brand-teal.underline[href$=\"gus\"]",
         "dd:nth-child(4) > .text-brand-teal.underline[href$=\"nbp\"]",
         "dd:nth-child(8) > .text-brand-teal.underline[href$=\"fx_rate\"]",
@@ -988,11 +904,8 @@
       "impact": "serious",
       "bug": "zohelo#440",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
-        ".sm\\:inline-block",
-        ".space-x-4 > span",
-        ".underline"
+        ".sm\\:flex > nav[aria-label=\"Język\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
+        ".sm\\:inline-block"
       ]
     },
     {
@@ -1025,10 +938,7 @@
       "impact": "serious",
       "bug": "zohelo#440",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
-        ".space-x-4 > span",
-        ".underline"
+        ".sm\\:hidden > nav[aria-label=\"Język\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]"
       ]
     },
     {
@@ -1051,11 +961,8 @@
       "impact": "serious",
       "bug": "zohelo#441",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[hreflang=\"en\"][href$=\"inflation\"]",
+        ".sm\\:flex > nav[aria-label=\"Język\"] > .text-slate-500[hreflang=\"en\"][href$=\"inflation\"]",
         ".sm\\:inline-block",
-        ".space-x-4 > span",
-        ".underline.hover\\:text-white[href$=\"sources\"]",
         "summary"
       ]
     },
@@ -1089,10 +996,7 @@
       "impact": "serious",
       "bug": "zohelo#441",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[hreflang=\"en\"][href$=\"inflation\"]",
-        ".space-x-4 > span",
-        ".underline.hover\\:text-white[href$=\"sources\"]",
+        ".sm\\:hidden > nav[aria-label=\"Język\"] > .text-slate-500[hreflang=\"en\"][href$=\"inflation\"]",
         "summary"
       ]
     },
@@ -1116,11 +1020,8 @@
       "impact": "serious",
       "bug": "zohelo#442",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[hreflang=\"en\"][href$=\"portfolio\"]",
-        ".sm\\:inline-block",
-        ".space-x-4 > span",
-        ".underline"
+        ".sm\\:flex > nav[aria-label=\"Język\"] > .text-slate-500[hreflang=\"en\"][href$=\"portfolio\"]",
+        ".sm\\:inline-block"
       ]
     },
     {
@@ -1153,10 +1054,7 @@
       "impact": "serious",
       "bug": "zohelo#442",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[hreflang=\"en\"][href$=\"portfolio\"]",
-        ".space-x-4 > span",
-        ".underline"
+        ".sm\\:hidden > nav[aria-label=\"Język\"] > .text-slate-500[hreflang=\"en\"][href$=\"portfolio\"]"
       ]
     },
     {
@@ -1179,12 +1077,9 @@
       "impact": "serious",
       "bug": "zohelo#443",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
+        ".sm\\:flex > nav[aria-label=\"Język\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
         ".sm\\:inline-block",
-        ".space-x-4 > span",
-        ".text-brand-teal",
-        ".underline.hover\\:text-white[href$=\"sources\"]"
+        ".text-brand-teal"
       ]
     },
     {
@@ -1217,11 +1112,8 @@
       "impact": "serious",
       "bug": "zohelo#443",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
-        ".space-x-4 > span",
-        ".text-brand-teal",
-        ".underline.hover\\:text-white[href$=\"sources\"]"
+        ".sm\\:hidden > nav[aria-label=\"Język\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
+        ".text-brand-teal"
       ]
     },
     {
@@ -1244,12 +1136,9 @@
       "impact": "serious",
       "bug": "zohelo#444",
       "targets": [
-        ".hover\\:text-white.underline[href$=\"sources\"]",
         ".inline-block",
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[href=\"/en/regions/14\"][hreflang=\"en\"]",
+        ".sm\\:flex > nav[aria-label=\"Język\"] > .text-slate-500[href=\"/en/regions/14\"][hreflang=\"en\"]",
         ".sm\\:inline-block",
-        ".space-x-4 > span",
         "a[href=\"/regions/04\"]",
         "a[href=\"/regions/06\"]",
         "a[href=\"/regions/10\"]",
@@ -1288,11 +1177,8 @@
       "impact": "serious",
       "bug": "zohelo#444",
       "targets": [
-        ".hover\\:text-white.underline[href$=\"sources\"]",
         ".inline-block",
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[href=\"/en/regions/14\"][hreflang=\"en\"]",
-        ".space-x-4 > span",
+        ".sm\\:hidden > nav[aria-label=\"Język\"] > .text-slate-500[href=\"/en/regions/14\"][hreflang=\"en\"]",
         "a[href=\"/regions/04\"]",
         "a[href=\"/regions/06\"]",
         "a[href=\"/regions/10\"]",
@@ -1321,11 +1207,8 @@
       "impact": "serious",
       "bug": "zohelo#445",
       "targets": [
-        ".hover\\:text-white.underline[href$=\"sources\"]",
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
+        ".sm\\:flex > nav[aria-label=\"Język\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
         ".sm\\:inline-block",
-        ".space-x-4 > span",
         "td:nth-child(3) > .text-brand-teal.underline[href$=\"gus\"]",
         "td:nth-child(3) > .text-brand-teal.underline[href$=\"nbp\"]",
         "td:nth-child(5) > .text-brand-teal.underline[href$=\"fx_rate\"]",
@@ -1370,8 +1253,6 @@
       "impact": "serious",
       "bug": "zohelo#445",
       "targets": [
-        ".hover\\:text-white.underline[href$=\"sources\"]",
-        ".pt-6 > div:nth-child(1)",
         ".py-4:nth-child(1) > dl > dd:nth-child(4) > .text-brand-teal.underline",
         ".py-4:nth-child(1) > dl > dd:nth-child(8) > .text-brand-teal.underline[href$=\"gdp_current_prices\"]",
         ".py-4:nth-child(1) > dl > dd:nth-child(8) > .text-brand-teal.underline[href$=\"inflation\"]",
@@ -1380,8 +1261,7 @@
         ".py-4:nth-child(2) > dl > dd:nth-child(8) > .text-brand-teal.underline[href$=\"gdp_current_prices\"]",
         ".py-4:nth-child(2) > dl > dd:nth-child(8) > .text-brand-teal.underline[href$=\"inflation\"]",
         ".py-4:nth-child(2) > dl > dd:nth-child(8) > .text-brand-teal.underline[href$=\"unemployment_rate\"]",
-        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
-        ".space-x-4 > span",
+        ".sm\\:hidden > nav[aria-label=\"Język\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
         "dd:nth-child(4) > .text-brand-teal.underline[href$=\"gus\"]",
         "dd:nth-child(4) > .text-brand-teal.underline[href$=\"nbp\"]",
         "dd:nth-child(8) > .text-brand-teal.underline[href$=\"fx_rate\"]",
@@ -1408,11 +1288,8 @@
       "impact": "serious",
       "bug": "zohelo#458",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[href=\"/en/404\"][hreflang=\"en\"]",
-        ".sm\\:inline-block",
-        ".space-x-4 > span",
-        ".underline.hover\\:text-white[href$=\"sources\"]"
+        ".sm\\:flex > nav[aria-label=\"Język\"] > .text-slate-500[href=\"/en/404\"][hreflang=\"en\"]",
+        ".sm\\:inline-block"
       ]
     },
     {
@@ -1445,10 +1322,7 @@
       "impact": "serious",
       "bug": "zohelo#458",
       "targets": [
-        ".pt-6 > div:nth-child(1)",
-        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[href=\"/en/404\"][hreflang=\"en\"]",
-        ".space-x-4 > span",
-        ".underline.hover\\:text-white[href$=\"sources\"]"
+        ".sm\\:hidden > nav[aria-label=\"Język\"] > .text-slate-500[href=\"/en/404\"][hreflang=\"en\"]"
       ]
     },
     {
