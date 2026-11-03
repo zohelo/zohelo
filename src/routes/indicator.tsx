@@ -4,6 +4,7 @@ import { useLoaderData } from 'react-router';
 import { SeriesChart } from '../components/SeriesChart.client';
 import { SubscribeCalendar } from '../components/SubscribeCalendar';
 import { localeOf, useLocale } from '../i18n';
+import { bandOf, datasetOf, definitionOf } from '../indicators/definition';
 import { indicatorDescription, indicatorTakeaway } from '../indicators/description';
 import { readHeadlineSeries } from '../indicators/readHeadline';
 import { SeriesTable } from '../indicators/SeriesTable';
@@ -42,7 +43,20 @@ export async function loader({ request, params }: { request: Request; params: { 
     const unit = unitLabel(catalog.units, kpi.unit_key, locale);
     const tile: LatestTile = { label: name, value: null, unit, delta: null, period: '', sourceKey: null, checkedAt: null, provisional: false };
     const description = indicatorDescription(name, tile, sources.sources.map((s) => s.name), locale);
-    return { tile, sources, ranking: null, geo: null, jsonLd, breadcrumb, name, lastPeriod: kpi.last_period, description, series: null };
+    return {
+      tile,
+      sources,
+      ranking: null,
+      geo: null,
+      jsonLd,
+      breadcrumb,
+      name,
+      lastPeriod: kpi.last_period,
+      description,
+      series: null,
+      definition: definitionOf(kpi.kpi_key, locale),
+      band: null,
+    };
   }
 
   const latest = readKpiLatest(dir, kpi.kpi_key);
@@ -50,9 +64,20 @@ export async function loader({ request, params }: { request: Request; params: { 
   const tile = latestTile(kpi, latest, catalog.units, locale);
   // The headline series for the line chart below the tile (#389); null without series.parquet.
   const series = await readHeadlineSeries(dir, kpi.kpi_key, tile.sourceKey, catalog.units, locale);
+  // With a chart, the source line names only the source of the drawn series, with its dataset code
+  // ('Eurostat (prc_hicp_manr)'), not every source of the KPI (zohelo#412).
+  const drawn = series
+    ? kpiSources(catalog, kpi.kpi_key, locale)
+        .filter((s) => s.source_key === series.sourceKey)
+        .map((s) => ({ ...s, code: datasetOf(kpi.kpi_key, s.source_key) }))
+    : [];
+  const chartSources =
+    drawn.length > 0
+      ? { ...footerProps(drawn), sources: drawn.map((s) => (s.code ? { name: s.name, code: s.code } : { name: s.name })) }
+      : sources;
   return {
     tile,
-    sources,
+    sources: chartSources,
     series,
     ranking,
     geo: ranking ? readGeo(dir, 'voivodeship') : null,
@@ -61,6 +86,8 @@ export async function loader({ request, params }: { request: Request; params: { 
     name,
     lastPeriod: kpi.last_period,
     description: indicatorDescription(name, tile, sources.sources.map((s) => s.name), locale),
+    definition: definitionOf(kpi.kpi_key, locale),
+    band: series ? bandOf(kpi.kpi_key, series.sourceKey, locale) : null,
   };
 }
 
@@ -79,7 +106,7 @@ export function meta({
 }
 
 export default function Indicator() {
-  const { tile, sources, series, ranking, geo, jsonLd, breadcrumb, name, lastPeriod } = useLoaderData<typeof loader>();
+  const { tile, sources, series, ranking, geo, jsonLd, breadcrumb, name, lastPeriod, definition, band } = useLoaderData<typeof loader>();
   const locale = useLocale();
   // The chart is client-only (D25): rendered after hydration; the table is in the pre-rendered page.
   const [mounted, setMounted] = useState(false);
@@ -90,6 +117,7 @@ export default function Indicator() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <h1 className="font-display text-[length:var(--z-size-display)] font-semibold">{name}</h1>
+      {definition ? <p className="mt-3 max-w-prose font-ui text-text-muted">{definition}</p> : null}
       <div className="mt-6 max-w-sm">
         <KpiTile label={tile.label} value={tile.value} unit={tile.unit} delta={tile.delta ?? undefined} period={tile.period} locale={locale} compact={false} />
       </div>
@@ -97,7 +125,7 @@ export default function Indicator() {
         <section aria-labelledby="series-chart" className="mt-10">
           <h2 id="series-chart" className="font-ui text-[length:var(--z-size-lg)] font-semibold">{takeaway}</h2>
           <div className="mt-4">
-            {mounted ? <SeriesChart points={series.points} unit={series.unit} frequency={series.frequency} label={takeaway} locale={locale} /> : null}
+            {mounted ? <SeriesChart points={series.points} unit={series.unit} frequency={series.frequency} label={takeaway} locale={locale} band={band} /> : null}
             <SeriesTable points={series.points} unit={series.unit} caption={takeaway} locale={locale} />
           </div>
         </section>

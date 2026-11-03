@@ -6,7 +6,13 @@ import { readKpiSeries, type Unit } from '../published';
 import { headlineSeries, type SeriesPoint } from './series';
 import { unitLabel } from './unitLabel';
 
-export type ChartSeries = { points: SeriesPoint[]; unit: string; frequency: string };
+export type ChartSeries = {
+  points: SeriesPoint[];
+  unit: string;
+  frequency: string;
+  /** The source of the drawn series: the source line under the chart names only it (zohelo#412). */
+  sourceKey: string;
+};
 
 export async function readHeadlineSeries(
   dir: string,
@@ -24,5 +30,5 @@ export async function readHeadlineSeries(
   }
   const series = headlineSeries(rows, sourceKey);
   if (!series || series.points.length < 2) return null;
-  return { points: series.points, unit: unitLabel(units, series.unit_key, locale), frequency: series.frequency };
+  return { points: series.points, unit: unitLabel(units, series.unit_key, locale), frequency: series.frequency, sourceKey: series.source_key };
 }
