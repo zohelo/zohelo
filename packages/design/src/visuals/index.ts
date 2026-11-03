@@ -2,6 +2,7 @@ export { Chart, type ChartProps } from "./Chart";
 export {
   barSpec,
   choroplethSpec,
+  fixedFormat,
   lineSpec,
   rankingSpec,
   smallMultiplesSpec,
