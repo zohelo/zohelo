@@ -2,201 +2,1467 @@
   "known": [
     {
       "page": "/",
+      "width": 1440,
       "rule": "color-contrast",
       "impact": "serious",
-      "bug": "zohelo#435"
+      "bug": "zohelo#435",
+      "targets": [
+        ".hover\\:text-white.underline[href$=\"sources\"]",
+        ".inline-block",
+        ".mb-4 > .text-slate-400.mt-0\\.5",
+        ".mb-4.justify-between.items-center > .text-\\[\\#3B8B94\\].font-semibold.text-xs",
+        ".mb-4.justify-between.items-center > div > .text-slate-400.mt-0\\.5",
+        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .hover\\:text-\\[\\#3B8B94\\][href=\"/en\"][hreflang=\"en\"]",
+        ".sm\\:flex-row > div:nth-child(1)",
+        ".sm\\:inline-block",
+        ".space-x-4.items-center.flex > span",
+        ".text-brand-teal.underline[href$=\"changes\"]",
+        ".text-brand-teal.underline[href$=\"regions\"]",
+        ".text-center.cursor-pointer.flex-col:nth-child(4) > .sm\\:text-sm.font-extrabold.mt-3",
+        ".tracking-wide > span",
+        "a[href=\"/regions/12\"]",
+        "summary"
+      ]
     },
     {
       "page": "/",
+      "width": 1440,
       "rule": "label-content-name-mismatch",
       "impact": "serious",
-      "bug": "zohelo#435"
+      "bug": "zohelo#435",
+      "targets": [
+        "a[aria-label=\"Zohelo.com\"]"
+      ]
     },
     {
       "page": "/",
+      "width": 1440,
       "rule": "target-size",
       "impact": "serious",
-      "bug": "zohelo#435"
+      "bug": "zohelo#435",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#435",
+      "targets": [
+        ".hover\\:text-white.underline[href$=\"sources\"]",
+        ".inline-block",
+        ".mb-4 > .text-slate-400.mt-0\\.5",
+        ".mb-4.justify-between.items-center > .text-\\[\\#3B8B94\\].font-semibold.text-xs",
+        ".mb-4.justify-between.items-center > div > .text-slate-400.mt-0\\.5",
+        ".sm\\:flex-row > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .hover\\:text-\\[\\#3B8B94\\][href=\"/en\"][hreflang=\"en\"]",
+        ".space-x-4.items-center.flex > span",
+        ".text-brand-teal.underline[href$=\"changes\"]",
+        ".text-brand-teal.underline[href$=\"regions\"]",
+        ".text-center.cursor-pointer.flex-col:nth-child(4) > .sm\\:text-sm.font-extrabold.mt-3",
+        ".text-lg",
+        ".tracking-wide > span",
+        "a[href=\"/regions/12\"]",
+        "summary"
+      ]
+    },
+    {
+      "page": "/",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#435",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/ (menu open)",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#435",
+      "targets": [
+        ".hover\\:text-white.underline[href$=\"sources\"]",
+        ".inline-block",
+        ".mb-4 > .text-slate-400.mt-0\\.5",
+        ".mb-4.justify-between.items-center > .text-\\[\\#3B8B94\\].font-semibold.text-xs",
+        ".mb-4.justify-between.items-center > div > .text-slate-400.mt-0\\.5",
+        ".sm\\:flex-row > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .hover\\:text-\\[\\#3B8B94\\][href=\"/en\"][hreflang=\"en\"]",
+        ".space-x-4.items-center.flex > span",
+        ".text-brand-teal.underline[href$=\"changes\"]",
+        ".text-brand-teal.underline[href$=\"regions\"]",
+        ".text-center.cursor-pointer.flex-col:nth-child(4) > .sm\\:text-sm.font-extrabold.mt-3",
+        ".text-lg",
+        ".tracking-wide > span",
+        "a[href=\"/regions/12\"]",
+        "summary"
+      ]
+    },
+    {
+      "page": "/ (menu open)",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#435",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
     },
     {
       "page": "/changes",
+      "width": 1440,
       "rule": "color-contrast",
       "impact": "serious",
-      "bug": "zohelo#436"
+      "bug": "zohelo#436",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        ".text-brand-teal",
+        ".underline.hover\\:text-white[href$=\"sources\"]"
+      ]
     },
     {
       "page": "/changes",
+      "width": 1440,
       "rule": "label-content-name-mismatch",
       "impact": "serious",
-      "bug": "zohelo#436"
+      "bug": "zohelo#436",
+      "targets": [
+        ".text-left"
+      ]
     },
     {
       "page": "/changes",
+      "width": 1440,
       "rule": "target-size",
       "impact": "serious",
-      "bug": "zohelo#436"
+      "bug": "zohelo#436",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/changes",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#436",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
+        ".space-x-4 > span",
+        ".text-brand-teal",
+        ".underline.hover\\:text-white[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/changes",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#436",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
     },
     {
       "page": "/design",
+      "width": 1440,
       "rule": "color-contrast",
       "impact": "serious",
-      "bug": "zohelo#437"
+      "bug": "zohelo#437",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[hreflang=\"en\"][href$=\"design\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        ".underline"
+      ]
     },
     {
       "page": "/design",
+      "width": 1440,
       "rule": "label-content-name-mismatch",
       "impact": "serious",
-      "bug": "zohelo#437"
+      "bug": "zohelo#437",
+      "targets": [
+        "a[href=\"/\"]"
+      ]
     },
     {
       "page": "/design",
+      "width": 1440,
       "rule": "target-size",
       "impact": "serious",
-      "bug": "zohelo#437"
+      "bug": "zohelo#437",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/design",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#437",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[hreflang=\"en\"][href$=\"design\"]",
+        ".space-x-4 > span",
+        ".underline"
+      ]
+    },
+    {
+      "page": "/design",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#437",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
     },
     {
       "page": "/en",
+      "width": 1440,
       "rule": "color-contrast",
       "impact": "serious",
-      "bug": "zohelo#438"
+      "bug": "zohelo#438",
+      "targets": [
+        ".hover\\:text-white.underline[href$=\"sources\"]",
+        ".inline-block",
+        ".mb-4 > .text-slate-400.mt-0\\.5",
+        ".mb-4.justify-between.items-center > .text-\\[\\#3B8B94\\].font-semibold.text-xs",
+        ".mb-4.justify-between.items-center > div > .text-slate-400.mt-0\\.5",
+        ".sm\\:flex > nav[aria-label=\"Language\"] > .hover\\:text-\\[\\#3B8B94\\][href=\"/\"][hreflang=\"pl\"]",
+        ".sm\\:flex-row > div:nth-child(1)",
+        ".sm\\:inline-block",
+        ".space-x-4.items-center.flex > span",
+        ".text-brand-teal.underline[href$=\"changes\"]",
+        ".text-brand-teal.underline[href$=\"regions\"]",
+        ".text-center.cursor-pointer.flex-col:nth-child(4) > .sm\\:text-sm.font-extrabold.mt-3",
+        ".tracking-wide > span",
+        "a[href=\"/en/regions/12\"]",
+        "summary"
+      ]
     },
     {
       "page": "/en",
+      "width": 1440,
       "rule": "label-content-name-mismatch",
       "impact": "serious",
-      "bug": "zohelo#438"
+      "bug": "zohelo#438",
+      "targets": [
+        "a[aria-label=\"Zohelo.com\"]"
+      ]
     },
     {
       "page": "/en",
+      "width": 1440,
       "rule": "target-size",
       "impact": "serious",
-      "bug": "zohelo#438"
+      "bug": "zohelo#438",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#438",
+      "targets": [
+        ".hover\\:text-white.underline[href$=\"sources\"]",
+        ".inline-block",
+        ".mb-4 > .text-slate-400.mt-0\\.5",
+        ".mb-4.justify-between.items-center > .text-\\[\\#3B8B94\\].font-semibold.text-xs",
+        ".mb-4.justify-between.items-center > div > .text-slate-400.mt-0\\.5",
+        ".sm\\:flex-row > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .hover\\:text-\\[\\#3B8B94\\][href=\"/\"][hreflang=\"pl\"]",
+        ".space-x-4.items-center.flex > span",
+        ".text-brand-teal.underline[href$=\"changes\"]",
+        ".text-brand-teal.underline[href$=\"regions\"]",
+        ".text-center.cursor-pointer.flex-col:nth-child(4) > .sm\\:text-sm.font-extrabold.mt-3",
+        ".text-lg",
+        ".tracking-wide > span",
+        "a[href=\"/en/regions/12\"]",
+        "summary"
+      ]
+    },
+    {
+      "page": "/en",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#438",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en (menu open)",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#438",
+      "targets": [
+        ".hover\\:text-white.underline[href$=\"sources\"]",
+        ".inline-block",
+        ".mb-4 > .text-slate-400.mt-0\\.5",
+        ".mb-4.justify-between.items-center > .text-\\[\\#3B8B94\\].font-semibold.text-xs",
+        ".mb-4.justify-between.items-center > div > .text-slate-400.mt-0\\.5",
+        ".sm\\:flex-row > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .hover\\:text-\\[\\#3B8B94\\][href=\"/\"][hreflang=\"pl\"]",
+        ".space-x-4.items-center.flex > span",
+        ".text-brand-teal.underline[href$=\"changes\"]",
+        ".text-brand-teal.underline[href$=\"regions\"]",
+        ".text-center.cursor-pointer.flex-col:nth-child(4) > .sm\\:text-sm.font-extrabold.mt-3",
+        ".text-lg",
+        ".tracking-wide > span",
+        "a[href=\"/en/regions/12\"]",
+        "summary"
+      ]
+    },
+    {
+      "page": "/en (menu open)",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#438",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en 404",
+      "width": 1440,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#457",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500[href=\"/404\"][hreflang=\"pl\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        ".underline.hover\\:text-white[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en 404",
+      "width": 1440,
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#457",
+      "targets": [
+        ".text-left"
+      ]
+    },
+    {
+      "page": "/en 404",
+      "width": 1440,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#457",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en 404",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#457",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500[href=\"/404\"][hreflang=\"pl\"]",
+        ".space-x-4 > span",
+        ".underline.hover\\:text-white[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en 404",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#457",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/changes",
+      "width": 1440,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#436",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        ".text-brand-teal",
+        ".underline.hover\\:text-white[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/changes",
+      "width": 1440,
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#436",
+      "targets": [
+        ".text-left"
+      ]
+    },
+    {
+      "page": "/en/changes",
+      "width": 1440,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#436",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/changes",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#436",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
+        ".space-x-4 > span",
+        ".text-brand-teal",
+        ".underline.hover\\:text-white[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/changes",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#436",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/design",
+      "width": 1440,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#437",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500[hreflang=\"pl\"][href$=\"design\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        ".underline"
+      ]
+    },
+    {
+      "page": "/en/design",
+      "width": 1440,
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#437",
+      "targets": [
+        "a[href=\"/en\"]"
+      ]
+    },
+    {
+      "page": "/en/design",
+      "width": 1440,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#437",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/design",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#437",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500[hreflang=\"pl\"][href$=\"design\"]",
+        ".space-x-4 > span",
+        ".underline"
+      ]
+    },
+    {
+      "page": "/en/design",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#437",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/indicators",
+      "width": 1440,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#440",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        ".underline"
+      ]
+    },
+    {
+      "page": "/en/indicators",
+      "width": 1440,
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#440",
+      "targets": [
+        ".text-left"
+      ]
+    },
+    {
+      "page": "/en/indicators",
+      "width": 1440,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#440",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/indicators",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#440",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
+        ".space-x-4 > span",
+        ".underline"
+      ]
+    },
+    {
+      "page": "/en/indicators",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#440",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
     },
     {
       "page": "/en/indicators/inflation",
+      "width": 1440,
       "rule": "color-contrast",
       "impact": "serious",
-      "bug": "zohelo#439"
+      "bug": "zohelo#439",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500[hreflang=\"pl\"][href$=\"inflation\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        ".underline.hover\\:text-white[href$=\"sources\"]",
+        "summary"
+      ]
     },
     {
       "page": "/en/indicators/inflation",
+      "width": 1440,
       "rule": "label-content-name-mismatch",
       "impact": "serious",
-      "bug": "zohelo#439"
+      "bug": "zohelo#439",
+      "targets": [
+        "a[href=\"/en\"]"
+      ]
     },
     {
       "page": "/en/indicators/inflation",
+      "width": 1440,
       "rule": "target-size",
       "impact": "serious",
-      "bug": "zohelo#439"
+      "bug": "zohelo#439",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/indicators/inflation",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#439",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500[hreflang=\"pl\"][href$=\"inflation\"]",
+        ".space-x-4 > span",
+        ".underline.hover\\:text-white[href$=\"sources\"]",
+        "summary"
+      ]
+    },
+    {
+      "page": "/en/indicators/inflation",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#439",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/portfolio",
+      "width": 1440,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#442",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500[hreflang=\"pl\"][href$=\"portfolio\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        ".underline"
+      ]
+    },
+    {
+      "page": "/en/portfolio",
+      "width": 1440,
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#442",
+      "targets": [
+        ".text-left"
+      ]
+    },
+    {
+      "page": "/en/portfolio",
+      "width": 1440,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#442",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/portfolio",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#442",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500[hreflang=\"pl\"][href$=\"portfolio\"]",
+        ".space-x-4 > span",
+        ".underline"
+      ]
+    },
+    {
+      "page": "/en/portfolio",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#442",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/regions",
+      "width": 1440,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#443",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        ".text-brand-teal",
+        ".underline.hover\\:text-white[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/regions",
+      "width": 1440,
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#443",
+      "targets": [
+        "a[href=\"/en\"]"
+      ]
+    },
+    {
+      "page": "/en/regions",
+      "width": 1440,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#443",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/regions",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#443",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
+        ".space-x-4 > span",
+        ".text-brand-teal",
+        ".underline.hover\\:text-white[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/regions",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#443",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/regions/14",
+      "width": 1440,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#444",
+      "targets": [
+        ".hover\\:text-white.underline[href$=\"sources\"]",
+        ".inline-block",
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500[href=\"/regions/14\"][hreflang=\"pl\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        "a[href=\"/en/regions/04\"]",
+        "a[href=\"/en/regions/06\"]",
+        "a[href=\"/en/regions/10\"]",
+        "a[href=\"/en/regions/20\"]",
+        "a[href=\"/en/regions/26\"]",
+        "a[href=\"/en/regions/28\"]"
+      ]
+    },
+    {
+      "page": "/en/regions/14",
+      "width": 1440,
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#444",
+      "targets": [
+        ".text-left"
+      ]
+    },
+    {
+      "page": "/en/regions/14",
+      "width": 1440,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#444",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/regions/14",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#444",
+      "targets": [
+        ".hover\\:text-white.underline[href$=\"sources\"]",
+        ".inline-block",
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500[href=\"/regions/14\"][hreflang=\"pl\"]",
+        ".space-x-4 > span",
+        "a[href=\"/en/regions/04\"]",
+        "a[href=\"/en/regions/06\"]",
+        "a[href=\"/en/regions/10\"]",
+        "a[href=\"/en/regions/20\"]",
+        "a[href=\"/en/regions/26\"]",
+        "a[href=\"/en/regions/28\"]"
+      ]
+    },
+    {
+      "page": "/en/regions/14",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#444",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/sources",
+      "width": 1440,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#445",
+      "targets": [
+        ".hover\\:text-white.underline[href$=\"sources\"]",
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        "td:nth-child(3) > .text-brand-teal.underline[href$=\"gus\"]",
+        "td:nth-child(3) > .text-brand-teal.underline[href$=\"nbp\"]",
+        "td:nth-child(5) > .text-brand-teal.underline[href$=\"fx_rate\"]",
+        "td:nth-child(5) > .text-brand-teal.underline[href$=\"population\"]",
+        "tr:nth-child(1) > td:nth-child(3) > .text-brand-teal.underline",
+        "tr:nth-child(1) > td:nth-child(5) > .text-brand-teal.underline:nth-child(1)",
+        "tr:nth-child(1) > td:nth-child(5) > .text-brand-teal.underline:nth-child(3)",
+        "tr:nth-child(1) > td:nth-child(5) > .text-brand-teal.underline[href$=\"inflation\"]",
+        "tr:nth-child(4) > td:nth-child(3) > .text-brand-teal.underline",
+        "tr:nth-child(4) > td:nth-child(5) > .text-brand-teal.underline:nth-child(1)",
+        "tr:nth-child(4) > td:nth-child(5) > .text-brand-teal.underline:nth-child(3)",
+        "tr:nth-child(4) > td:nth-child(5) > .text-brand-teal.underline[href$=\"inflation\"]"
+      ]
+    },
+    {
+      "page": "/en/sources",
+      "width": 1440,
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#445",
+      "targets": [
+        "a[href=\"/en\"]"
+      ]
+    },
+    {
+      "page": "/en/sources",
+      "width": 1440,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#445",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/en/sources",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#445",
+      "targets": [
+        ".hover\\:text-white.underline[href$=\"sources\"]",
+        ".pt-6 > div:nth-child(1)",
+        ".py-4:nth-child(1) > dl > dd:nth-child(4) > .text-brand-teal.underline",
+        ".py-4:nth-child(1) > dl > dd:nth-child(8) > .text-brand-teal.underline:nth-child(1)",
+        ".py-4:nth-child(1) > dl > dd:nth-child(8) > .text-brand-teal.underline:nth-child(3)",
+        ".py-4:nth-child(1) > dl > dd:nth-child(8) > .text-brand-teal.underline[href$=\"inflation\"]",
+        ".py-4:nth-child(4) > dl > dd:nth-child(4) > .text-brand-teal.underline",
+        ".py-4:nth-child(4) > dl > dd:nth-child(8) > .text-brand-teal.underline:nth-child(1)",
+        ".py-4:nth-child(4) > dl > dd:nth-child(8) > .text-brand-teal.underline:nth-child(3)",
+        ".py-4:nth-child(4) > dl > dd:nth-child(8) > .text-brand-teal.underline[href$=\"inflation\"]",
+        ".sm\\:hidden > nav[aria-label=\"Language\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"pl\"]",
+        ".space-x-4 > span",
+        "dd:nth-child(4) > .text-brand-teal.underline[href$=\"gus\"]",
+        "dd:nth-child(4) > .text-brand-teal.underline[href$=\"nbp\"]",
+        "dd:nth-child(8) > .text-brand-teal.underline[href$=\"fx_rate\"]",
+        "dd:nth-child(8) > .text-brand-teal.underline[href$=\"population\"]"
+      ]
+    },
+    {
+      "page": "/en/sources",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#445",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
     },
     {
       "page": "/indicators",
+      "width": 1440,
       "rule": "color-contrast",
       "impact": "serious",
-      "bug": "zohelo#440"
+      "bug": "zohelo#440",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        ".underline"
+      ]
     },
     {
       "page": "/indicators",
+      "width": 1440,
       "rule": "label-content-name-mismatch",
       "impact": "serious",
-      "bug": "zohelo#440"
+      "bug": "zohelo#440",
+      "targets": [
+        ".text-left"
+      ]
     },
     {
       "page": "/indicators",
+      "width": 1440,
       "rule": "target-size",
       "impact": "serious",
-      "bug": "zohelo#440"
+      "bug": "zohelo#440",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/indicators",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#440",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
+        ".space-x-4 > span",
+        ".underline"
+      ]
+    },
+    {
+      "page": "/indicators",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#440",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
     },
     {
       "page": "/indicators/inflation",
+      "width": 1440,
       "rule": "color-contrast",
       "impact": "serious",
-      "bug": "zohelo#441"
+      "bug": "zohelo#441",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[hreflang=\"en\"][href$=\"inflation\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        ".underline.hover\\:text-white[href$=\"sources\"]",
+        "summary"
+      ]
     },
     {
       "page": "/indicators/inflation",
+      "width": 1440,
       "rule": "label-content-name-mismatch",
       "impact": "serious",
-      "bug": "zohelo#441"
+      "bug": "zohelo#441",
+      "targets": [
+        "a[href=\"/\"]"
+      ]
     },
     {
       "page": "/indicators/inflation",
+      "width": 1440,
       "rule": "target-size",
       "impact": "serious",
-      "bug": "zohelo#441"
+      "bug": "zohelo#441",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/indicators/inflation",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#441",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[hreflang=\"en\"][href$=\"inflation\"]",
+        ".space-x-4 > span",
+        ".underline.hover\\:text-white[href$=\"sources\"]",
+        "summary"
+      ]
+    },
+    {
+      "page": "/indicators/inflation",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#441",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
     },
     {
       "page": "/portfolio",
+      "width": 1440,
       "rule": "color-contrast",
       "impact": "serious",
-      "bug": "zohelo#442"
+      "bug": "zohelo#442",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[hreflang=\"en\"][href$=\"portfolio\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        ".underline"
+      ]
     },
     {
       "page": "/portfolio",
+      "width": 1440,
       "rule": "label-content-name-mismatch",
       "impact": "serious",
-      "bug": "zohelo#442"
+      "bug": "zohelo#442",
+      "targets": [
+        ".text-left"
+      ]
     },
     {
       "page": "/portfolio",
+      "width": 1440,
       "rule": "target-size",
       "impact": "serious",
-      "bug": "zohelo#442"
+      "bug": "zohelo#442",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/portfolio",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#442",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[hreflang=\"en\"][href$=\"portfolio\"]",
+        ".space-x-4 > span",
+        ".underline"
+      ]
+    },
+    {
+      "page": "/portfolio",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#442",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
     },
     {
       "page": "/regions",
+      "width": 1440,
       "rule": "color-contrast",
       "impact": "serious",
-      "bug": "zohelo#443"
+      "bug": "zohelo#443",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        ".text-brand-teal",
+        ".underline.hover\\:text-white[href$=\"sources\"]"
+      ]
     },
     {
       "page": "/regions",
+      "width": 1440,
       "rule": "label-content-name-mismatch",
       "impact": "serious",
-      "bug": "zohelo#443"
+      "bug": "zohelo#443",
+      "targets": [
+        "a[href=\"/\"]"
+      ]
     },
     {
       "page": "/regions",
+      "width": 1440,
       "rule": "target-size",
       "impact": "serious",
-      "bug": "zohelo#443"
+      "bug": "zohelo#443",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
     },
     {
-      "page": "/regions/14",
+      "page": "/regions",
+      "width": 390,
       "rule": "color-contrast",
       "impact": "serious",
-      "bug": "zohelo#444"
+      "bug": "zohelo#443",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
+        ".space-x-4 > span",
+        ".text-brand-teal",
+        ".underline.hover\\:text-white[href$=\"sources\"]"
+      ]
     },
     {
-      "page": "/regions/14",
-      "rule": "label-content-name-mismatch",
-      "impact": "serious",
-      "bug": "zohelo#444"
-    },
-    {
-      "page": "/regions/14",
+      "page": "/regions",
+      "width": 390,
       "rule": "target-size",
       "impact": "serious",
-      "bug": "zohelo#444"
+      "bug": "zohelo#443",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
     },
     {
-      "page": "/sources",
+      "page": "/regions/14",
+      "width": 1440,
       "rule": "color-contrast",
       "impact": "serious",
-      "bug": "zohelo#445"
+      "bug": "zohelo#444",
+      "targets": [
+        ".hover\\:text-white.underline[href$=\"sources\"]",
+        ".inline-block",
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[href=\"/en/regions/14\"][hreflang=\"en\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        "a[href=\"/regions/04\"]",
+        "a[href=\"/regions/06\"]",
+        "a[href=\"/regions/10\"]",
+        "a[href=\"/regions/20\"]",
+        "a[href=\"/regions/26\"]",
+        "a[href=\"/regions/28\"]"
+      ]
     },
     {
-      "page": "/sources",
+      "page": "/regions/14",
+      "width": 1440,
       "rule": "label-content-name-mismatch",
       "impact": "serious",
-      "bug": "zohelo#445"
+      "bug": "zohelo#444",
+      "targets": [
+        ".text-left"
+      ]
+    },
+    {
+      "page": "/regions/14",
+      "width": 1440,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#444",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/regions/14",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#444",
+      "targets": [
+        ".hover\\:text-white.underline[href$=\"sources\"]",
+        ".inline-block",
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[href=\"/en/regions/14\"][hreflang=\"en\"]",
+        ".space-x-4 > span",
+        "a[href=\"/regions/04\"]",
+        "a[href=\"/regions/06\"]",
+        "a[href=\"/regions/10\"]",
+        "a[href=\"/regions/20\"]",
+        "a[href=\"/regions/26\"]",
+        "a[href=\"/regions/28\"]"
+      ]
+    },
+    {
+      "page": "/regions/14",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#444",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
     },
     {
       "page": "/sources",
+      "width": 1440,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#445",
+      "targets": [
+        ".hover\\:text-white.underline[href$=\"sources\"]",
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        "td:nth-child(3) > .text-brand-teal.underline[href$=\"gus\"]",
+        "td:nth-child(3) > .text-brand-teal.underline[href$=\"nbp\"]",
+        "td:nth-child(5) > .text-brand-teal.underline[href$=\"fx_rate\"]",
+        "td:nth-child(5) > .text-brand-teal.underline[href$=\"population\"]",
+        "tr:nth-child(1) > td:nth-child(3) > .text-brand-teal.underline",
+        "tr:nth-child(1) > td:nth-child(5) > .text-brand-teal.underline[href$=\"gdp_current_prices\"]",
+        "tr:nth-child(1) > td:nth-child(5) > .text-brand-teal.underline[href$=\"inflation\"]",
+        "tr:nth-child(1) > td:nth-child(5) > .text-brand-teal.underline[href$=\"unemployment_rate\"]",
+        "tr:nth-child(2) > td:nth-child(3) > .text-brand-teal.underline",
+        "tr:nth-child(2) > td:nth-child(5) > .text-brand-teal.underline[href$=\"gdp_current_prices\"]",
+        "tr:nth-child(2) > td:nth-child(5) > .text-brand-teal.underline[href$=\"inflation\"]",
+        "tr:nth-child(2) > td:nth-child(5) > .text-brand-teal.underline[href$=\"unemployment_rate\"]"
+      ]
+    },
+    {
+      "page": "/sources",
+      "width": 1440,
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#445",
+      "targets": [
+        "a[href=\"/\"]"
+      ]
+    },
+    {
+      "page": "/sources",
+      "width": 1440,
       "rule": "target-size",
       "impact": "serious",
-      "bug": "zohelo#445"
+      "bug": "zohelo#445",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "/sources",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#445",
+      "targets": [
+        ".hover\\:text-white.underline[href$=\"sources\"]",
+        ".pt-6 > div:nth-child(1)",
+        ".py-4:nth-child(1) > dl > dd:nth-child(4) > .text-brand-teal.underline",
+        ".py-4:nth-child(1) > dl > dd:nth-child(8) > .text-brand-teal.underline[href$=\"gdp_current_prices\"]",
+        ".py-4:nth-child(1) > dl > dd:nth-child(8) > .text-brand-teal.underline[href$=\"inflation\"]",
+        ".py-4:nth-child(1) > dl > dd:nth-child(8) > .text-brand-teal.underline[href$=\"unemployment_rate\"]",
+        ".py-4:nth-child(2) > dl > dd:nth-child(4) > .text-brand-teal.underline",
+        ".py-4:nth-child(2) > dl > dd:nth-child(8) > .text-brand-teal.underline[href$=\"gdp_current_prices\"]",
+        ".py-4:nth-child(2) > dl > dd:nth-child(8) > .text-brand-teal.underline[href$=\"inflation\"]",
+        ".py-4:nth-child(2) > dl > dd:nth-child(8) > .text-brand-teal.underline[href$=\"unemployment_rate\"]",
+        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500.hover\\:text-\\[\\#3B8B94\\][hreflang=\"en\"]",
+        ".space-x-4 > span",
+        "dd:nth-child(4) > .text-brand-teal.underline[href$=\"gus\"]",
+        "dd:nth-child(4) > .text-brand-teal.underline[href$=\"nbp\"]",
+        "dd:nth-child(8) > .text-brand-teal.underline[href$=\"fx_rate\"]",
+        "dd:nth-child(8) > .text-brand-teal.underline[href$=\"population\"]"
+      ]
+    },
+    {
+      "page": "/sources",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#445",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "404",
+      "width": 1440,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#458",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:flex > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[href=\"/en/404\"][hreflang=\"en\"]",
+        ".sm\\:inline-block",
+        ".space-x-4 > span",
+        ".underline.hover\\:text-white[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "404",
+      "width": 1440,
+      "rule": "label-content-name-mismatch",
+      "impact": "serious",
+      "bug": "zohelo#458",
+      "targets": [
+        ".text-left"
+      ]
+    },
+    {
+      "page": "404",
+      "width": 1440,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#458",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "404",
+      "width": 390,
+      "rule": "color-contrast",
+      "impact": "serious",
+      "bug": "zohelo#458",
+      "targets": [
+        ".pt-6 > div:nth-child(1)",
+        ".sm\\:hidden > nav[aria-label=\"J\u0119zyk\"] > .text-slate-500[href=\"/en/404\"][hreflang=\"en\"]",
+        ".space-x-4 > span",
+        ".underline.hover\\:text-white[href$=\"sources\"]"
+      ]
+    },
+    {
+      "page": "404",
+      "width": 390,
+      "rule": "target-size",
+      "impact": "serious",
+      "bug": "zohelo#458",
+      "targets": [
+        ".hover\\:text-white.transition-colors[href$=\"changes\"]",
+        ".hover\\:text-white.transition-colors[href$=\"indicators\"]",
+        ".hover\\:text-white.transition-colors[href$=\"regions\"]",
+        ".hover\\:text-white.transition-colors[href$=\"sources\"]"
+      ]
     }
   ]
 }
