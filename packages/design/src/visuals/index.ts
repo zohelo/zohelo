@@ -5,12 +5,14 @@ export {
   lineSpec,
   rankingSpec,
   smallMultiplesSpec,
+  withBand,
   config,
   type BarOptions,
   type ChoroplethOptions,
   type LineOptions,
   type RankingOptions,
   type SmallMultiplesOptions,
+  type Band,
   type Theme,
 } from "./specs";
 export { themeFromMode } from "./theme";
