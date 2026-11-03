@@ -63,9 +63,9 @@ jobs:
         # Playwright's Chromium at the version in bun.lock (zohelo-data#2499).
         run: bunx playwright install --with-deps chromium
       - name: Accessibility (axe-core, 1440 and 390 px)
-        # Fails on serious or critical violations not in scripts/a11y-baseline.json; counts by rule
-        # and page go to the job summary.
-        run: node scripts/a11y.mjs --root build/client --report a11y-report.json
+        # Fails on serious or critical elements not in scripts/a11y-baseline.json and on pages that
+        # did not load; counts by rule and page go to the job summary.
+        run: node scripts/a11y.mjs --report a11y-report.json
       - name: Accessibility report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
