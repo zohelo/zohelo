@@ -35,7 +35,7 @@ describe('/indicators loader', () => {
     const { groups } = await load('http://x/en/indicators');
     const unemployment = groups.flatMap((g) => g.kpis).find((k) => k.kpi_key === 'unemployment_rate')!;
     expect(unemployment.name).toBe('Unemployment rate (LFS)');
-    expect(unemployment.tile.label).toBe('Unemployment rate (LFS)');
+    expect(unemployment.tile.label).toBe('Unemployment rate (LFS) · % of labour force');
     expect(unemployment.href).toBe('/en/indicators/unemployment_rate');
   });
 

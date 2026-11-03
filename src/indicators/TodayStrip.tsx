@@ -9,15 +9,20 @@ export type TodayTile = {
   value: number | null;
   unit: string;
   delta: number | null;
+  /** The period in words, with the provisional note when flagged (home.ts cardTile). */
   period: string;
   provisional: boolean;
+  /** 'vs sierpień 2026'; KpiTile's default when absent. */
+  comparison?: string;
+  goodDirection?: 'up' | 'down';
+  /** Benchmark verdict and source name, in order. */
+  notes?: string[];
 };
 
 // As many columns as tiles at lg, so the row is full (#387); Tailwind needs the literal classes.
 const columns = ['', 'lg:grid-cols-1', 'lg:grid-cols-2', 'lg:grid-cols-3', 'lg:grid-cols-4', 'lg:grid-cols-5', 'lg:grid-cols-6'];
 
 const heading: Record<Locale, string> = { pl: 'Dziś w danych', en: 'Today in data' };
-const provisionalNote: Record<Locale, string> = { pl: 'dane wstępne', en: 'provisional' };
 
 /** Up to six headline KPIs as tiles linking to their indicator pages, in input order; nothing when empty. */
 export function TodayStrip({ tiles, locale }: { tiles: TodayTile[]; locale: Locale }) {
@@ -37,7 +42,10 @@ export function TodayStrip({ tiles, locale }: { tiles: TodayTile[]; locale: Loca
             delta={tile.delta}
             locale={locale}
             href={localizedPath(`/indicators/${tile.kpi_key}`, locale)}
-            period={tile.provisional ? `${tile.period}, ${provisionalNote[locale]}` : tile.period}
+            period={tile.period}
+            comparison={tile.comparison}
+            goodDirection={tile.goodDirection}
+            notes={tile.notes}
           />
         ))}
       </div>

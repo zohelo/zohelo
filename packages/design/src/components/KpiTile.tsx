@@ -15,6 +15,8 @@ export type KpiTileProps = {
   compact?: boolean;
   /** What the change compares with, shown after it; default 'vs poprzedni okres' / 'vs previous period'. */
   comparison?: string;
+  /** Lines under the period, in order (a benchmark verdict, the source name). */
+  notes?: string[];
 };
 
 const previousPeriod: Record<Locale, string> = { pl: 'vs poprzedni okres', en: 'vs previous period' };
@@ -42,7 +44,7 @@ function deltaColour(direction: Direction, good?: 'up' | 'down') {
 }
 
 /** One headline figure with its unit, period and change; direction is told by arrow and text, never colour alone. */
-export function KpiTile({ label, value, unit, delta, period, locale, href, goodDirection, decimals, compact = true, comparison }: KpiTileProps) {
+export function KpiTile({ label, value, unit, delta, period, locale, href, goodDirection, decimals, compact = true, comparison, notes }: KpiTileProps) {
   // The change carries its unit (zohelo#388): percentage points for a rate, the unit for a level.
   const d = delta === undefined ? null : formatChange(delta, unit, locale, { decimals });
   // Every tile has one value size: long levels are written compactly ('37,5 mln') instead of stepping
@@ -64,6 +66,11 @@ export function KpiTile({ label, value, unit, delta, period, locale, href, goodD
         </div>
       ) : null}
       <div className="mt-2 font-ui text-[length:var(--z-size-xs)] text-text-faint">{period}</div>
+      {notes?.map((note) => (
+        <div key={note} className="font-ui text-[length:var(--z-size-xs)] text-text-faint">
+          {note}
+        </div>
+      ))}
     </>
   );
   const box = 'block min-w-0 rounded-lg border border-border bg-surface p-4 shadow-[var(--z-shadow-card)]';
