@@ -70,6 +70,17 @@ describe('shell navigation', () => {
     expect(html).not.toContain('RIO');
   });
 
+  test('Footer bottom row meets AA contrast: slate-400 at 12 px, not slate-500 at 11 px (#433)', () => {
+    const html = renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/']}>
+        <Footer sources={['Eurostat']} />
+      </MemoryRouter>,
+    );
+    expect(html).toMatch(/<div class="pt-6 [^"]*text-xs text-slate-400[^"]*">/);
+    expect(html).not.toContain('text-slate-500');
+    expect(html).not.toContain('text-[11px]');
+  });
+
   test('Language and footer links have a 24 px target (WCAG 2.5.8)', () => {
     const header = renderToStaticMarkup(
       <MemoryRouter initialEntries={['/en']}>
