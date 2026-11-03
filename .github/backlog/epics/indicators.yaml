@@ -82,6 +82,46 @@ deliverables:
     - Readers for manifest.json, series.parquet and geo files
     depends_on:
     - data/published/published-v1/contract/schemas
+  - key: com/site/indicators/data/fixtures-sync-kpis-40
+    type: Task
+    title: Sync the published fixtures with zohelo-data (two GDP KPIs)
+    effort: M
+    state: open
+    contract: true
+    context: 'zohelo-data publishes eight more KPIs in pairs (Epic data/published/kpis-40). Each publish Task adds
+      its warehouse/published/fixtures/kpi/<key>/latest.json and catalog entries on the producer side (D26). The
+      site''s copy is behind: gdp_per_capita and gdp_volume_growth are missing; catalog.json, manifest.json and
+      kpi/unemployment_rate/latest.json differ. Review of zohelo-data#2505: readers follow before the next
+      publish Task merges. Values are synthetic (FIXTURE.txt).'
+    files:
+    - edit: fixtures/published/
+    - edit: tests/
+    steps:
+    - 'Copy the producer files byte for byte, keeping FIXTURE.txt and kpi/fx_rate/ as they are: `for p in catalog/catalog.json
+      manifest.json status.json feed/changes.json geo/voivodeship.geojson kpi/gdp_current_prices/latest.json kpi/gdp_per_capita/latest.json
+      kpi/gdp_volume_growth/latest.json kpi/inflation/latest.json kpi/population/latest.json kpi/unemployment_rate/latest.json;
+      do mkdir -p fixtures/published/$(dirname $p); gh api "repos/zohelo/zohelo-data/contents/warehouse/published/fixtures/$p?ref=a3b7f86f3656ce48b5eb5d4bd2d2289da3ed6471"
+      -H "Accept: application/vnd.github.raw" > fixtures/published/$p; done`.'
+    - 'Run `bun test`. Fix only the expectations that changed because of the new fixture content (KPI counts in the
+      catalog, the unemployment_rate voivodeship rows, lists of KPI keys). Keep the intent of each test, and list
+      every changed expectation with its old and new value in the PR body.'
+    - 'If a reader mirrors the producer''s skip list (NO_LATEST, D26), check it still equals zohelo-data
+      warehouse/publish.py SKIP (today only fx_rate). Leave the code unchanged if it does.'
+    - 'The build must show the two new KPIs wherever the site lists all catalog KPIs (e.g. /indicators); name the
+      routes in the PR body.'
+    acceptance:
+    - The 11 files equal zohelo-data's at commit a3b7f86 (`cmp` in the PR body)
+    - bun test passes, with every changed expectation listed in the PR body
+    - No source file outside tests/ changes, unless a reader fails on the new KPIs. Then stop and comment on this issue
+    verify:
+    - run: bun install --frozen-lockfile && bun run lint && bun test && bun run build
+      expect: exit 0; 0 fail
+    out_of_scope:
+    - Pages for the new KPIs (the template handles them; page work is in com/site/indicators/pages)
+    - Changing zohelo-data fixtures (comment on zohelo-data instead)
+    - The six KPIs not published yet; each later publish gets its own sync Task
+    depends_on:
+    - com/site/indicators/data/readers
 - key: com/site/indicators/pages
   title: Index and KPI page template
   depends_on:
