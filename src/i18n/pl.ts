@@ -26,6 +26,7 @@ export const pl = {
     language: 'Język',
     pl: 'PL',
     en: 'EN',
+    skip: 'Przejdź do treści',
   },
   sample: {
     banner:
