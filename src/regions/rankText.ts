@@ -6,12 +6,13 @@ import type { Locale } from '../i18n';
 export const VOIVODESHIPS = 16;
 
 /**
- * '1. miejsce z 16 (najwyższa wartość)' / 'rank 1 of 16 (highest value)'; the last rank says
- * 'najniższa wartość' / 'lowest value'. Null when fewer than 16 voivodeships have a value.
+ * '1. miejsce z 16 (najwyższa wartość)' / 'rank 1 of 16 (highest value)'; a region that no other
+ * region is below says 'najniższa wartość' / 'lowest value' — `lowest`, because ranks are shared
+ * (1, 2, 2, 4) and a tied minimum never reaches rank 16. Null when fewer than 16 voivodeships have a value.
  */
-export function rankText(rank: number, of: number, locale: Locale): string | null {
+export function rankText(rank: number, of: number, lowest: boolean, locale: Locale): string | null {
   if (of < VOIVODESHIPS) return null;
-  const end = rank === 1 ? 'top' : rank === of ? 'bottom' : null;
+  const end = rank === 1 ? 'top' : lowest ? 'bottom' : null;
   if (locale === 'pl') {
     const note = end === 'top' ? ' (najwyższa wartość)' : end === 'bottom' ? ' (najniższa wartość)' : '';
     return `${rank}. miejsce z ${of}${note}`;

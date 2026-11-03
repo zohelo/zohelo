@@ -13,7 +13,10 @@ export type SpotlightData = {
   name: string;
   unit: string;
   period: string;
-  /** Voivodeships with a value; ranks are shown only when all 16 have one (zohelo#413). Default 16. */
+  /**
+   * Voivodeships with a value. "Najwyższa / Najniższa" is a rank claim, so the spotlight renders only
+   * when all 16 have one (zohelo#413). Default 16.
+   */
   of?: number;
   top: SpotRow[];
   bottom: SpotRow[];
@@ -35,17 +38,16 @@ export function HomeSpotlight({
   locale: Locale;
   children?: ReactNode;
 }) {
-  if (!data) return null;
+  if (!data || (data.of ?? VOIVODESHIPS) < VOIVODESHIPS) return null;
   const t = texts[locale];
   // The list titles name the measure and its direction (zohelo#413): "Najwyżej" alone read as "best".
   const titles = spotlightTitles(data.kpi_key, data.name, data.period, locale);
-  const ranked = (data.of ?? VOIVODESHIPS) >= VOIVODESHIPS;
   const format = new Intl.NumberFormat(numberLocale[locale]);
   const list = (rows: SpotRow[]) => (
-    <ol className={`mt-2 space-y-1${ranked ? '' : ' list-none'}`}>
+    <ol className="mt-2 space-y-1">
       {rows.map((row) => (
         <li key={row.teryt}>
-          {ranked ? `${row.rank}. ` : null}
+          {`${row.rank}. `}
           <a href={regionPath(row.teryt, locale)} className="text-brand-teal underline">
             {row.name}
           </a>{' '}

@@ -99,7 +99,7 @@ export default function Region() {
               <p className="mt-2 font-ui text-[length:var(--z-size-sm)] text-text-muted">
                 {/* No rank unless all 16 voivodeships have a value (zohelo#413). */}
                 {[
-                  rankText(row.rank, row.of, locale),
+                  rankText(row.rank, row.of, row.lowest, locale),
                   row.national !== null ? `${t.national}${format.format(row.national)} ${row.unit}` : null,
                 ]
                   .filter((part) => part !== null)

@@ -34,11 +34,15 @@ describe('HomeSpotlight', () => {
     expect(html).toContain('href="/en/regions/12"');
   });
 
-  test('fewer than 16 voivodeships with a value: no rank numbers (#413)', () => {
-    const one = { ...data, of: 1, top: [data.top[0]], bottom: [] };
-    const html = renderToStaticMarkup(<HomeSpotlight data={one} locale="pl" />);
-    expect(html).not.toContain('1. ');
-    expect(html).toContain('Małopolskie');
+  test('fewer than 16 voivodeships with a value: no spotlight, no Najwyższa/Najniższa (#413)', () => {
+    for (const of of [1, 15]) {
+      const partial = { ...data, of, top: [data.top[0]], bottom: [] };
+      for (const locale of ['pl', 'en'] as const) {
+        const html = renderToStaticMarkup(<HomeSpotlight data={partial} locale={locale} />);
+        expect(html).not.toMatch(/Najwyższa|Najniższa|Highest|Lowest/);
+        expect(html).toBe('');
+      }
+    }
     expect(renderToStaticMarkup(<HomeSpotlight data={{ ...data, of: 16 }} locale="pl" />)).toContain('1. ');
   });
 
