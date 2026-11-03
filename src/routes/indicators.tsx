@@ -2,7 +2,8 @@ import { KpiTile } from '@zohelo/design';
 import { useLoaderData } from 'react-router';
 import { localeOf, useLocale } from '../i18n';
 import { indicatorGroups } from '../indicators/groups';
-import { latestTile, type LatestTile } from '../indicators/tile';
+import { cardTile } from '../indicators/home';
+import type { TodayTile } from '../indicators/TodayStrip';
 import { NO_LATEST, publishedDir, readCatalog, readKpiLatest } from '../published';
 import { pageMeta } from '../seo';
 import { pages } from '../site.config';
@@ -21,9 +22,9 @@ export async function loader({ request }: { request: Request }) {
     ...group,
     kpis: group.kpis.map((link) => {
       const kpi = catalog.kpis.find((k) => k.kpi_key === link.kpi_key)!;
-      const tile: LatestTile = NO_LATEST.includes(kpi.kpi_key)
-        ? { label: link.name, value: null, unit: link.unit, delta: null, period: '', sourceKey: null, checkedAt: null, provisional: false }
-        : latestTile(kpi, readKpiLatest(dir, kpi.kpi_key), catalog.units, locale);
+      const tile: TodayTile = NO_LATEST.includes(kpi.kpi_key)
+        ? { kpi_key: kpi.kpi_key, label: link.name, value: null, unit: link.unit, delta: null, period: '', provisional: false }
+        : cardTile(catalog, kpi, readKpiLatest(dir, kpi.kpi_key), locale);
       return { ...link, tile };
     }),
   }));
@@ -53,6 +54,9 @@ export default function Indicators() {
                 unit={tile.unit}
                 delta={tile.delta ?? undefined}
                 period={tile.period}
+                comparison={tile.comparison}
+                goodDirection={tile.goodDirection}
+                notes={tile.notes}
                 locale={locale}
                 href={href}
               />

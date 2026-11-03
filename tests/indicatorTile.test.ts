@@ -72,6 +72,7 @@ describe('latestTile', () => {
       unit: '%',
       delta: null,
       period: kpi.last_period,
+      previousPeriod: null,
       sourceKey: null,
       checkedAt: null,
       provisional: false,

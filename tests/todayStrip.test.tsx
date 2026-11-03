@@ -31,10 +31,11 @@ describe('TodayStrip', () => {
     expect(html).toContain('3.2');
   });
 
-  test('provisional period', () => {
-    expect(render([{ ...tile, provisional: true }], 'pl')).toContain('2025, dane wstępne');
-    expect(render([{ ...tile, provisional: true }], 'en')).toContain('2025, provisional');
-    expect(render([tile], 'en')).not.toContain('provisional');
+  test('the period, comparison and notes come from the tile as given (home.ts cardTile)', () => {
+    const html = render([{ ...tile, period: '2025, dane wstępne', comparison: 'vs 2024', notes: ['Eurostat'] }], 'pl');
+    expect(html).toContain('2025, dane wstępne');
+    expect(html).toContain('vs 2024');
+    expect(html).toContain('Eurostat');
   });
 
   test('the first six tiles in input order', () => {

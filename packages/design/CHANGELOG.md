@@ -1,5 +1,6 @@
 ## Unreleased
 
+- `KpiTile` — optional `notes`: lines under the period, in order (a benchmark verdict, the source name) (zohelo#411).
 - `KpiTile` — the value never breaks inside the number (`white-space: nowrap`), the unit wraps below it when the tile is narrow, and values longer than 7 characters use `size-lg` so they fit a 2-column phone grid and the 6-column desktop strip (zohelo#357).
 - `./visuals` — `choroplethSpec` for region maps.
 - `DataTable` — a column's `format` also receives the row.
