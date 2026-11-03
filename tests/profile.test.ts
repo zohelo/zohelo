@@ -44,7 +44,7 @@ describe('TERYT helpers', () => {
 describe('regionProfile', () => {
   test('the region in one ranking', () => {
     expect(regionProfile('TERC:12', [unemployment])).toEqual([
-      { kpi_key: 'unemployment_rate', source_key: 'gus_bdl', period: '2025', value: 5, rank: 3, of: 3, national: 6.1, provisional: false },
+      { kpi_key: 'unemployment_rate', source_key: 'gus_bdl', period: '2025', value: 5, rank: 3, of: 3, lowest: true, national: 6.1, provisional: false },
     ]);
   });
 
