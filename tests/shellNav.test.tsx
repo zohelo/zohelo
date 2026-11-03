@@ -35,6 +35,19 @@ describe('shell navigation', () => {
     expect(pl).not.toMatch(/<a href="\/regions" aria-current="page"/);
   });
 
+  test('the logo link and the menu button show a focus ring for the keyboard (#452, WCAG 2.4.7)', () => {
+    const html = renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/']}>
+        <Header />
+      </MemoryRouter>,
+    );
+    const ring = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';
+    expect(html).toMatch(new RegExp(`<a href="/" aria-label="[^"]*" class="[^"]*${ring}`));
+    expect(html).toMatch(new RegExp(`<button[^>]*class="[^"]*${ring}`));
+    // focus:outline-none would win over the ring in the cascade (outline-style: none).
+    expect(html).not.toContain('focus:outline-none');
+  });
+
   test('Footer links to the pages in Polish without the old credit', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter initialEntries={['/']}>
