@@ -70,7 +70,7 @@ function homeSpotlight(dir: string, catalog: Catalog, locale: Locale): HomeSpotl
     });
   const { top, bottom } = spotlight(ranking);
   return {
-    data: { kpi_key: option.kpi_key, name: option.name, unit: option.unit, period: ranking.period, top: rows(top), bottom: rows(bottom) },
+    data: { kpi_key: option.kpi_key, name: option.name, unit: option.unit, period: ranking.period, of: ranking.regions.length, top: rows(top), bottom: rows(bottom) },
     map: { geo, rows: ranking.regions },
   };
 }

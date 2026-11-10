@@ -84,6 +84,8 @@ export type ProfileRow = {
   value: number;
   rank: number;
   of: number;
+  /** No voivodeship has a lower value; ranks are shared, so a tied minimum never reaches `of` (zohelo#413). */
+  lowest: boolean;
   national: number | null;
   provisional: boolean;
 };
@@ -101,6 +103,7 @@ export function regionProfile(geographyKey: string, rankings: RegionRanking[]): 
       value: region.value,
       rank: region.rank,
       of: ranking.regions.length,
+      lowest: !ranking.regions.some((o) => o.value < region.value),
       national: ranking.national,
       provisional: region.provisional,
     });
