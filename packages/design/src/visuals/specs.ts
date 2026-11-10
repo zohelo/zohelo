@@ -251,7 +251,8 @@ export function withBand(spec: VisualizationSpec, band: Band): VisualizationSpec
       // One datum each, not one per series row: a band drawn once per row would stack its opacity.
       {
         data: { values: [{}] },
-        mark: { type: "rect", opacity: 0.12 },
+        // Decorative: the label layer names the band, so the shape stays out of the accessibility tree (axe svg-img-alt).
+        mark: { type: "rect", opacity: 0.12, aria: false },
         encoding: { y: { datum: band.low, type: "quantitative", scale: y.scale }, y2: { datum: band.high } },
       },
       {
