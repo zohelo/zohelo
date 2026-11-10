@@ -17,6 +17,9 @@ export function config(t: Theme, locale: ChartLocale = "en") {
     view: { stroke: null },
     range: { category: t.palette },
     line: { strokeCap: "round" },
+    // Only the target band of withBand uses rect and text marks: the band in the accent colour, its label muted.
+    rect: { color: t.accent },
+    text: { color: t.muted },
   };
 }
 
@@ -227,5 +230,37 @@ export function choroplethSpec(geojson: object, rows: object[], o: ChoroplethOpt
         { field: o.value, type: "quantitative", title: o.valueTitle, format: TOOLTIP_FORMAT },
       ],
     },
+  } as VisualizationSpec;
+}
+
+/** A target band behind a line chart: y from `low` to `high`, labelled at its top left (zohelo#412). */
+export type Band = { low: number; high: number; label: string };
+
+/**
+ * The line spec with a shaded band behind the line. The band's bounds are y data, so the y domain
+ * covers both the series and the band (content standard: a target chart shows the whole band).
+ */
+export function withBand(spec: VisualizationSpec, band: Band): VisualizationSpec {
+  const { mark, encoding, data, height, ...rest } = spec as Record<string, unknown>;
+  const y = (encoding as { y: Record<string, unknown> }).y;
+  return {
+    ...rest,
+    height,
+    data,
+    layer: [
+      // One datum each, not one per series row: a band drawn once per row would stack its opacity.
+      {
+        data: { values: [{}] },
+        // Decorative: the label layer names the band, so the shape stays out of the accessibility tree (axe svg-img-alt).
+        mark: { type: "rect", opacity: 0.12, aria: false },
+        encoding: { y: { datum: band.low, type: "quantitative", scale: y.scale }, y2: { datum: band.high } },
+      },
+      {
+        data: { values: [{}] },
+        mark: { type: "text", align: "left", baseline: "top", dx: 4, dy: 4, fontSize: 12 },
+        encoding: { x: { value: 0 }, y: { datum: band.high, type: "quantitative" }, text: { value: band.label } },
+      },
+      { mark, encoding },
+    ],
   } as VisualizationSpec;
 }

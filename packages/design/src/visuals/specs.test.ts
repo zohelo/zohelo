@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { numberLocale, timeLocale, TIME_FORMAT, TOOLTIP_FORMAT, VALUE_FORMAT } from "./locale";
 import { config } from "./specs";
-import { barSpec, choroplethSpec, fixedFormat, lineSpec, rankingSpec, smallMultiplesSpec, type ChoroplethOptions } from "./specs";
+import { barSpec, choroplethSpec, config, fixedFormat, lineSpec, rankingSpec, smallMultiplesSpec, withBand, type ChoroplethOptions } from "./specs";
 
 const geojson = JSON.parse(
   readFileSync(join(import.meta.dir, "../../../../fixtures/published/geo/voivodeship.geojson"), "utf8"),
@@ -186,5 +186,43 @@ describe("tooltip titles and dates per page language (zohelo#399)", () => {
     expect((config(theme, "pl") as any).timeFormat).toBe(TIME_FORMAT);
     expect(timeLocale.pl.dateTime).not.toContain("%B");
     expect(timeLocale.pl.date).not.toContain("%B");
+  });
+});
+
+describe("withBand (zohelo#412)", () => {
+  const rows = [
+    { date: "2026-07-01", value: 3.1, series: "Polska" },
+    { date: "2026-09-01", value: 2.9, series: "Polska" },
+  ];
+  const line = lineSpec(rows, { x: "date", y: "value", series: "series", yTitle: "%", yDecimals: 1 }) as any;
+  const spec = withBand(line, { low: 1.5, high: 3.5, label: "Cel NBP" }) as any;
+
+  test("the band and its label are layers behind the unchanged line", () => {
+    expect(spec.layer).toHaveLength(3);
+    expect(spec.layer[0].mark.type).toBe("rect");
+    expect(spec.layer[0].encoding.y).toMatchObject({ datum: 1.5, type: "quantitative" });
+    expect(spec.layer[0].encoding.y2).toEqual({ datum: 3.5 });
+    expect(spec.layer[1].mark.type).toBe("text");
+    expect(spec.layer[1].encoding.text).toEqual({ value: "Cel NBP" });
+    // Drawn once: a band per series row would stack its opacity.
+    expect(spec.layer[0].data).toEqual({ values: [{}] });
+    expect(spec.layer[1].data).toEqual({ values: [{}] });
+    expect(spec.layer[2].mark).toEqual(line.mark);
+    expect(spec.layer[2].encoding).toEqual(line.encoding);
+  });
+
+  test("data, size and the shared y scale stay; no top-level mark or encoding", () => {
+    expect(spec.data).toEqual(line.data);
+    expect(spec.height).toBe(line.height);
+    expect(spec.width).toBe("container");
+    expect(spec.mark).toBeUndefined();
+    expect(spec.encoding).toBeUndefined();
+    expect(spec.layer[0].encoding.y.scale).toEqual({ zero: false });
+  });
+
+  test("the band takes the accent colour and its label the muted colour from the theme", () => {
+    const c = config({ text: "#111", muted: "#555", grid: "#ddd", accent: "#2c6e76", mutedMark: "#aaa", palette: ["#000"] }) as any;
+    expect(c.rect).toEqual({ color: "#2c6e76" });
+    expect(c.text).toEqual({ color: "#555" });
   });
 });
