@@ -38,7 +38,7 @@ export function SeriesChart({
       yTitle: unit,
       xTicks: { interval: ticks.interval, step: ticks.step },
       xFormat: ticks.format,
-      yDecimals: seriesDecimals(points),
+      yDecimals: seriesDecimals(points, unit),
       locale,
     });
     return band ? withBand(spec, band) : spec;

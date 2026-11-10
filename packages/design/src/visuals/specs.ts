@@ -35,9 +35,17 @@ export type LineOptions = {
   xTicks?: { interval: "year" | "quarter" | "month" | "day"; step: number };
   /** d3 time format of the x labels ('%Y', '%b %Y'); the tooltip period uses it too (zohelo#407). */
   xFormat?: string;
-  /** Decimals of the source: y ticks in that precision (`.1f`, tickMinStep 0.1). Default: Vega's choice. */
+  /**
+   * Decimals of the source (an integer 0–20): the y ticks and the tooltip value in that precision (`.1f`,
+   * tickMinStep 0.1; zohelo#414). Default, or any other value: the trimmed formats (Vega's tick choice).
+   */
   yDecimals?: number;
 };
+
+/** The fixed-decimals d3 format for a valid precision, else undefined (an invalid format would break the chart). */
+export function fixedFormat(decimals: number | undefined): string | undefined {
+  return decimals !== undefined && Number.isInteger(decimals) && decimals >= 0 && decimals <= 20 ? `,.${decimals}f` : undefined;
+}
 
 const base = {
   $schema: "https://vega.github.io/schema/vega-lite/v6.json",
@@ -47,6 +55,8 @@ const base = {
 } as const;
 
 export function lineSpec(rows: object[], o: LineOptions): VisualizationSpec {
+  // One precision for the y-axis and the tooltip; an invalid `yDecimals` falls back to the trimmed formats.
+  const yFormat = fixedFormat(o.yDecimals);
   return {
     ...base,
     height: 300,
@@ -66,9 +76,9 @@ export function lineSpec(rows: object[], o: LineOptions): VisualizationSpec {
         title: o.yTitle,
         scale: { zero: false },
         axis:
-          o.yDecimals === undefined
+          yFormat === undefined
             ? { format: VALUE_FORMAT, tickCount: 5 }
-            : { format: `,.${o.yDecimals}f`, tickMinStep: 10 ** -o.yDecimals, tickCount: 5 },
+            : { format: yFormat, tickMinStep: 10 ** -(o.yDecimals as number), tickCount: 5 },
       },
       color: {
         field: o.series,
@@ -83,7 +93,8 @@ export function lineSpec(rows: object[], o: LineOptions): VisualizationSpec {
         { field: o.series, type: "nominal", title: labels[o.locale ?? "en"].series },
         // The period in the axis form of the series' frequency ('2025', 'wrz 2026'), not the fallback day date.
         { field: o.x, type: "temporal", title: labels[o.locale ?? "en"].period, ...(o.xFormat ? { format: o.xFormat } : {}) },
-        { field: o.y, type: "quantitative", title: o.yTitle, format: TOOLTIP_FORMAT },
+        // The value in the series' precision, as the axis and the data table (zohelo#414); trimmed only when unknown.
+        { field: o.y, type: "quantitative", title: o.yTitle, format: yFormat ?? TOOLTIP_FORMAT },
       ],
     },
   } as VisualizationSpec;

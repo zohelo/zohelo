@@ -42,7 +42,10 @@ export const Footer: React.FC<{ sources?: string[] }> = ({ sources = [] }) => {
             <ul className="space-y-1.5 text-slate-400">
               {links.map((link) => (
                 <li key={link.path}>
-                  <a href={localizedPath(link.path, locale)} className="hover:text-white transition-colors">
+                  <a
+                    href={localizedPath(link.path, locale)}
+                    className="inline-flex min-h-6 items-center hover:text-white transition-colors"
+                  >
                     {t.nav[link.key]}
                   </a>
                 </li>
@@ -53,7 +56,7 @@ export const Footer: React.FC<{ sources?: string[] }> = ({ sources = [] }) => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-3">
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-3">
           <div>
             © {new Date().getFullYear()} {t.common.site} • {t.footer.foundedBy} <strong className="text-slate-300">{t.footer.founder}</strong>.
           </div>

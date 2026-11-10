@@ -1,10 +1,12 @@
 // The home page's chart of the day at build time: the pick over every required latest.json, with its
 // source name and file date. Server only (reads files through src/published.ts), so it lives outside
 // src/routes and the client imports only its type.
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import type { Locale } from '../i18n';
-import { readKpiLatest, requiredLatest, type Catalog } from '../published';
+import { readChanges, readKpiLatest, requiredLatest, type Catalog } from '../published';
 import { unitLabel } from '../indicators/unitLabel';
-import { chartOfDay, type ChartOfDay } from './chartOfDay';
+import { chartOfDay, parseCalendar, type ChartOfDay, type ReleaseSignals } from './chartOfDay';
 
 export type HomeChartOfDay = {
   pick: ChartOfDay;
@@ -12,11 +14,25 @@ export type HomeChartOfDay = {
   date: string;
 };
 
-/** The chart of the day with its source name in the locale and the file's date; null when there is no pick. */
+/** The release signals of the layer: feed/calendar.ics and feed/changes.json, each when present. */
+function releaseSignals(dir: string): ReleaseSignals {
+  const ics = join(dir, 'feed', 'calendar.ics');
+  const changes = join(dir, 'feed', 'changes.json');
+  return {
+    calendar: existsSync(ics) ? parseCalendar(readFileSync(ics, 'utf8')) : [],
+    changes: existsSync(changes) ? readChanges(dir).items : [],
+  };
+}
+
+/**
+ * The chart of the day at `now` (default: the build time) with its source name in the locale and the
+ * file's date; null when no KPI is eligible.
+ */
 export function homeChartOfDay(
   dir: string,
   catalog: Catalog,
   locale: Locale,
+  now: Date = new Date(),
 ): HomeChartOfDay | null {
   const files = requiredLatest(catalog).map((k) => readKpiLatest(dir, k));
   const names = Object.fromEntries(
@@ -25,7 +41,7 @@ export function homeChartOfDay(
       { name_pl: k.name_pl, name_en: k.name_en, unit_pl: unitLabel(catalog.units, k.unit_key, 'pl'), unit_en: unitLabel(catalog.units, k.unit_key, 'en') },
     ]),
   );
-  const pick = chartOfDay(files, names);
+  const pick = chartOfDay(files, names, now, releaseSignals(dir));
   if (!pick) return null;
   const source = catalog.sources.find((s) => s.source_key === pick.source_key);
   const sourceName = source

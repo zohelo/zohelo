@@ -1,6 +1,7 @@
 ## Unreleased
 
 - `./visuals` — `withBand(spec, { low, high, label })` draws a shaded target band, labelled at its top left, behind a `lineSpec` chart; `config` gives `rect` the accent colour and `text` the muted colour for it (zohelo#412).
+- `./visuals` — `lineSpec` tooltips: the period in the axis form of the series' frequency (`xFormat`, zohelo#407) and the value in the series' precision (`yDecimals`, zohelo#414); `fixedFormat(decimals)` exported; an invalid `yDecimals` (not an integer 0–20) falls back to the trimmed formats on the axis and in the tooltip instead of an invalid d3 format.
 - `KpiTile` — the value never breaks inside the number (`white-space: nowrap`), the unit wraps below it when the tile is narrow, and values longer than 7 characters use `size-lg` so they fit a 2-column phone grid and the 6-column desktop strip (zohelo#357).
 - `./visuals` — `choroplethSpec` for region maps.
 - `DataTable` — a column's `format` also receives the row.
