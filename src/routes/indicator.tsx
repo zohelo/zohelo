@@ -40,7 +40,7 @@ export async function loader({ request, params }: { request: Request; params: { 
 
   if (NO_LATEST.includes(kpi.kpi_key)) {
     const unit = unitLabel(catalog.units, kpi.unit_key, locale);
-    const tile: LatestTile = { label: name, value: null, unit, delta: null, period: '', sourceKey: null, checkedAt: null, provisional: false };
+    const tile: LatestTile = { label: name, value: null, unit, delta: null, period: '', previousPeriod: null, sourceKey: null, checkedAt: null, provisional: false };
     const description = indicatorDescription(name, tile, sources.sources.map((s) => s.name), locale);
     return { tile, sources, ranking: null, geo: null, jsonLd, breadcrumb, name, lastPeriod: kpi.last_period, description, series: null };
   }
