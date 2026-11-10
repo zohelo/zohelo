@@ -11,6 +11,8 @@ export type LatestTile = {
   unit: string;
   delta: number | null;
   period: string;
+  /** The period the change compares with (latest.json previous_period); null when unknown. */
+  previousPeriod: string | null;
   sourceKey: string | null;
   checkedAt: string | null;
   provisional: boolean;
@@ -25,7 +27,7 @@ export function latestTile(kpi: CatalogKpi, latest: KpiLatest, units: Unit[], lo
   const symbolOf = (unitKey: string) => unitLabel(units, unitKey, locale);
   const rows = latest.values.filter((v) => v.geography_key === 'PL');
   if (rows.length === 0) {
-    return { label, value: null, unit: symbolOf(kpi.unit_key), delta: null, period: kpi.last_period, sourceKey: null, checkedAt: null, provisional: false };
+    return { label, value: null, unit: symbolOf(kpi.unit_key), delta: null, period: kpi.last_period, previousPeriod: null, sourceKey: null, checkedAt: null, provisional: false };
   }
 
   const present = new Set(rows.map((r) => r.source_key));
@@ -41,6 +43,7 @@ export function latestTile(kpi: CatalogKpi, latest: KpiLatest, units: Unit[], lo
     unit: symbolOf(row.unit_key ?? kpi.unit_key),
     delta: row.previous_value !== undefined && row.previous_value !== null ? row.value - row.previous_value : null,
     period: row.period,
+    previousPeriod: row.previous_period ?? null,
     sourceKey: row.source_key,
     checkedAt: row.checked_at,
     provisional: row.flags.includes('p'),
