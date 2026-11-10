@@ -13,7 +13,7 @@ export const en: Dict = {
   footer: {
     badge: 'POLAND IN DATA',
     about: 'Public data on Poland and the world, built on Cloudflare and GitHub.',
-    navHeading: 'Navigation Hub',
+    navHeading: 'Navigation',
     foundedBy: 'Founded by',
     founder: 'Radosław Utkała',
     sources: 'Data sources:',
@@ -28,6 +28,7 @@ export const en: Dict = {
     language: 'Language',
     pl: 'PL',
     en: 'EN',
+    skip: 'Skip to content',
   },
   sample: {
     banner:

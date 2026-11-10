@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { SampleDataBanner } from './components/SampleDataBanner';
-import { localeOf, useLocale } from './i18n';
+import { localeOf, useLocale, useT } from './i18n';
 import { isFixtureLayer, publishedDir, readCatalog } from './published';
 import {
   isRouteErrorResponse,
@@ -29,6 +29,7 @@ export async function loader({ request }: { request: Request }) {
 
 export function Layout({ children }: { children: ReactNode }) {
   const locale = useLocale();
+  const t = useT();
   const root = useRouteLoaderData<typeof loader>('root');
   const sample = root?.sample ?? false;
   const sources = root?.sources ?? [];
@@ -41,11 +42,21 @@ export function Layout({ children }: { children: ReactNode }) {
         <Links />
       </head>
       <body className="min-h-screen flex flex-col bg-[#F8FAFC] text-[#24292E] font-sans antialiased selection:bg-[#3B8B94]/20 selection:text-[#18484F]">
+        {/* The first focusable element on every page: skips the header to the content (WCAG 2.4.1). */}
+        <a
+          href="#content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-[#24292E] focus:shadow"
+        >
+          {t.common.skip}
+        </a>
         {sample && <SampleDataBanner locale={locale} />}
         {/* The shell (header with navigation and language switch, footer) on every route, once (#385). */}
         <Header />
         {/* A block, not a flex container: a flex column would shrink-wrap the routes' `mx-auto` <main>. */}
-        <div className="flex-1">{children}</div>
+        {/* scroll-mt-20: the sticky 80 px header must not cover the first lines after the skip link (WCAG 2.4.11). */}
+        <div id="content" tabIndex={-1} className="flex-1 scroll-mt-20 focus:outline-none">
+          {children}
+        </div>
         <Footer sources={sources} />
         <ScrollRestoration />
         <Scripts />

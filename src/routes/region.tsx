@@ -12,6 +12,7 @@ import {
   VOIVODESHIP_TERYT,
 } from '../regions/profile';
 import { rankRegions, type RegionRanking } from '../regions/ranking';
+import { rankText } from '../regions/rankText';
 import { pageMeta } from '../seo';
 import { CONTAINER } from '../components/container';
 
@@ -45,16 +46,14 @@ const texts = {
     description: (name: string) => `Województwo ${name}: wskaźniki na tle Polski i miejsce wśród 16 województw.`,
     all: 'Wszystkie regiony',
     none: 'Brak danych regionalnych.',
-    rank: (rank: number, of: number) => `${rank}. miejsce z ${of}`,
-    national: ' · Polska: ',
+    national: 'Polska: ',
     neighbours: 'Sąsiednie województwa',
   },
   en: {
     description: (name: string) => `${name}: indicators compared with Poland and the rank among the 16 voivodeships.`,
     all: 'All regions',
     none: 'No regional data.',
-    rank: (rank: number, of: number) => `rank ${rank} of ${of}`,
-    national: ' · Poland: ',
+    national: 'Poland: ',
     neighbours: 'Neighbouring voivodeships',
   },
 };
@@ -98,8 +97,13 @@ export default function Region() {
                 href={localizedPath(`/indicators/${row.kpi_key}`, locale)}
               />
               <p className="mt-2 font-ui text-[length:var(--z-size-sm)] text-text-muted">
-                {t.rank(row.rank, row.of)}
-                {row.national !== null ? `${t.national}${format.format(row.national)} ${row.unit}` : null}
+                {/* No rank unless all 16 voivodeships have a value (zohelo#413). */}
+                {[
+                  rankText(row.rank, row.of, row.lowest, locale),
+                  row.national !== null ? `${t.national}${format.format(row.national)} ${row.unit}` : null,
+                ]
+                  .filter((part) => part !== null)
+                  .join(' · ')}
               </p>
             </div>
           ))}

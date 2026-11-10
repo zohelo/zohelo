@@ -9,3 +9,4 @@ coverage/
 packages/design/dist/
 .react-router/
 .published/
+a11y-report.json

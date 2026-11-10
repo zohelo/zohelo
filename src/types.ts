@@ -10,19 +10,3 @@ export interface ProductItem {
   /** The sub-product's page (Polish path; localised when rendered). Live sub-products always have one. */
   href?: string;
 }
-
-export interface ConsultantProfile {
-  name: string;
-  title: string;
-  headline: string;
-  bio: string;
-  experienceYears: number;
-  email: string;
-  timeline: {
-    year: string;
-    role: string;
-    description: string;
-    milestone: string;
-  }[];
-  consultingSpecialties: string[];
-}
