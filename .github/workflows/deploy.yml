@@ -78,8 +78,8 @@ jobs:
             live=$(curl -s -o /dev/null -w '%{http_code}' https://zohelo.com/ || true)
             echo "::notice title=zohelo.com::HTTP $live (the certificate can take a few minutes after the first switch)"
           fi
-      - name: Release (production deploys only)
-        if: github.ref == 'refs/heads/main'
+      - name: Release (production deploys from a push; scheduled rebuilds add no code)
+        if: github.ref == 'refs/heads/main' && github.event_name != 'schedule'
         env:
           GH_TOKEN: ${{ github.token }}
         run: >-
