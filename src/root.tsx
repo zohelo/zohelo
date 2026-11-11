@@ -5,6 +5,7 @@ import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { SampleDataBanner } from './components/SampleDataBanner';
 import { localeOf, useLocale, useT } from './i18n';
+import { warsawStamp } from './dataAsOf';
 import { feedingSources } from './licenceGate';
 import { isFixtureLayer, publishedDir, readCatalog } from './published';
 import {
@@ -24,8 +25,9 @@ import { CONTAINER } from './components/container';
 export async function loader({ request }: { request: Request }) {
   const dir = publishedDir();
   const locale = localeOf(new URL(request.url).pathname);
-  const sources = feedingSources(readCatalog(dir)).map((s) => (locale === 'pl' ? s.name_pl : s.name_en));
-  return { sample: isFixtureLayer(dir), sources };
+  const catalog = readCatalog(dir);
+  const sources = feedingSources(catalog).map((s) => (locale === 'pl' ? s.name_pl : s.name_en));
+  return { sample: isFixtureLayer(dir), sources, dataAsOf: warsawStamp(catalog.generated_at, locale) };
 }
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -34,6 +36,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const root = useRouteLoaderData<typeof loader>('root');
   const sample = root?.sample ?? false;
   const sources = root?.sources ?? [];
+  const dataAsOf = root?.dataAsOf ?? '';
   return (
     <html lang={locale} data-theme="light">
       <head>
@@ -58,7 +61,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <div id="content" tabIndex={-1} className="flex-1 scroll-mt-20 focus:outline-none">
           {children}
         </div>
-        <Footer sources={sources} />
+        <Footer sources={sources} dataAsOf={dataAsOf} />
         <ScrollRestoration />
         <Scripts />
       </body>

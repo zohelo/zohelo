@@ -17,6 +17,7 @@ export const en: Dict = {
     foundedBy: 'Founded by',
     founder: 'Radosław Utkała',
     sources: 'Data sources:',
+    dataAsOf: 'Data as of',
   },
   products: {
     heading: 'Products',
