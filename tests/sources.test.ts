@@ -12,10 +12,12 @@ describe('sourceRows', () => {
       'Bank Światowy – WDI',
       'Eurostat',
       'GUS – Bank Danych Lokalnych',
+      'GUS Dziedzinowe Bazy Wiedzy',
       'Narodowy Bank Polski',
     ]);
     expect(sourceRows(catalog, 'en').map((r) => r.name)).toEqual([
       'Eurostat',
+      'GUS Knowledge Databases',
       'National Bank of Poland',
       'Statistics Poland – Local Data Bank',
       'World Bank – WDI',
@@ -36,7 +38,7 @@ describe('sourceRows', () => {
     const { rows } = await loader({ request: new Request('http://x/sources') });
     if (previous === undefined) delete process.env.PUBLISHED_DIR;
     else process.env.PUBLISHED_DIR = previous;
-    expect(rows.map((r) => r.source_key).sort()).toEqual(['eurostat', 'gus_bdl', 'world_bank_wdi']);
+    expect(rows.map((r) => r.source_key).sort()).toEqual(['eurostat', 'gus_bdl', 'gus_dbw', 'world_bank_wdi']);
     expect(JSON.stringify(rows)).not.toContain('Terms not established');
   });
 

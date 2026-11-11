@@ -58,8 +58,8 @@ describe('licenceAllows (the rule reads the licence row only)', () => {
   test('unresolved ("Terms not established"), even with commercial_ok: hidden', () => {
     expect(licenceAllows(licence({ licence_key: 'unresolved', commercial_ok: true }))).toBe(false);
   });
-  test('commercial_ok false: hidden', () => {
-    expect(licenceAllows(licence({ commercial_ok: false }))).toBe(false);
+  test('commercial_ok false ("commercial reuse not addressed", e.g. gus_copyright): shown', () => {
+    expect(licenceAllows(licence({ licence_key: 'gus_copyright', commercial_ok: false }))).toBe(true);
   });
   test('no licence row: hidden', () => {
     expect(licenceAllows(undefined)).toBe(false);
@@ -67,18 +67,37 @@ describe('licenceAllows (the rule reads the licence row only)', () => {
   test('a source pointing at a missing licence row is hidden', () => {
     const copy = structuredClone(raw);
     copy.sources.find((s) => s.source_key === 'eurostat')!.licence_key = 'nope';
-    expect([...shownSourceKeys(copy)].sort()).toEqual(['gus_bdl', 'world_bank_wdi']);
+    expect([...shownSourceKeys(copy)].sort()).toEqual(['gus_bdl', 'gus_dbw', 'world_bank_wdi']);
   });
 });
 
 describe('gateCatalog on the fixtures (NBP: licence unresolved)', () => {
   const gated = gateCatalog(raw);
   test('no NBP source, no unresolved licence, no fx_rate', () => {
-    expect(gated.sources.map((s) => s.source_key).sort()).toEqual(['eurostat', 'gus_bdl', 'world_bank_wdi']);
-    expect(gated.licences.map((l) => l.licence_key).sort()).toEqual(['cc_by_4_0', 'gus_terms']);
+    expect(gated.sources.map((s) => s.source_key).sort()).toEqual(['eurostat', 'gus_bdl', 'gus_dbw', 'world_bank_wdi']);
+    expect(gated.licences.map((l) => l.licence_key).sort()).toEqual(['cc_by_4_0', 'gus_copyright', 'gus_terms']);
     expect(gated.kpis.map((k) => k.kpi_key)).not.toContain('fx_rate');
     expect(gated.kpis).toHaveLength(4);
   });
+  test('GUS DBW (gus_copyright, commercial_ok false) stays visible with its KPI and numbers', async () => {
+    const dbw = raw.licences.find((l) => l.licence_key === 'gus_copyright')!;
+    expect(dbw.commercial_ok).toBe(false);
+    const copy = structuredClone(raw);
+    copy.kpis.find((k) => k.kpi_key === 'population')!.source_keys = ['gus_dbw'];
+    const kept = gateCatalog(copy);
+    expect(kept.kpis.find((k) => k.kpi_key === 'population')!.source_keys).toEqual(['gus_dbw']);
+    expect(kept.sources.map((s) => s.source_key)).toContain('gus_dbw');
+    expect(feedingSources(copy).map((s) => s.source_key)).toContain('gus_dbw');
+    const v = { geography_key: 'PL', geography_level: 'country', period: '2025', value: 37489087, flags: [], checked_at: '' };
+    const latest = { kpi_key: 'population', unit_key: 'persons', generated_at: '', values: [{ ...v, source_key: 'gus_dbw' }] };
+    expect(gateLatest(copy, latest).values).toHaveLength(1);
+    expect(hiddenOf(copy).names).not.toContain('GUS Dziedzinowe Bazy Wiedzy');
+    // On the fixture build, /sources lists it with its licence.
+    process.env.PUBLISHED_DIR = FIXTURES;
+    const { rows } = await sourcesLoader({ request: new Request('http://x/sources') });
+    expect(rows.find((r) => r.source_key === 'gus_dbw')!.licence!.name).toBe(dbw.name);
+  });
+
   test('a KPI with a shown and a hidden source keeps the shown one', () => {
     const copy = structuredClone(raw);
     copy.kpis.find((k) => k.kpi_key === 'inflation')!.source_keys = ['nbp', 'eurostat'];

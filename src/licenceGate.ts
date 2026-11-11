@@ -1,16 +1,19 @@
 // The licence gate (zohelo#469): no number from a source whose reuse terms are not established
-// reaches the public build. A source may be shown only when its licence row in catalog.json exists,
-// is not `unresolved` and has `commercial_ok: true`. The rule reads the licence table only, never a
-// source name: when a licence row changes in zohelo-data, the site follows without an edit.
+// reaches the public build. A source may be shown only when its licence row in catalog.json exists
+// and its licence_key is not `unresolved` ("Terms not established"). `commercial_ok` is not part of
+// the rule: false there means commercial reuse is not addressed (e.g. `gus_copyright` for GUS DBW,
+// whose terms allow reuse with the source named), and it matters only for paid surfaces, which
+// zohelo.com does not have. The rule reads the licence table only, never a source name: when a
+// licence row changes in zohelo-data, the site follows without an edit.
 // Pure; src/published.ts applies it in every reader, so pages, feeds and the sitemap see gated data.
 import type { Catalog, ChangeItem, Changes, KpiLatest, Licence, SeriesRow, Source } from './published';
 
 /** The licence_key zohelo-data gives a source whose reuse terms are not established ("Terms not established"). */
 export const UNRESOLVED_LICENCE = 'unresolved';
 
-/** True when a licence lets the site show the numbers of the sources under it. */
+/** True when a licence lets the site show the numbers of the sources under it: a row exists and is not `unresolved`. */
 export function licenceAllows(licence: Licence | undefined): boolean {
-  return licence !== undefined && licence.licence_key !== UNRESOLVED_LICENCE && licence.commercial_ok === true;
+  return licence !== undefined && licence.licence_key !== UNRESOLVED_LICENCE;
 }
 
 /** The source_keys whose numbers may be shown: a catalog source with an allowing licence row. */
