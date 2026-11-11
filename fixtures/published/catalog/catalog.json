@@ -262,7 +262,7 @@
       "source_key": "nbp",
       "name_pl": "Narodowy Bank Polski",
       "name_en": "National Bank of Poland",
-      "licence_key": "nbp_terms",
+      "licence_key": "unresolved",
       "register_id": "PLG-001"
     }
   ],
@@ -282,11 +282,11 @@
       "commercial_ok": true
     },
     {
-      "licence_key": "nbp_terms",
-      "name": "NBP terms of use (illustrative)",
-      "url": "https://example.invalid/nbp",
-      "attribution_text": "Źródło: NBP (illustrative)",
-      "commercial_ok": true
+      "licence_key": "unresolved",
+      "name": "Terms not established",
+      "url": "https://example.invalid/register",
+      "attribution_text": "Source: see the source register",
+      "commercial_ok": false
     }
   ]
 }

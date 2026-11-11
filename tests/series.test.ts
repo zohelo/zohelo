@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { copyFileSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { readKpiSeries } from '../src/published';
+import { readKpiSeries, readKpiSeriesUngated } from '../src/published';
 
 const dir = 'fixtures/published';
 
@@ -27,10 +27,14 @@ describe('readKpiSeries', () => {
     expect(rows.find((r) => r.geography_key === 'TERC:12')!.flags).toBe('p');
   });
 
-  test('fx_rate has the currency dimension', async () => {
-    const rows = await readKpiSeries(dir, 'fx_rate');
+  test('fx_rate has the currency dimension (before the gate)', async () => {
+    const rows = await readKpiSeriesUngated(dir, 'fx_rate');
     expect(rows.map((r) => r.dims.currency)).toEqual(['EUR', 'EUR', 'USD', 'USD']);
     expect(rows[1].period_start).toBe('2026-10-27');
+  });
+
+  test('fx_rate (NBP, licence unresolved) has no rows after the gate (#469)', async () => {
+    expect(await readKpiSeries(dir, 'fx_rate')).toEqual([]);
   });
 
   test('a missing file names its path', async () => {

@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 import { indicatorGroups } from '../src/indicators/groups';
-import { readCatalog } from '../src/published';
+import { readCatalogUngated } from '../src/published';
 
-const catalog = readCatalog('fixtures/published');
+// The catalog as published, fx_rate (finance) included: grouping is pure and does not gate (src/licenceGate.ts does).
+const catalog = readCatalogUngated('fixtures/published');
 const link = (locale: 'pl' | 'en', key: string) =>
   indicatorGroups(catalog, locale)
     .flatMap((g) => g.kpis)

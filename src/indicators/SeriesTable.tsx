@@ -6,8 +6,8 @@ import { seriesDecimals, tablePoints, type SeriesPoint } from './series';
 // "Tabela / Table" toggle, server-rendered, so the values are readable without the chart.
 
 const text: Record<Locale, { toggle: string; period: string; value: string; truncated: string }> = {
-  pl: { toggle: 'Tabela danych', period: 'Okres', value: 'Wartość', truncated: 'Pierwsze i ostatnie 12 okresów; cała seria w pliku do pobrania.' },
-  en: { toggle: 'Data table', period: 'Period', value: 'Value', truncated: 'First and last 12 periods; the full series is in the download.' },
+  pl: { toggle: 'Tabela danych', period: 'Okres', value: 'Wartość', truncated: 'Pierwsze i ostatnie 12 okresów.' },
+  en: { toggle: 'Data table', period: 'Period', value: 'Value', truncated: 'First and last 12 periods.' },
 };
 
 export function SeriesTable({ points, unit, caption, locale }: { points: SeriesPoint[]; unit: string; caption: string; locale: Locale }) {

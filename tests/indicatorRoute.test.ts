@@ -1,5 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
+import { rmSync } from 'node:fs';
 import { loader } from '../src/routes/indicator';
+import { licensedLayer } from './licensedLayer';
 
 const previous = process.env.PUBLISHED_DIR;
 beforeAll(() => {
@@ -47,13 +49,26 @@ describe('/indicators/:kpi loader', () => {
     expect(data.name).toBe('Unemployment rate (LFS)');
   });
 
-  test('fx_rate (NO_LATEST) has a tile without value, no ranking and no geo', async () => {
-    const data = await load('/indicators/fx_rate', 'fx_rate');
-    expect(data.tile.value).toBeNull();
-    expect(data.tile.delta).toBeNull();
-    expect(data.ranking).toBeNull();
-    expect(data.geo).toBeNull();
-    expect(data.sources.sources.length).toBeGreaterThan(0);
+  test('fx_rate (NBP, licence unresolved) has no page: a 404 Response (#469)', async () => {
+    const thrown = await load('/indicators/fx_rate', 'fx_rate').catch((e: unknown) => e);
+    expect(thrown).toBeInstanceOf(Response);
+    expect((thrown as Response).status).toBe(404);
+  });
+
+  test('fx_rate with an established NBP licence (NO_LATEST) has a tile without value, no ranking and no geo', async () => {
+    const layer = licensedLayer();
+    process.env.PUBLISHED_DIR = layer;
+    try {
+      const data = await load('/indicators/fx_rate', 'fx_rate');
+      expect(data.tile.value).toBeNull();
+      expect(data.tile.delta).toBeNull();
+      expect(data.ranking).toBeNull();
+      expect(data.geo).toBeNull();
+      expect(data.sources.sources).toEqual([{ name: 'Narodowy Bank Polski' }]);
+    } finally {
+      process.env.PUBLISHED_DIR = 'fixtures/published';
+      rmSync(layer, { recursive: true, force: true });
+    }
   });
 
   test('an unknown KPI throws a 404 Response', async () => {

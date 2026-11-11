@@ -1,10 +1,13 @@
 // Typed readers for the published layer (06_published/v1, contract: zohelo-data docs/published.md).
 // The site reads these files at build time only; each reader takes the directory holding a copy
-// of the layer (.published/ in the build, fixtures/published in tests).
-import { existsSync, readFileSync } from 'node:fs';
+// of the layer (.published/ in the build, fixtures/published in tests). Every reader of the catalog,
+// values, series and feeds passes its result through the licence gate (src/licenceGate.ts, zohelo#469):
+// a source whose reuse terms are not established never reaches a page, feed or file of the build.
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { parquetReadObjects } from 'hyparquet';
 import { compressors } from 'hyparquet-compressors';
+import { gateCatalog, gateChanges, gateLatest, gateSeries } from './licenceGate';
 
 export type KpiDimension = { dimension_key: string; member_count: number; levels: string[] };
 
@@ -142,25 +145,50 @@ function invalid(path: string): Error {
   return new Error(`published file invalid: ${path}`);
 }
 
-export function readCatalog(dir: string): Catalog {
+const catalogCache = new Map<string, { stamp: string; catalog: Catalog }>();
+
+/**
+ * catalog.json as published, before the licence gate. Only for the gate itself and the build's
+ * licence check (scripts/licence-check.ts); pages and feeds read readCatalog.
+ */
+export function readCatalogUngated(dir: string): Catalog {
   const path = join(dir, 'catalog', 'catalog.json');
+  // Every gated reader needs the catalog; parse it once per file version.
+  const stamp = existsSync(path) ? `${statSync(path).mtimeMs}:${statSync(path).size}` : '';
+  const cached = catalogCache.get(path);
+  // A copy each time: a caller that edits its catalog never changes the next caller's.
+  if (cached && stamp && cached.stamp === stamp) return structuredClone(cached.catalog);
   const data = readJson(path) as Catalog;
   if (data?.version !== 1 || !Array.isArray(data.kpis)) throw invalid(path);
+  catalogCache.set(path, { stamp, catalog: structuredClone(data) });
   return data;
 }
 
-export function readKpiLatest(dir: string, kpiKey: string): KpiLatest {
+/** The catalog after the licence gate: only shown sources, their licences and KPIs with a shown source. */
+export function readCatalog(dir: string): Catalog {
+  return gateCatalog(readCatalogUngated(dir));
+}
+
+/** latest.json as published, before the licence gate (see readCatalogUngated). */
+export function readKpiLatestUngated(dir: string, kpiKey: string): KpiLatest {
   const path = join(dir, 'kpi', kpiKey, 'latest.json');
   const data = readJson(path) as KpiLatest;
   if (data?.kpi_key !== kpiKey || !Array.isArray(data.values)) throw invalid(path);
   return data;
 }
 
+/** A KPI's latest.json with only the values of shown sources (none for a KPI the gate drops). */
+export function readKpiLatest(dir: string, kpiKey: string): KpiLatest {
+  const latest = readKpiLatestUngated(dir, kpiKey);
+  return gateLatest(readCatalogUngated(dir), latest);
+}
+
+/** The what-changed feed without the items of hidden sources. */
 export function readChanges(dir: string): Changes {
   const path = join(dir, 'feed', 'changes.json');
   const data = readJson(path) as Changes;
   if (!Array.isArray(data?.items)) throw invalid(path);
-  return data;
+  return gateChanges(readCatalogUngated(dir), data);
 }
 
 export function readGeo(dir: string, level: string): GeoCollection {
@@ -172,8 +200,17 @@ export function readGeo(dir: string, level: string): GeoCollection {
 
 const SERIES_COLUMNS = ['kpi_key', 'source_key', 'measure_key', 'geography_key', 'geography_level', 'period', 'period_start', 'frequency', 'value', 'unit_key', 'flags'] as const;
 
-/** Rows of kpi/<kpiKey>/series.parquet (zstd as gold.publish writes it, or snappy as the fixtures). */
+/** Rows of kpi/<kpiKey>/series.parquet of shown sources only (none for a KPI the gate drops). */
 export async function readKpiSeries(dir: string, kpiKey: string): Promise<SeriesRow[]> {
+  const rows = await readKpiSeriesUngated(dir, kpiKey);
+  return gateSeries(readCatalogUngated(dir), rows);
+}
+
+/**
+ * Rows of kpi/<kpiKey>/series.parquet (zstd as gold.publish writes it, or snappy as the fixtures), before
+ * the licence gate (see readCatalogUngated).
+ */
+export async function readKpiSeriesUngated(dir: string, kpiKey: string): Promise<SeriesRow[]> {
   const path = join(dir, 'kpi', kpiKey, 'series.parquet');
   if (!existsSync(path)) throw new Error(`published file missing: ${path}`);
   const bytes = readFileSync(path);

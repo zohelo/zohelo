@@ -27,7 +27,7 @@ describe('/changes route', () => {
   test('loader reads the feed and the catalog sources', async () => {
     process.env.PUBLISHED_DIR = fixtures;
     const data = await loader();
-    expect(data.items).toHaveLength(2);
+    expect(data.items).toHaveLength(1);
     expect(data.sources).toEqual(readCatalog(fixtures).sources);
   });
 

@@ -1,11 +1,12 @@
 import { describe, expect, test } from 'bun:test';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { ChangesList } from '../src/growth/ChangesList';
-import { readCatalog, readChanges, type ChangeItem } from '../src/published';
+import { readCatalogUngated, readChanges, type ChangeItem } from '../src/published';
 
 const dir = 'fixtures/published';
 const items = readChanges(dir).items;
-const sources = readCatalog(dir).sources;
+// The list renders any source it is given; the catalog as published names every fixture source.
+const sources = readCatalogUngated(dir).sources;
 
 const item = (over: Partial<ChangeItem>): ChangeItem => ({
   at: '2026-01-02T00:00:00Z',
@@ -23,7 +24,9 @@ describe('ChangesList', () => {
     const html = renderToStaticMarkup(<ChangesList items={items} sources={sources} locale="pl" />);
     expect(html).toContain('Eurostat: zaktualizowano stopę bezrobocia (przykład)');
     expect(html).toContain('href="/indicators/unemployment_rate"');
-    expect(html).toContain('Narodowy Bank Polski · fx_a');
+    expect(html).toContain('Eurostat · une_rt_a');
+    // The NBP item is gated in readChanges (#469).
+    expect(html).not.toContain('fx_rate');
     expect(html).toContain('dateTime="2026-01-01T00:00:00Z"');
     // The visible date is in the page language, never the ISO string (zohelo#404).
     expect(html).toContain('>1 sty 2026</time>');
@@ -32,7 +35,7 @@ describe('ChangesList', () => {
 
   test('English links', () => {
     const html = renderToStaticMarkup(<ChangesList items={items} sources={sources} locale="en" />);
-    expect(html).toContain('href="/en/indicators/fx_rate"');
+    expect(html).toContain('href="/en/indicators/unemployment_rate"');
     expect(html).toContain('>1 Jan 2026</time>');
   });
 

@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import { fetchPublished, seriesPaths } from '../scripts/fetch-published';
-import { isFixtureLayer, NO_LATEST, readCatalog, requiredLatest } from '../src/published';
+import { isFixtureLayer, NO_LATEST, readCatalog, readCatalogUngated, requiredLatest } from '../src/published';
 
 const dirs: string[] = [];
 function tempOut(): string {
@@ -23,6 +23,7 @@ describe('fetchPublished without credentials', () => {
     expect(written.map((p) => relative(out, p)).sort()).toEqual([
       'FIXTURE.txt',
       'catalog/catalog.json',
+      'feed/calendar.ics',
       'feed/changes.json',
       'geo/voivodeship.geojson',
       'kpi/fx_rate/series.parquet',
@@ -43,7 +44,7 @@ describe('fetchPublished without credentials', () => {
   test('a partial key counts as missing', async () => {
     const out = tempOut();
     const written = await fetchPublished(out, { STORAGE_ENDPOINT_URL: 'https://example.invalid' }, { require: false });
-    expect(written).toHaveLength(14);
+    expect(written).toHaveLength(15);
   });
 
   test('with require it rejects', async () => {
@@ -55,13 +56,17 @@ describe('fetchPublished without credentials', () => {
 
 describe('seriesPaths', () => {
   test('every published KPI in catalog order', () => {
-    expect(seriesPaths(readCatalog('fixtures/published'))).toEqual([
+    expect(seriesPaths(readCatalogUngated('fixtures/published'))).toEqual([
       'kpi/population/series.parquet',
       'kpi/gdp_current_prices/series.parquet',
       'kpi/inflation/series.parquet',
       'kpi/unemployment_rate/series.parquet',
       'kpi/fx_rate/series.parquet',
     ]);
+  });
+
+  test('a KPI the licence gate drops is not fetched (#469)', () => {
+    expect(seriesPaths(readCatalog('fixtures/published'))).not.toContain('kpi/fx_rate/series.parquet');
   });
 
   test('a draft KPI has no series path', () => {
@@ -73,7 +78,7 @@ describe('seriesPaths', () => {
 
 describe('requiredLatest', () => {
   test('every published fixture KPI except fx_rate', () => {
-    const catalog = readCatalog('fixtures/published');
+    const catalog = readCatalogUngated('fixtures/published');
     const published = catalog.kpis.filter((k) => k.status === 'published').map((k) => k.kpi_key);
     expect(published).toContain('fx_rate');
     expect(requiredLatest(catalog)).toEqual(published.filter((k) => k !== 'fx_rate'));
