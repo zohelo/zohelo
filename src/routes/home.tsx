@@ -8,7 +8,7 @@ import { localeOf, useLocale, type Locale } from '../i18n';
 import { homeTiles } from '../indicators/home';
 import { readHeadlineSeries } from '../indicators/readHeadline';
 import { SeriesTable } from '../indicators/SeriesTable';
-import { publishedDir, readCatalog, readChanges, readGeo, readKpiLatest, type Catalog, type GeoCollection } from '../published';
+import { calendarEvents, publishedDir, readCalendar, readCatalog, readChanges, readGeo, readKpiLatest, type Catalog, type GeoCollection } from '../published';
 import type { SpotlightData, SpotRow } from '../regions/HomeSpotlight';
 import { regionalKpis } from '../regions/kpiOptions';
 import type { MapRow } from '../regions/mapSpec';
@@ -41,6 +41,8 @@ export async function loader({ request }: { request: Request }) {
     spotlightMap: result?.map ?? null,
     chartOfDay,
     chartSeries,
+    // The subscribe links only while the gated calendar has events (zohelo#469).
+    calendar: calendarEvents(readCalendar(dir)) > 0,
   };
 }
 
@@ -81,7 +83,7 @@ export function meta({ location }: { location: { pathname: string } }) {
 }
 
 export default function Home() {
-  const { tiles, items, sources, spotlight, spotlightMap, chartOfDay, chartSeries } = useLoaderData<typeof loader>();
+  const { tiles, items, sources, spotlight, spotlightMap, chartOfDay, chartSeries, calendar } = useLoaderData<typeof loader>();
   const locale = useLocale();
   // The map is client-only (D25): rendered after hydration, like on /regions.
   const [mounted, setMounted] = useState(false);
@@ -117,6 +119,7 @@ export default function Home() {
         spotlightMap={map}
         chartOfDay={chartOfDay}
         chartOfDayChart={chart}
+        calendar={calendar}
         locale={locale}
       />
     </>

@@ -1,8 +1,20 @@
 import { afterAll, describe, expect, test } from 'bun:test';
-import { readFileSync, rmSync } from 'node:fs';
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import config from '../react-router.config';
-import { findLeaks, hiddenOf, hiddenValues, significantDigits, type Hidden } from '../scripts/licence-check';
+import {
+  calendarKeys,
+  distinctive,
+  findLeaks,
+  hiddenOf,
+  hiddenValues,
+  numbersToMatch,
+  rssSourceKeys,
+  shownValues,
+  significantDigits,
+  type Hidden,
+} from '../scripts/licence-check';
 import { sitemapPaths } from '../scripts/sitemap';
 import { renderRss } from '../src/growth/rss';
 import {
@@ -16,6 +28,8 @@ import {
   shownSourceKeys,
 } from '../src/licenceGate';
 import {
+  calendarEvents,
+  readCalendar,
   readCatalog,
   readCatalogUngated,
   readChanges,
@@ -210,9 +224,24 @@ describe('the build from fixtures with an nbp series (#469)', () => {
     expect(all).not.toContain('National Bank of Poland');
     expect(all).not.toMatch(/"source_key":"nbp"/);
     // The build's own check (scripts/licence-check.ts) finds nothing either.
-    const hidden: Hidden = { ...hiddenOf(raw), values: await hiddenValues(FIXTURES, raw) };
+    const hidden: Hidden = { ...hiddenOf(raw), values: numbersToMatch(await hiddenValues(FIXTURES, raw), await shownValues(FIXTURES)) };
     expect(hidden.kpis).toEqual(['fx_rate']);
+    expect(hidden.sources).toEqual(['nbp']);
     expect(hidden.values).toEqual(values);
+    expect(findLeaks(models, hidden)).toEqual([]);
+  });
+
+  test('a hidden value that a shown source also has is not a leak; the build passes', async () => {
+    const models = await buildModels(FIXTURES);
+    const shown = await shownValues(FIXTURES);
+    // 37490000: population 2024 (GUS BDL), on the home page and /indicators/population.
+    expect(shown).toContain(37490000);
+    expect(models.map((m) => m.text).join('\n')).toContain('37490000');
+    const withShown = [...(await hiddenValues(FIXTURES, raw)), 37490000];
+    const naive: Hidden = { ...hiddenOf(raw), values: withShown };
+    expect(findLeaks(models, naive).some((l) => l.includes('number 37490000'))).toBe(true);
+    const hidden: Hidden = { ...hiddenOf(raw), values: numbersToMatch(withShown, shown) };
+    expect(hidden.values).not.toContain(37490000);
     expect(findLeaks(models, hidden)).toEqual([]);
   });
 
@@ -228,12 +257,18 @@ describe('the build from fixtures with an nbp series (#469)', () => {
     expect(text('rss.xml')).toContain('https://zohelo.com/indicators/fx_rate');
     expect(text('calendar.ics')).toContain('nbp-fx_rate');
     expect(text('/root')).toContain('Narodowy Bank Polski');
-    expect(hiddenOf(readCatalogUngated(layer))).toEqual({ kpis: [], names: [] });
+    expect(hiddenOf(readCatalogUngated(layer))).toEqual({ kpis: [], droppedKpis: [], sources: [], names: [] });
   });
 });
 
 describe('scripts/licence-check findLeaks', () => {
-  const hidden: Hidden = { kpis: ['fx_rate'], names: ['Terms not established'], values: [4.2531, 3.5] };
+  const hidden: Hidden = {
+    kpis: ['fx_rate'],
+    droppedKpis: ['fx_rate'],
+    sources: ['nbp'],
+    names: ['Terms not established'],
+    values: [4.2531, 3.5, 2024, 37640000],
+  };
   test('a hidden KPI page, a link to it, a downloads directory, a hidden name and a hidden number', () => {
     const leaks = findLeaks(
       [
@@ -244,6 +279,13 @@ describe('scripts/licence-check findLeaks', () => {
         { path: 'sources/index.html', text: 'Terms not established' },
         { path: 'x/index.html', text: '"value":4.2531,' },
         { path: 'y/index.html', text: 'kurs 4,2531 zł' },
+        { path: 'regions/index.html', text: '"value":37640000' },
+        { path: 'img/chart.svg', text: '<text>4,2531</text>' },
+        {
+          path: 'calendar.ics',
+          text: 'BEGIN:VEVENT\r\nUID:20261109T111500Z-nbp-fx_rate@zohelo.com\r\nSUMMARY:NBP: tabela A kursów średnich walut\r\nURL:https://api.nbp.pl/en.html\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nUID:20261109T111500Z-eurostat-fx_rate@zohelo.com\r\nEND:VEVENT\r\n',
+        },
+        { path: 'en/rss.xml', text: '<item><guid isPermaLink="false">nbp:fx_A:2026-11-09T11:15:00Z</guid></item>' },
       ],
       hidden,
     );
@@ -255,14 +297,35 @@ describe('scripts/licence-check findLeaks', () => {
       'sources/index.html: hidden source or licence "Terms not established"',
       'x/index.html: number 4.2531 of a hidden source',
       'y/index.html: number 4.2531 of a hidden source',
+      'regions/index.html: number 37640000 of a hidden source',
+      'img/chart.svg: number 4.2531 of a hidden source',
+      'calendar.ics: calendar event of hidden source nbp',
+      'calendar.ics: calendar event of hidden KPI fx_rate',
+      'en/rss.xml: feed item of hidden source nbp',
     ]);
   });
-  test('no false hits: other KPIs, longer numbers, short numbers', () => {
+  test('no false hits: other KPIs, longer numbers, short numbers, years, shown keys', () => {
     const files = [
       { path: 'indicators/fx_rate_eur/index.html', text: '/indicators/fx_rate_eur 14.25311 3.5 4.25310' },
-      { path: 'indicators/inflation/index.html', text: 'Cel NBP 2,5 % ± 1 p.p.' },
+      { path: 'indicators/inflation/index.html', text: 'Cel NBP 2,5 % ± 1 p.p. (2024)' },
+      { path: 'calendar.ics', text: 'UID:20260115T100000Z-eurostat-inflation@zohelo.com\r\n' },
+      { path: 'rss.xml', text: '<guid isPermaLink="false">eurostat:une_rt_a:2026-01-01T00:00:00Z</guid>' },
     ];
     expect(findLeaks(files, hidden)).toEqual([]);
+  });
+  test('distinctive numbers: fractions of 4+ significant digits, integers of 5+ digits', () => {
+    expect(distinctive(4.2531)).toBe(true);
+    expect(distinctive(5.75)).toBe(false);
+    expect(distinctive(2024)).toBe(false);
+    expect(distinctive(12345)).toBe(true);
+    expect(numbersToMatch([4.2531, 4.2531, 2.9, 2024, 37490000], [37490000])).toEqual([4.2531]);
+  });
+  test('calendar and RSS keys', () => {
+    expect(calendarKeys('UID:20261109T111500Z-nbp-fx_rate@zohelo.com\r\nUID:20260115T100000Z-gus_bdl-population@zohelo.com')).toEqual([
+      { source: 'nbp', kpi: 'fx_rate' },
+      { source: 'gus_bdl', kpi: 'population' },
+    ]);
+    expect(rssSourceKeys('<guid isPermaLink="false">nbp:fx_A:2026</guid><guid>eurostat:x:1</guid>')).toEqual(['nbp', 'eurostat']);
   });
   test('significant digits', () => {
     expect(significantDigits(4.2531)).toBe(5);
@@ -272,3 +335,37 @@ describe('scripts/licence-check findLeaks', () => {
   });
 });
 
+
+describe('subscribe links follow the gated calendar (#469)', () => {
+  const nbpOnly = (dir: string) => {
+    const path = join(dir, 'feed', 'calendar.ics');
+    const ics = readFileSync(path, 'utf8').replace(/BEGIN:VEVENT\r\nUID:[^\r\n]*eurostat[\s\S]*?END:VEVENT\r\n/, '');
+    writeFileSync(path, ics);
+  };
+  const flags = async (dir: string) => {
+    process.env.PUBLISHED_DIR = dir;
+    const home = await homeLoader({ request: new Request('http://x/') });
+    const page = await indicatorLoader({ request: new Request('http://x/indicators/inflation'), params: { kpi: 'inflation' } });
+    return [home.calendar, page.calendar];
+  };
+  test('fixtures (one Eurostat event): shown', async () => {
+    expect(calendarEvents(readCalendar(FIXTURES))).toBe(1);
+    expect(await flags(FIXTURES)).toEqual([true, true]);
+  });
+  test('only NBP events, NBP unresolved: hidden; NBP licence established: shown again', async () => {
+    const hidden = mkdtempSync(join(tmpdir(), 'published-nbp-cal-'));
+    layers.push(hidden);
+    cpSync(FIXTURES, hidden, { recursive: true });
+    nbpOnly(hidden);
+    expect(calendarEvents(readCalendar(hidden))).toBe(0);
+    expect(await flags(hidden)).toEqual([false, false]);
+    const licensed = licensedLayer();
+    layers.push(licensed);
+    nbpOnly(licensed);
+    expect(calendarEvents(readCalendar(licensed))).toBe(1);
+    expect(await flags(licensed)).toEqual([true, true]);
+  });
+  test('no calendar file: hidden', () => {
+    expect(calendarEvents(null)).toBe(0);
+  });
+});

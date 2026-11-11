@@ -18,6 +18,7 @@ export default function App({
   spotlightMap,
   chartOfDay,
   chartOfDayChart,
+  calendar = false,
   locale,
 }: {
   tiles: TodayTile[];
@@ -28,6 +29,8 @@ export default function App({
   chartOfDay: HomeChartOfDay | null;
   /** The series chart and its table for the chart of the day; the chart is client-only (D25). */
   chartOfDayChart?: ReactNode;
+  /** The release calendar has events: show its subscribe links. */
+  calendar?: boolean;
   locale: Locale;
 }) {
   return (
@@ -38,7 +41,7 @@ export default function App({
       <main className="flex-1">
         <h1 className="sr-only">{pages.find((p) => p.path === '/')!.title[locale]}</h1>
         <TodayStrip tiles={tiles} locale={locale} />
-        <HomeChanges items={items} sources={sources} locale={locale} />
+        <HomeChanges items={items} sources={sources} calendar={calendar} locale={locale} />
 
         <HomeSpotlight data={spotlight} locale={locale}>
           {spotlightMap}

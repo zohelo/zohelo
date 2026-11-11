@@ -17,12 +17,12 @@ const items: ChangeItem[] = Array.from({ length: 12 }, (_, i) => ({
 
 describe('HomeChanges', () => {
   test('12 items show 10', () => {
-    const html = renderToStaticMarkup(<HomeChanges items={items} sources={sources} locale="pl" />);
+    const html = renderToStaticMarkup(<HomeChanges items={items} sources={sources} calendar locale="pl" />);
     expect(html.match(/<li/g)).toHaveLength(10);
   });
 
   test('Polish heading and link', () => {
-    const html = renderToStaticMarkup(<HomeChanges items={items} sources={sources} locale="pl" />);
+    const html = renderToStaticMarkup(<HomeChanges items={items} sources={sources} calendar locale="pl" />);
     expect(html).toContain('Co się zmieniło');
     expect(html).toContain('href="/changes"');
     expect(html).toContain('webcal://zohelo.com/calendar.ics');
@@ -30,7 +30,7 @@ describe('HomeChanges', () => {
   });
 
   test('English heading and link', () => {
-    const html = renderToStaticMarkup(<HomeChanges items={items} sources={sources} locale="en" />);
+    const html = renderToStaticMarkup(<HomeChanges items={items} sources={sources} calendar locale="en" />);
     expect(html).toContain('What changed');
     expect(html).toContain('href="/en/changes"');
     expect(html).toContain('Subscribe to the release calendar');
@@ -39,5 +39,10 @@ describe('HomeChanges', () => {
   test('no items show the empty text', () => {
     const html = renderToStaticMarkup(<HomeChanges items={[]} sources={sources} locale="en" />);
     expect(html).toContain('No changes in the last 30 days.');
+  });
+
+  test('no subscribe links while the calendar has no events (#469)', () => {
+    const html = renderToStaticMarkup(<HomeChanges items={items} sources={sources} locale="pl" />);
+    expect(html).not.toContain('calendar.ics');
   });
 });

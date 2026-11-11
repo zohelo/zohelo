@@ -7,7 +7,7 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { parquetReadObjects } from 'hyparquet';
 import { compressors } from 'hyparquet-compressors';
-import { gateCatalog, gateChanges, gateLatest, gateSeries } from './licenceGate';
+import { gateCalendar, gateCatalog, gateChanges, gateLatest, gateSeries } from './licenceGate';
 
 export type KpiDimension = { dimension_key: string; member_count: number; levels: string[] };
 
@@ -181,6 +181,23 @@ export function readKpiLatestUngated(dir: string, kpiKey: string): KpiLatest {
 export function readKpiLatest(dir: string, kpiKey: string): KpiLatest {
   const latest = readKpiLatestUngated(dir, kpiKey);
   return gateLatest(readCatalogUngated(dir), latest);
+}
+
+/**
+ * feed/calendar.ics without the events of hidden sources and KPIs, as the build writes it to
+ * /calendar.ics; null when the layer has no calendar. Throws when the file is not an iCalendar file.
+ */
+export function readCalendar(dir: string): string | null {
+  const path = join(dir, 'feed', 'calendar.ics');
+  if (!existsSync(path)) return null;
+  const text = readFileSync(path, 'utf8');
+  if (!text.startsWith('BEGIN:VCALENDAR')) throw invalid(path);
+  return gateCalendar(readCatalogUngated(dir), text);
+}
+
+/** The number of events in an iCalendar text. Pure. */
+export function calendarEvents(ics: string | null): number {
+  return ics === null ? 0 : (ics.match(/^BEGIN:VEVENT/gm) ?? []).length;
 }
 
 /** The what-changed feed without the items of hidden sources. */

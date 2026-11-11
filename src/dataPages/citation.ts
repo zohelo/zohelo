@@ -1,5 +1,5 @@
-// The citation shown with every /data download:
-// 'zohelo (<year>), <KPI>, source <source dataset>, accessed <date>'. Pure.
+// A citation line for a KPI: 'zohelo (<year>), <KPI>, source <source dataset>, accessed <date>'.
+// Not shown on any page yet. Pure.
 
 export type CitationInput = {
   kpiName: string;
