@@ -15,6 +15,7 @@ export const pl = {
     foundedBy: 'Założyciel:',
     founder: 'Radosław Utkała',
     sources: 'Źródła danych:',
+    dataAsOf: 'Dane z',
   },
   products: {
     heading: 'Produkty',

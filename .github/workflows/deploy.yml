@@ -1,11 +1,15 @@
 name: Deploy zohelo.com
 
-# zohelo.com on Cloudflare Pages (a static site, no Pages Functions). Push to main deploys
+# zohelo.com on Cloudflare Pages (a static site, no Pages Functions). Push to main, and the schedule below, deploys
 # production and keeps zohelo.com and www.zohelo.com pointed at it; a manual run on a branch deploys a preview <branch>.<project>.pages.dev.
 
 on:
   push:
     branches: [main]
+  schedule:
+    # The published layer changes without a merge: rebuild production four times a day, off the hour
+    # (UTC), after the zohelo-data morning runs. A scheduled run is a run on main: the same as a push.
+    - cron: '40 5,9,13,18 * * *'
   workflow_dispatch:
 
 permissions:

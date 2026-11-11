@@ -9,6 +9,13 @@
 | bi.zohelo.com | Merge to `main` in zohelo-bi → **Deploy portal**; a manual run on a branch deploys a preview. |
 | Scheduler Worker | zohelo-data → Actions → **Ops · ad-hoc**, script `scheduler_trigger`, args `deploy` (also `status`, `pause`, `resume`). |
 
+### Scheduled rebuild of zohelo.com
+
+**Deploy zohelo.com** also runs on a schedule (05:40, 09:40, 13:40 and 18:40 UTC), so the numbers follow the published layer without a merge. A scheduled run is a run on `main` and does exactly what a push does: install, type check, fetch the published layer (`--require`), build, deploy, check the site answers, release. The footer of every page shows "Dane z" (EN "Data as of") the catalogue's `generated_at` in Warsaw time, so you can see which publication a deploy carries.
+
+- A failed fetch or build fails the run before the deploy step and leaves the previous deploy live. Nothing is half-published. Read the failed run, fix the cause (credential, layer, code); the next scheduled run, or a manual run on `main`, retries. An unchanged layer is not an error: the run succeeds and redeploys the same numbers.
+- GitHub pauses scheduled workflows in a repository after 60 days without repository activity (GitHub emails a warning first). Merges and pushes count as activity. If the schedule has paused, re-enable it under Actions → Deploy zohelo.com. The fallback while it is paused is a dispatch of the workflow from the zohelo-data scheduler (Ops `scheduler_trigger deploy`, see the table above).
+
 Each deploy checks itself. zohelo.com: the site answers. data and bi: sign-in is enforced; bi also runs a smoke test against the lakehouse before deploying.
 
 ## Rotate a credential

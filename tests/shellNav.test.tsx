@@ -99,3 +99,34 @@ describe('shell navigation', () => {
     expect(footer.match(/min-h-6/g)?.length).toBe(footerLinks);
   });
 });
+
+describe('footer data date (#470)', () => {
+  test('warsawStamp shows the catalogue date in Warsaw time, winter and summer', async () => {
+    const { warsawStamp } = await import('../src/dataAsOf');
+    expect(warsawStamp('2026-11-11T08:40:00Z', 'pl')).toBe('11.11.2026 09:40');
+    expect(warsawStamp('2026-07-01T22:30:00Z', 'pl')).toBe('02.07.2026 00:30');
+    expect(warsawStamp('2026-11-11T08:40:00Z', 'en')).toBe('11 Nov 2026, 09:40');
+    expect(warsawStamp('nonsense', 'pl')).toBe('');
+  });
+
+  test('Footer prints "Dane z" / "Data as of" with the date, nothing without it', () => {
+    const pl = renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/']}>
+        <Footer dataAsOf="11.11.2026 09:40" />
+      </MemoryRouter>,
+    );
+    expect(pl).toContain('Dane z 11.11.2026 09:40');
+    const en = renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/en']}>
+        <Footer dataAsOf="11 Nov 2026, 09:40" />
+      </MemoryRouter>,
+    );
+    expect(en).toContain('Data as of 11 Nov 2026, 09:40');
+    const none = renderToStaticMarkup(
+      <MemoryRouter initialEntries={['/']}>
+        <Footer />
+      </MemoryRouter>,
+    );
+    expect(none).not.toContain('Dane z');
+  });
+});

@@ -10,7 +10,8 @@ const links = [
 ] as const;
 
 /** `sources`: the names of the sources that feed something shown, in the page language, read by the root loader at build. */
-export const Footer: React.FC<{ sources?: string[] }> = ({ sources = [] }) => {
+/** `dataAsOf`: the catalog's generated_at as a Warsaw date and time, shown on every page (zohelo#470). */
+export const Footer: React.FC<{ sources?: string[]; dataAsOf?: string }> = ({ sources = [], dataAsOf = '' }) => {
   const t = useT();
   const locale = useLocale();
   return (
@@ -69,6 +70,7 @@ export const Footer: React.FC<{ sources?: string[] }> = ({ sources = [] }) => {
             </span>
           </div>
         </div>
+        {dataAsOf ? <p className="pt-3 text-xs text-slate-400">{t.footer.dataAsOf} {dataAsOf}</p> : null}
       </div>
     </footer>
   );
