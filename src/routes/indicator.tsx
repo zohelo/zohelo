@@ -11,7 +11,7 @@ import { SeriesTable } from '../indicators/SeriesTable';
 import { footerProps, kpiSources } from '../indicators/sources';
 import { latestTile, type LatestTile } from '../indicators/tile';
 import { unitLabel } from '../indicators/unitLabel';
-import { NO_LATEST, publishedDir, readCatalog, readGeo, readKpiLatest } from '../published';
+import { calendarEvents, NO_LATEST, publishedDir, readCalendar, readCatalog, readGeo, readKpiLatest } from '../published';
 import { RankingTable } from '../regions/RankingTable';
 import { rankRegions } from '../regions/ranking';
 import { breadcrumbJsonLd, datasetJsonLd, pageMeta } from '../seo';
@@ -39,6 +39,9 @@ export async function loader({ request, params }: { request: Request; params: { 
     locale,
   );
 
+  // The subscribe links only while the gated calendar has events (zohelo#469: today all NBP).
+  const calendar = calendarEvents(readCalendar(dir)) > 0;
+
   if (NO_LATEST.includes(kpi.kpi_key)) {
     const unit = unitLabel(catalog.units, kpi.unit_key, locale);
     const tile: LatestTile = { label: name, value: null, unit, delta: null, period: '', previousPeriod: null, sourceKey: null, checkedAt: null, provisional: false };
@@ -56,6 +59,7 @@ export async function loader({ request, params }: { request: Request; params: { 
       series: null,
       definition: definitionOf(kpi.kpi_key, locale),
       band: null,
+      calendar,
     };
   }
 
@@ -88,6 +92,7 @@ export async function loader({ request, params }: { request: Request; params: { 
     description: indicatorDescription(name, tile, sources.sources.map((s) => s.name), locale),
     definition: definitionOf(kpi.kpi_key, locale),
     band: series ? bandOf(kpi.kpi_key, series.sourceKey, locale) : null,
+    calendar,
   };
 }
 
@@ -106,7 +111,7 @@ export function meta({
 }
 
 export default function Indicator() {
-  const { tile, sources, series, ranking, geo, jsonLd, breadcrumb, name, lastPeriod, definition, band } = useLoaderData<typeof loader>();
+  const { tile, sources, series, ranking, geo, jsonLd, breadcrumb, name, lastPeriod, definition, band, calendar } = useLoaderData<typeof loader>();
   const locale = useLocale();
   // The chart is client-only (D25): rendered after hydration; the table is in the pre-rendered page.
   const [mounted, setMounted] = useState(false);
@@ -141,9 +146,11 @@ export default function Indicator() {
       <div className="mt-10">
         <SourceFooter {...sources} date={tile.checkedAt ?? (tile.period || lastPeriod)} locale={locale} />
       </div>
-      <div className="mt-4">
-        <SubscribeCalendar locale={locale} />
-      </div>
+      {calendar ? (
+        <div className="mt-4">
+          <SubscribeCalendar locale={locale} />
+        </div>
+      ) : null}
     </main>
   );
 }
