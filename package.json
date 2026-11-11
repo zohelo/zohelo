@@ -31,16 +31,16 @@
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
     "@react-router/dev": "7.18.5",
-    "@tailwindcss/vite": "^4.1.14",
+    "@tailwindcss/vite": "^4.3.5",
     "@types/node": "^22.20.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "hyparquet-writer": "^0.18.0",
-    "playwright": "1.63.0",
-    "tailwindcss": "^4.1.14",
+    "playwright": "1.65.0",
+    "tailwindcss": "^4.3.5",
     "typescript": "~5.9.3",
     "vite": "^6.4.5",
-    "wrangler": "4.152.0"
+    "wrangler": "4.158.0"
   },
   "overrides": {
     "undici": "7.30.1"
