@@ -9,7 +9,7 @@ const links = [
   { key: 'sources', path: '/sources' },
 ] as const;
 
-/** `sources`: the catalogue's source names in the page language, read by the root loader at build. */
+/** `sources`: the names of the sources that feed something shown, in the page language, read by the root loader at build. */
 export const Footer: React.FC<{ sources?: string[] }> = ({ sources = [] }) => {
   const t = useT();
   const locale = useLocale();

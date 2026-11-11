@@ -30,8 +30,8 @@ export const productsList: ProductItem[] = [
   {
     id: 'data',
     name: 'Dane i API',
-    oneLine: 'Pliki do pobrania, licencje i cytowania; później publiczne API.',
-    en: { name: 'Data and API', oneLine: 'Downloads, licences and citations; a public API later.' },
+    oneLine: 'Źródła, licencje i cytowania; później publiczne API.',
+    en: { name: 'Data and API', oneLine: 'Sources, licences and citations; a public API later.' },
     status: 'live',
     href: '/sources',
   },
@@ -42,12 +42,5 @@ export const productsList: ProductItem[] = [
     en: { name: 'Portfolio', oneLine: 'Case studies: dashboards on demo and public data.' },
     status: 'concept',
     href: '/portfolio',
-  },
-  {
-    id: 'markets',
-    name: 'Rynki',
-    oneLine: 'Kursy walut i stopy NBP z otwartych danych.',
-    en: { name: 'Markets', oneLine: 'Exchange rates and NBP rates from open data.' },
-    status: 'concept',
   },
 ];

@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//zohelo//release calendar (fixture)//PL
+BEGIN:VEVENT
+UID:20260115T100000Z-eurostat-inflation@zohelo.com
+DTSTAMP:20260101T000000Z
+DTSTART:20260115T100000Z
+SUMMARY:Eurostat: HICP (przykład)
+URL:https://example.invalid/eurostat
+END:VEVENT
+BEGIN:VEVENT
+UID:20260115T111500Z-nbp-fx_rate@zohelo.com
+DTSTAMP:20260101T000000Z
+DTSTART:20260115T111500Z
+SUMMARY:NBP: tabela A (przykład)
+URL:https://example.invalid/nbp
+END:VEVENT
+END:VCALENDAR

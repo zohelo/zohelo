@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 import { sourceRows } from '../src/dataPages/sources';
-import { readCatalog } from '../src/published';
+import { readCatalogUngated } from '../src/published';
 
-const catalog = readCatalog('fixtures/published');
+// The catalog as published, NBP included: the page model is pure; the gate is tested in licenceGate.test.ts.
+const catalog = readCatalogUngated('fixtures/published');
 const row = (locale: 'pl' | 'en', key: string, c = catalog) => sourceRows(c, locale).find((r) => r.source_key === key)!;
 
 describe('sourceRows', () => {
@@ -11,10 +12,12 @@ describe('sourceRows', () => {
       'Bank Światowy – WDI',
       'Eurostat',
       'GUS – Bank Danych Lokalnych',
+      'GUS Dziedzinowe Bazy Wiedzy',
       'Narodowy Bank Polski',
     ]);
     expect(sourceRows(catalog, 'en').map((r) => r.name)).toEqual([
       'Eurostat',
+      'GUS Knowledge Databases',
       'National Bank of Poland',
       'Statistics Poland – Local Data Bank',
       'World Bank – WDI',
@@ -26,6 +29,17 @@ describe('sourceRows', () => {
     expect(row('en', 'nbp').kpis).toEqual([{ kpi_key: 'fx_rate', name: expect.any(String), href: '/en/indicators/fx_rate' }]);
     expect(row('pl', 'eurostat').kpis).toHaveLength(3);
     expect(row('pl', 'eurostat').licence?.name).toBe('Creative Commons Attribution 4.0');
+  });
+
+  test('the /sources loader reads the gated catalog: no hidden source, no "Terms not established"', async () => {
+    const previous = process.env.PUBLISHED_DIR;
+    process.env.PUBLISHED_DIR = 'fixtures/published';
+    const { loader } = await import('../src/routes/sources');
+    const { rows } = await loader({ request: new Request('http://x/sources') });
+    if (previous === undefined) delete process.env.PUBLISHED_DIR;
+    else process.env.PUBLISHED_DIR = previous;
+    expect(rows.map((r) => r.source_key).sort()).toEqual(['eurostat', 'gus_bdl', 'gus_dbw', 'world_bank_wdi']);
+    expect(JSON.stringify(rows)).not.toContain('Terms not established');
   });
 
   test('last_loaded is the latest loaded_at of the fed KPIs', () => {

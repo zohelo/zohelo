@@ -262,8 +262,15 @@
       "source_key": "nbp",
       "name_pl": "Narodowy Bank Polski",
       "name_en": "National Bank of Poland",
-      "licence_key": "nbp_terms",
+      "licence_key": "unresolved",
       "register_id": "PLG-001"
+    },
+    {
+      "source_key": "gus_dbw",
+      "name_pl": "GUS Dziedzinowe Bazy Wiedzy",
+      "name_en": "GUS Knowledge Databases",
+      "licence_key": "gus_copyright",
+      "register_id": "PLS-002"
     }
   ],
   "licences": [
@@ -282,11 +289,18 @@
       "commercial_ok": true
     },
     {
-      "licence_key": "nbp_terms",
-      "name": "NBP terms of use (illustrative)",
-      "url": "https://example.invalid/nbp",
-      "attribution_text": "Źródło: NBP (illustrative)",
-      "commercial_ok": true
+      "licence_key": "gus_copyright",
+      "name": "GUS copyright terms (source required; commercial reuse not addressed)",
+      "url": "https://stat.gov.pl/copyright",
+      "attribution_text": "Źródło: GUS, Dziedzinowe Bazy Wiedzy / Source: Statistics Poland, DBW",
+      "commercial_ok": false
+    },
+    {
+      "licence_key": "unresolved",
+      "name": "Terms not established",
+      "url": "https://example.invalid/register",
+      "attribution_text": "Source: see the source register",
+      "commercial_ok": false
     }
   ]
 }

@@ -5,6 +5,7 @@ import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { SampleDataBanner } from './components/SampleDataBanner';
 import { localeOf, useLocale, useT } from './i18n';
+import { feedingSources } from './licenceGate';
 import { isFixtureLayer, publishedDir, readCatalog } from './published';
 import {
   isRouteErrorResponse,
@@ -19,11 +20,11 @@ import {
 import { CONTAINER } from './components/container';
 
 // Runs at build only (ssr: false): a build from fixtures/published marks every page as sample data,
-// and the footer names the catalogue's sources in the page language.
+// and the footer names, in the page language, the shown sources that feed a published KPI (zohelo#469).
 export async function loader({ request }: { request: Request }) {
   const dir = publishedDir();
   const locale = localeOf(new URL(request.url).pathname);
-  const sources = readCatalog(dir).sources.map((s) => (locale === 'pl' ? s.name_pl : s.name_en));
+  const sources = feedingSources(readCatalog(dir)).map((s) => (locale === 'pl' ? s.name_pl : s.name_en));
   return { sample: isFixtureLayer(dir), sources };
 }
 

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { footerProps, kpiSources } from '../src/indicators/sources';
-import { readCatalog } from '../src/published';
+import { readCatalog, readCatalogUngated } from '../src/published';
 
 const catalog = readCatalog('fixtures/published');
 
@@ -22,7 +22,7 @@ describe('kpiSources', () => {
   });
 
   test('an unknown source_key is skipped', () => {
-    const copy = structuredClone(catalog);
+    const copy = structuredClone(readCatalogUngated('fixtures/published'));
     copy.kpis.find((k) => k.kpi_key === 'fx_rate')!.source_keys = ['nope', 'nbp'];
     expect(kpiSources(copy, 'fx_rate', 'pl').map((s) => s.source_key)).toEqual(['nbp']);
   });

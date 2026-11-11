@@ -21,7 +21,7 @@ describe('ProductsSection (#390)', () => {
     const live = productsList.filter((p) => p.status === 'live');
     expect(live.map((p) => p.id).sort()).toEqual(['data', 'indicators', 'regions']);
     for (const p of live) expect(p.href).toBeString();
-    expect(productsList.filter((p) => p.status === 'concept').map((p) => p.id).sort()).toEqual(['brief', 'markets', 'portfolio']);
+    expect(productsList.filter((p) => p.status === 'concept').map((p) => p.id).sort()).toEqual(['brief', 'portfolio']);
   });
 
   test('live cards are links to their page in the current language; concept cards are not links', () => {
@@ -39,9 +39,9 @@ describe('ProductsSection (#390)', () => {
     expect(en).toContain('>Live<');
     expect(en).toContain('>Concept<');
     expect(en).toContain('>Indicators<');
-    expect(en).toContain('Exchange rates and NBP rates');
     expect(en).not.toContain('Koncepcja');
-    // Rynki/Markets has no page and no link
-    expect(en).not.toContain('href="/en/markets"');
+    // No Rynki/Markets card while NBP's reuse terms are not established (#469)
+    expect(en).not.toContain('Exchange rates and NBP rates');
+    expect(pl).not.toContain('Rynki');
   });
 });
